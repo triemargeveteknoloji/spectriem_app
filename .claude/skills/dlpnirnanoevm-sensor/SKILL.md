@@ -2,9 +2,23 @@
 
 Texas Instruments DLP NIRscan Nano EVM sensörü ile Bluetooth Low Energy üzerinden iletişim kurma rehberi.
 
+## Referans Dokümantasyonu
+
+Detaylı teknik bilgiler için aşağıdaki referans dosyalarına bakınız:
+
+| Dosya | İçerik |
+|-------|--------|
+| [refs/gatt-uuids.md](refs/gatt-uuids.md) | Tüm GATT servisleri ve karakteristik UUID'leri |
+| [refs/commands.md](refs/commands.md) | GCS komut referansı (80+ komut) |
+| [refs/scan-workflow.md](refs/scan-workflow.md) | BLE bağlantı ve tarama iş akışları |
+| [refs/data-formats.md](refs/data-formats.md) | Veri parse/serialize formatları |
+| [refs/error-codes.md](refs/error-codes.md) | Hata kodları ve troubleshooting |
+| [refs/hardware-specs.md](refs/hardware-specs.md) | Donanım özellikleri ve elektronik |
+
 ## Sensör Genel Bilgileri
 
 ### Donanım Özellikleri
+> 📖 Detay: [refs/hardware-specs.md](refs/hardware-specs.md)
 - **Model:** DLPNIRNANOEVM (DLP NIRscan Nano EVM)
 - **DMD:** DLP2010NIR Digital Micromirror Device
 - **MCU:** Tiva TM4C1297NCZAD (TI RTOS, Bluetopia stack)
@@ -53,6 +67,7 @@ scanFilter: ScanFilter(
 ```
 
 ## GATT Servisleri ve Karakteristikleri
+> 📖 Detay: [refs/gatt-uuids.md](refs/gatt-uuids.md)
 
 ### 1. Device Information Service (DIS)
 Standard Bluetooth SIG servisi.
@@ -131,6 +146,7 @@ Standard Bluetooth SIG servisi.
 | `GSDIS_RET_SER_SCAN_DATA_STRUCT` | Serileştirilmiş tarama verisi dön | Notify |
 
 ## Komut ve Veri Akışları
+> 📖 Detay: [refs/scan-workflow.md](refs/scan-workflow.md) | [refs/commands.md](refs/commands.md)
 
 ### Notification Subscription Sırası
 Bağlantı sonrası descriptor'lar bu sırayla yazılmalı:
@@ -220,6 +236,7 @@ void startScan(bool saveToSD) {
 ```
 
 ## Veri Formatları
+> 📖 Detay: [refs/data-formats.md](refs/data-formats.md)
 
 ### Sıcaklık/Nem
 ```dart
@@ -294,6 +311,7 @@ class MockSpectrumGenerator {
 ```
 
 ## Hata Durumları
+> 📖 Detay: [refs/error-codes.md](refs/error-codes.md)
 
 ### Yaygın Hatalar
 | Kod | Açıklama | Çözüm |

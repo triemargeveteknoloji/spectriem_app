@@ -2,232 +2,369 @@ import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 
 /// GATT UUIDs for NIRScan Nano communication.
 ///
-/// Based on Texas Instruments DLP NIRscan Nano EVM SDK.
-/// Reference: https://github.com/kstechnologies/NIRScanNano_Android
+/// Based on Texas Instruments DLP NIRscan Nano EVM User's Guide (DLPU030G).
+/// Reference: Appendix J (Table J-1 through J-9)
+///
+/// Custom UUID Base Pattern:
+/// ```
+/// XXXXXXXX-444C-5020-4E49-52204E616E6F
+///          "DL P NI R Nano" (ASCII)
+/// ```
 class NanoGatt {
   NanoGatt._();
+
+  // ============================================
+  // Standard Bluetooth SIG UUIDs
+  // ============================================
 
   /// Client Characteristic Configuration Descriptor UUID
   static final Guid cccdUuid = Guid('00002902-0000-1000-8000-00805f9b34fb');
 
   // ============================================
-  // Device Information Service (DIS)
-  // Standard Bluetooth SIG Service
+  // Service UUIDs
   // ============================================
 
-  /// Manufacturer Name characteristic
+  /// Device Information Service (Bluetooth SIG Standard)
+  static final Guid disService = Guid('0000180a-0000-1000-8000-00805f9b34fb');
+
+  /// Battery Service (Bluetooth SIG Standard)
+  static final Guid basService = Guid('0000180f-0000-1000-8000-00805f9b34fb');
+
+  /// GATT General Information Service (Custom TI)
+  static final Guid ggisService = Guid('53455201-444c-5020-4e49-52204e616e6f');
+
+  /// GATT Command Service (Custom TI)
+  static final Guid gcsService = Guid('53455202-444c-5020-4e49-52204e616e6f');
+
+  /// GATT Date and Time Service (Custom TI)
+  static final Guid gdtsService = Guid('53455203-444c-5020-4e49-52204e616e6f');
+
+  /// GATT Calibration Information Service (Custom TI)
+  static final Guid gcisService = Guid('53455204-444c-5020-4e49-52204e616e6f');
+
+  /// GATT Scan Configuration Service (Custom TI)
+  static final Guid gscisService = Guid('53455205-444c-5020-4e49-52204e616e6f');
+
+  /// GATT Scan Data Information Service (Custom TI)
+  static final Guid gsdisService = Guid('53455206-444c-5020-4e49-52204e616e6f');
+
+  // ============================================
+  // Device Information Service (DIS) - 0x180A
+  // Standard Bluetooth SIG Characteristics
+  // ============================================
+
+  /// Manufacturer Name String (Read)
   static final Guid disManufName = Guid('00002a29-0000-1000-8000-00805f9b34fb');
 
-  /// Model Number characteristic
+  /// Model Number String (Read)
   static final Guid disModelNumber =
       Guid('00002a24-0000-1000-8000-00805f9b34fb');
 
-  /// Serial Number characteristic
+  /// Serial Number String (Read)
   static final Guid disSerialNumber =
       Guid('00002a25-0000-1000-8000-00805f9b34fb');
 
-  /// Hardware Revision characteristic
+  /// Hardware Revision String (Read)
   static final Guid disHwRev = Guid('00002a27-0000-1000-8000-00805f9b34fb');
 
-  /// Tiva Firmware Revision characteristic
+  /// Tiva Firmware Revision String (Read)
   static final Guid disTivaFwRev = Guid('00002a26-0000-1000-8000-00805f9b34fb');
 
-  /// Spectrum C Library Revision characteristic
+  /// Spectrum C Library Revision (Read) - uint16
   static final Guid disSpeccRev = Guid('00002a28-0000-1000-8000-00805f9b34fb');
 
   // ============================================
-  // Battery Service (BAS)
-  // Standard Bluetooth SIG Service
+  // Battery Service (BAS) - 0x180F
+  // Standard Bluetooth SIG Characteristics
   // ============================================
 
-  /// Battery Level characteristic (0-100)
+  /// Battery Level (Read) - uint8, 0-100%
   static final Guid basBattLvl = Guid('00002a19-0000-1000-8000-00805f9b34fb');
 
   // ============================================
-  // General Information Service (GGIS)
-  // Custom TI Service
+  // GATT General Information Service (GGIS)
+  // Service UUID: 53455201-444C-5020-4E49-52204E616E6F
   // ============================================
 
-  /// Temperature Measurement characteristic
+  /// Temperature Measurement (Read/Notify) - int16, value/100 = °C
   static final Guid ggisTempMeasurement =
-      Guid('00002a1c-0000-1000-8000-00805f9b34fb');
+      Guid('43484101-444c-5020-4e49-52204e616e6f');
 
-  /// Humidity Measurement characteristic
+  /// Humidity Measurement (Read/Notify) - uint16, value/100 = %
   static final Guid ggisHumidMeasurement =
-      Guid('00002a6f-0000-1000-8000-00805f9b34fb');
+      Guid('43484102-444c-5020-4e49-52204e616e6f');
 
-  /// Device Status characteristic
+  /// Device Status (Read/Notify) - uint16
   static final Guid ggisDevStatus =
-      Guid('00002a1d-0000-1000-8000-00805f9b34fb');
+      Guid('43484103-444c-5020-4e49-52204e616e6f');
 
-  /// Error Status characteristic
+  /// Error Status (Read/Notify) - uint16
   static final Guid ggisErrStatus =
-      Guid('00002a1e-0000-1000-8000-00805f9b34fb');
+      Guid('43484104-444c-5020-4e49-52204e616e6f');
 
-  /// Temperature Threshold characteristic
+  /// Temperature Threshold (Write) - int16, value*100
   static final Guid ggisTempThresh =
-      Guid('00002a1f-0000-1000-8000-00805f9b34fb');
+      Guid('43484105-444c-5020-4e49-52204e616e6f');
 
-  /// Humidity Threshold characteristic
+  /// Humidity Threshold (Write) - uint16, value*100
   static final Guid ggisHumidThresh =
-      Guid('00002a20-0000-1000-8000-00805f9b34fb');
+      Guid('43484106-444c-5020-4e49-52204e616e6f');
 
-  /// Hours of Use characteristic
+  /// Hours of Use (Read) - uint16
   static final Guid ggisHoursOfUse =
-      Guid('00002a21-0000-1000-8000-00805f9b34fb');
+      Guid('43484107-444c-5020-4e49-52204e616e6f');
 
-  /// Number of Battery Recharge cycles characteristic
+  /// Number of Battery Recharge Cycles (Read) - uint16
   static final Guid ggisNumBattRecharge =
-      Guid('00002a22-0000-1000-8000-00805f9b34fb');
+      Guid('43484108-444c-5020-4e49-52204e616e6f');
 
-  /// Lamp Hours characteristic
+  /// Total Lamp Hours (Read) - uint16
   static final Guid ggisLampHours =
-      Guid('00002a23-0000-1000-8000-00805f9b34fb');
+      Guid('43484109-444c-5020-4e49-52204e616e6f');
 
-  /// Error Log characteristic
-  static final Guid ggisErrLog = Guid('00002a2a-0000-1000-8000-00805f9b34fb');
-
-  // ============================================
-  // Date/Time Service (GDTS)
-  // ============================================
-
-  /// Time characteristic
-  static final Guid gdtsTime = Guid('00002a2b-0000-1000-8000-00805f9b34fb');
+  /// Error Log (Read) - string
+  static final Guid ggisErrLog = Guid('4348410a-444c-5020-4e49-52204e616e6f');
 
   // ============================================
-  // Calibration Information Service (GCIS)
+  // GATT Command Service (GCS)
+  // Service UUID: 53455202-444C-5020-4E49-52204E616E6F
   // ============================================
 
-  /// Request Spectrum Calibration Coefficients
+  /// Command Data Packet (Write/Notify)
+  /// Write: Send command, Notify: Receive response
+  /// Packet format: [cmd0, cmd1, flag, length, ...params]
+  /// Flag: 0x03=Write, 0x05=Read
+  static final Guid gcsCommandPacket =
+      Guid('4348410b-444c-5020-4e49-52204e616e6f');
+
+  // ============================================
+  // GATT Date and Time Service (GDTS)
+  // Service UUID: 53455203-444C-5020-4E49-52204E616E6F
+  // ============================================
+
+  /// Current Date/Time (Write) - 7 bytes
+  /// Format: [year, month, day, dayOfWeek, hour, minute, second]
+  /// Year: 0-99 (offset from 2000)
+  static final Guid gdtsTime = Guid('4348410c-444c-5020-4e49-52204e616e6f');
+
+  // ============================================
+  // GATT Calibration Information Service (GCIS)
+  // Service UUID: 53455204-444C-5020-4E49-52204E616E6F
+  // ============================================
+
+  /// Request Spectrum Calibration Coefficients (Write) - uint8
   static final Guid gcisReqSpecCalCoeff =
-      Guid('00002a30-0000-1000-8000-00805f9b34fb');
+      Guid('4348410d-444c-5020-4e49-52204e616e6f');
 
-  /// Return Spectrum Calibration Coefficients
+  /// Return Spectrum Calibration Coefficients (Notify) - Multi-packet
+  /// Contains 6 doubles (48 bytes): p0-p4 polynomial + shift
   static final Guid gcisRetSpecCalCoeff =
-      Guid('00002a31-0000-1000-8000-00805f9b34fb');
+      Guid('4348410e-444c-5020-4e49-52204e616e6f');
 
-  /// Request Reference Calibration Coefficients
+  /// Request Reference Calibration Coefficients (Write) - uint8
   static final Guid gcisReqRefCalCoeff =
-      Guid('00002a32-0000-1000-8000-00805f9b34fb');
+      Guid('4348410f-444c-5020-4e49-52204e616e6f');
 
-  /// Return Reference Calibration Coefficients
+  /// Return Reference Calibration Coefficients (Notify) - Multi-packet
   static final Guid gcisRetRefCalCoeff =
-      Guid('00002a33-0000-1000-8000-00805f9b34fb');
+      Guid('43484110-444c-5020-4e49-52204e616e6f');
 
-  /// Request Reference Calibration Matrix
+  /// Request Reference Calibration Matrix (Write) - uint8
   static final Guid gcisReqRefCalMatrix =
-      Guid('00002a34-0000-1000-8000-00805f9b34fb');
+      Guid('43484111-444c-5020-4e49-52204e616e6f');
 
-  /// Return Reference Calibration Matrix
+  /// Return Reference Calibration Matrix (Notify) - Multi-packet
   static final Guid gcisRetRefCalMatrix =
-      Guid('00002a35-0000-1000-8000-00805f9b34fb');
+      Guid('43484112-444c-5020-4e49-52204e616e6f');
 
   // ============================================
-  // Scan Configuration Service (GSCIS)
+  // GATT Scan Configuration Service (GSCIS)
+  // Service UUID: 53455205-444C-5020-4E49-52204E616E6F
   // ============================================
 
-  /// Number of Stored Configurations
+  /// Number of Stored Configurations (Read) - uint16
   static final Guid gscisNumStoredConf =
-      Guid('00002a40-0000-1000-8000-00805f9b34fb');
+      Guid('43484113-444c-5020-4e49-52204e616e6f');
 
-  /// Request Stored Configuration List
+  /// Request Stored Configuration List (Write) - triggers notify
   static final Guid gscisReqStoredConfList =
-      Guid('00002a41-0000-1000-8000-00805f9b34fb');
+      Guid('43484114-444c-5020-4e49-52204e616e6f');
 
-  /// Return Stored Configuration List
+  /// Return Stored Configuration List (Notify) - Multi-packet
+  /// Contains list of 2-byte configuration indices
   static final Guid gscisRetStoredConfList =
-      Guid('00002a42-0000-1000-8000-00805f9b34fb');
+      Guid('43484115-444c-5020-4e49-52204e616e6f');
 
-  /// Request Scan Configuration Data
+  /// Request Scan Configuration Data (Write) - uint16 index
   static final Guid gscisReqScanConfData =
-      Guid('00002a43-0000-1000-8000-00805f9b34fb');
+      Guid('43484116-444c-5020-4e49-52204e616e6f');
 
-  /// Return Scan Configuration Data
+  /// Return Scan Configuration Data (Notify) - Multi-packet
   static final Guid gscisRetScanConfData =
-      Guid('00002a44-0000-1000-8000-00805f9b34fb');
+      Guid('43484117-444c-5020-4e49-52204e616e6f');
 
-  /// Active Scan Configuration
+  /// Active Scan Configuration (Read/Write) - uint16 index
   static final Guid gscisActiveScanConf =
-      Guid('00002a45-0000-1000-8000-00805f9b34fb');
+      Guid('43484118-444c-5020-4e49-52204e616e6f');
 
   // ============================================
-  // Scan Data Information Service (GSDIS)
+  // GATT Scan Data Information Service (GSDIS)
+  // Service UUID: 53455206-444C-5020-4E49-52204E616E6F
   // ============================================
 
-  /// Number of SD Stored Scans
+  /// Number of SD Card Stored Scans (Read) - uint32
   static final Guid gsdisNumSdStoredScans =
-      Guid('00002a50-0000-1000-8000-00805f9b34fb');
+      Guid('43484119-444c-5020-4e49-52204e616e6f');
 
-  /// SD Stored Scan Indices List (request)
+  /// Request SD Stored Scan Indices List (Write) - triggers notify
   static final Guid gsdisSdStoredScanIndList =
-      Guid('00002a51-0000-1000-8000-00805f9b34fb');
+      Guid('4348411a-444c-5020-4e49-52204e616e6f');
 
-  /// SD Stored Scan Indices List Data (response)
+  /// Return SD Stored Scan Indices List (Notify) - Multi-packet
+  /// Contains 5 x 4-byte scan indices per packet
   static final Guid gsdisSdStoredScanIndListData =
-      Guid('00002a52-0000-1000-8000-00805f9b34fb');
+      Guid('4348411b-444c-5020-4e49-52204e616e6f');
 
-  /// Set Scan Name Stub
+  /// Set Scan Name Stub (Write) - string, max 15 bytes
   static final Guid gsdisSetScanNameStub =
-      Guid('00002a53-0000-1000-8000-00805f9b34fb');
+      Guid('4348411c-444c-5020-4e49-52204e616e6f');
 
-  /// Start Scan
+  /// Start Scan (Write/Notify)
+  /// Write: 0x00=don't save to SD, 0x01=save to SD
+  /// Notify: 0xFF=scan complete, then 4-byte scan index
   static final Guid gsdisStartScan =
-      Guid('00002a54-0000-1000-8000-00805f9b34fb');
+      Guid('4348411d-444c-5020-4e49-52204e616e6f');
 
-  /// Clear Scan
+  /// Clear Scan (Write/Notify) - uint32 scan index to delete
+  /// Notify: 0x00=success, non-zero=error
   static final Guid gsdisClearScan =
-      Guid('00002a55-0000-1000-8000-00805f9b34fb');
+      Guid('4348411e-444c-5020-4e49-52204e616e6f');
 
-  /// Request Scan Name
+  /// Request Scan Name (Write) - uint32 scan index
   static final Guid gsdisReqScanName =
-      Guid('00002a56-0000-1000-8000-00805f9b34fb');
+      Guid('4348411f-444c-5020-4e49-52204e616e6f');
 
-  /// Return Scan Name
+  /// Return Scan Name (Notify) - string, max 20 chars
   static final Guid gsdisRetScanName =
-      Guid('00002a57-0000-1000-8000-00805f9b34fb');
+      Guid('43484120-444c-5020-4e49-52204e616e6f');
 
-  /// Request Scan Type
+  /// Request Scan Type (Write) - uint32 scan index
   static final Guid gsdisReqScanType =
-      Guid('00002a58-0000-1000-8000-00805f9b34fb');
+      Guid('43484121-444c-5020-4e49-52204e616e6f');
 
-  /// Return Scan Type
+  /// Return Scan Type (Notify) - uint8
   static final Guid gsdisRetScanType =
-      Guid('00002a59-0000-1000-8000-00805f9b34fb');
+      Guid('43484122-444c-5020-4e49-52204e616e6f');
 
-  /// Request Scan Date
+  /// Request Scan Date/Time (Write) - uint32 scan index
   static final Guid gsdisReqScanDate =
-      Guid('00002a5a-0000-1000-8000-00805f9b34fb');
+      Guid('43484123-444c-5020-4e49-52204e616e6f');
 
-  /// Return Scan Date
+  /// Return Scan Date/Time (Notify) - 7 bytes (same as GDTS format)
   static final Guid gsdisRetScanDate =
-      Guid('00002a5b-0000-1000-8000-00805f9b34fb');
+      Guid('43484124-444c-5020-4e49-52204e616e6f');
 
-  /// Request Packet Format Version
+  /// Request Packet Format Version (Write) - uint32 scan index
   static final Guid gsdisReqPktFmtVer =
-      Guid('00002a5c-0000-1000-8000-00805f9b34fb');
+      Guid('43484125-444c-5020-4e49-52204e616e6f');
 
-  /// Return Packet Format Version
+  /// Return Packet Format Version (Notify) - uint32
   static final Guid gsdisRetPktFmtVer =
-      Guid('00002a5d-0000-1000-8000-00805f9b34fb');
+      Guid('43484126-444c-5020-4e49-52204e616e6f');
 
-  /// Request Serialized Scan Data Structure
+  /// Request Serialized Scan Data Structure (Write) - uint32 scan index
   static final Guid gsdisReqSerScanDataStruct =
-      Guid('00002a5e-0000-1000-8000-00805f9b34fb');
+      Guid('43484127-444c-5020-4e49-52204e616e6f');
 
-  /// Return Serialized Scan Data Structure
+  /// Return Serialized Scan Data Structure (Notify) - Multi-packet
+  /// Use dlpspec_scan_interpret() to parse
   static final Guid gsdisRetSerScanDataStruct =
-      Guid('00002a5f-0000-1000-8000-00805f9b34fb');
+      Guid('43484128-444c-5020-4e49-52204e616e6f');
+
+  // ============================================
+  // Notification Subscription Order
+  // ============================================
+
+  /// Characteristics that require notification subscription, in order.
+  /// Subscribe to these after service discovery, with ~100ms delay between each.
+  static final List<Guid> notificationCharacteristics = [
+    gcisRetSpecCalCoeff,
+    gcisRetRefCalCoeff,
+    gcisRetRefCalMatrix,
+    gsdisStartScan,
+    gsdisRetScanName,
+    gsdisRetScanType,
+    gsdisRetScanDate,
+    gsdisRetPktFmtVer,
+    gsdisRetSerScanDataStruct,
+    gscisRetStoredConfList,
+    gsdisSdStoredScanIndListData,
+    gsdisClearScan,
+    gscisRetScanConfData,
+  ];
 }
 
-/// Device name patterns for NIRScan Nano discovery
+/// Device name patterns for NIRScan Nano discovery.
 class NanoDevicePatterns {
   NanoDevicePatterns._();
 
+  /// Device name prefix to filter during BLE scan
   static const String namePrefix = 'NIRScan';
+
+  /// Full device name pattern
   static final RegExp namePattern = RegExp(r'NIRScan.*Nano.*');
 
+  /// Check if a device name matches NIRScan Nano pattern
   static bool isNanoDevice(String? name) {
     if (name == null) return false;
     return name.startsWith(namePrefix) || namePattern.hasMatch(name);
   }
+}
+
+/// Scan index representation (4 bytes).
+class ScanIndex {
+  final int b0;
+  final int b1;
+  final int b2;
+  final int b3;
+
+  const ScanIndex(this.b0, this.b1, this.b2, this.b3);
+
+  /// Create from 4-byte list
+  factory ScanIndex.fromBytes(List<int> bytes) {
+    if (bytes.length < 4) {
+      throw ArgumentError('ScanIndex requires 4 bytes');
+    }
+    return ScanIndex(bytes[0], bytes[1], bytes[2], bytes[3]);
+  }
+
+  /// Create from 32-bit integer (little-endian)
+  factory ScanIndex.fromInt(int value) {
+    return ScanIndex(
+      value & 0xFF,
+      (value >> 8) & 0xFF,
+      (value >> 16) & 0xFF,
+      (value >> 24) & 0xFF,
+    );
+  }
+
+  /// Convert to byte list for BLE write
+  List<int> toBytes() => [b0, b1, b2, b3];
+
+  /// Convert to 32-bit integer
+  int toInt() => b0 | (b1 << 8) | (b2 << 16) | (b3 << 24);
+
+  @override
+  String toString() => 'ScanIndex(${toInt()})';
+
+  @override
+  bool operator ==(Object other) =>
+      other is ScanIndex &&
+      b0 == other.b0 &&
+      b1 == other.b1 &&
+      b2 == other.b2 &&
+      b3 == other.b3;
+
+  @override
+  int get hashCode => Object.hash(b0, b1, b2, b3);
 }
