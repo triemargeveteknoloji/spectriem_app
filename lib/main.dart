@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'screens/bluetooth_connection_screen.dart';
+import 'screens/sensor_communication_screen.dart';
 import 'services/ble/mock_nir_scan_service.dart';
 import 'services/logging/log_service.dart';
 
@@ -18,6 +19,7 @@ class SpecTriemApp extends StatefulWidget {
 class _SpecTriemAppState extends State<SpecTriemApp> {
   late final MockNirScanService _bleService;
   late final LogService _logService;
+  int _currentIndex = 0;
 
   @override
   void initState() {
@@ -41,9 +43,40 @@ class _SpecTriemAppState extends State<SpecTriemApp> {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
         useMaterial3: true,
       ),
-      home: BluetoothConnectionScreen(
-        bleService: _bleService,
-        logService: _logService,
+      home: Scaffold(
+        body: IndexedStack(
+          index: _currentIndex,
+          children: [
+            BluetoothConnectionScreen(
+              bleService: _bleService,
+              logService: _logService,
+            ),
+            SensorCommunicationScreen(
+              bleService: _bleService,
+              logService: _logService,
+            ),
+          ],
+        ),
+        bottomNavigationBar: NavigationBar(
+          selectedIndex: _currentIndex,
+          onDestinationSelected: (index) {
+            setState(() {
+              _currentIndex = index;
+            });
+          },
+          destinations: const [
+            NavigationDestination(
+              icon: Icon(Icons.bluetooth),
+              selectedIcon: Icon(Icons.bluetooth_connected),
+              label: 'Connection',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.sensors_outlined),
+              selectedIcon: Icon(Icons.sensors),
+              label: 'Communicate',
+            ),
+          ],
+        ),
       ),
     );
   }
