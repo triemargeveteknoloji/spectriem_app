@@ -647,3 +647,19 @@ await startScanChar.write([scanCmd]);
 - Verify LED turns on
 - Verify scan completes without timeout
 - Check logs for notification receipt
+
+
+**If It Still Fails:**
+
+If the timeout persists after this fix, investigate:
+
+1. **Increase delay duration:** Try 500ms instead of 200ms
+2. **Use persistent listener approach:** Set up listener during connection setup (not in performScan)
+3. **Verify notification subscription:** Check if setNotifyValue(true) actually succeeded
+4. **Try different stream approach:** Use lastValueStream instead of onValueReceived
+5. **Check write acknowledgment:** Try write with response: withoutResponse: false
+6. **Verify UUID correctness:** Confirm 4348411d is correct for your sensor model
+
+---
+
+**S8** (2026-01-27): Systematic debugging (Iron Law) applied. Root cause: flutter_blue_plus .listen() timing issue - notification listener not fully registered at native layer before scan trigger write. Fixed with 200ms delay. Commit: 0a30aed. Ready for device testing.
