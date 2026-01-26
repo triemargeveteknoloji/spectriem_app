@@ -333,12 +333,16 @@ class BleNirScanService implements NirScanService {
 
     // Ensure calibration data is cached (as per protocol Flow 4A)
     final calCached = _cachedRefCalCoeff != null && _cachedRefCalMatrix != null;
-    _logger.info('[SCAN] Calibration check | Cached: $calCached',
-        tag: 'BLE');
+    _logger.info('[SCAN] Calibration check | Cached: $calCached', tag: 'BLE');
     await _ensureCalibrationData();
     _logger.info(
         '[SCAN] Calibration ready | Coeff: ${_cachedRefCalCoeff?.length ?? 0}B | Matrix: ${_cachedRefCalMatrix?.length ?? 0}B',
         tag: 'BLE');
+
+    // Ensure active scan configuration is set (as per protocol Flow 8)
+    _logger.info('[SCAN] Checking active scan configuration...', tag: 'BLE');
+    await _ensureActiveScanConfig();
+    _logger.info('[SCAN] Active scan configuration confirmed', tag: 'BLE');
 
     // 1. Subscribe to start scan notifications and trigger scan
     _logger.info('[SCAN] Finding start scan characteristic...', tag: 'BLE');
@@ -351,8 +355,7 @@ class BleNirScanService implements NirScanService {
 
     // NOTE: We already subscribed to this characteristic during connection setup
     // No need to call setNotifyValue again
-    _logger.info(
-        '[SCAN] Already subscribed to notifications during connection',
+    _logger.info('[SCAN] Already subscribed to notifications during connection',
         tag: 'BLE');
 
     // Create completer to wait for scan complete notification
@@ -478,8 +481,7 @@ class BleNirScanService implements NirScanService {
 
     // Log scan completion
     _logger.info('', tag: 'BLE');
-    _logger.info('[SCAN] ============ SCAN COMPLETED ============',
-        tag: 'BLE');
+    _logger.info('[SCAN] ============ SCAN COMPLETED ============', tag: 'BLE');
     _logger.info('[SCAN] Raw Data Size: ${scanData.rawData.length} bytes',
         tag: 'BLE');
     _logger.info('📝 [SCAN] Name: ${scanData.name}', tag: 'BLE');
@@ -487,8 +489,7 @@ class BleNirScanService implements NirScanService {
     _logger.info('🔢 [SCAN] Type: ${scanData.type}', tag: 'BLE');
     _logger.info('📌 [SCAN] Version: ${scanData.packetFormatVersion}',
         tag: 'BLE');
-    _logger.info(
-        '[SCAN] First 20 bytes: ${scanData.rawData.take(20).toList()}',
+    _logger.info('[SCAN] First 20 bytes: ${scanData.rawData.take(20).toList()}',
         tag: 'BLE');
     _logger.info(
         '[SCAN] Last 20 bytes: ${scanData.rawData.skip(scanData.rawData.length - 20).take(20).toList()}',
@@ -652,14 +653,12 @@ class BleNirScanService implements NirScanService {
 
   /// Fetches reference calibration coefficients (multi-packet)
   Future<List<int>> _fetchCalibrationCoefficients() async {
-    _logger.info('[CAL] Starting calibration coefficient fetch...',
-        tag: 'BLE');
+    _logger.info('[CAL] Starting calibration coefficient fetch...', tag: 'BLE');
     final reqChar = _findCharacteristic(NanoGatt.gcisReqRefCalCoeff);
     final retChar = _findCharacteristic(NanoGatt.gcisRetRefCalCoeff);
 
     if (reqChar == null || retChar == null) {
-      _logger.info('[CAL] Calibration characteristics not found!',
-          tag: 'BLE');
+      _logger.info('[CAL] Calibration characteristics not found!', tag: 'BLE');
       throw NirScanException(
           'Calibration coefficient characteristics not found');
     }
@@ -793,6 +792,45 @@ class BleNirScanService implements NirScanService {
   Future<CalibrationData> getCalibrationData() async {
     _ensureConnected();
     throw UnsupportedError('getCalibrationData not implemented yet');
+  }
+
+  /// Ensures active scan configuration is set on device.
+  /// Reads current active config, and if not set (0xFFFF), writes default (index 0).
+  Future<void> _ensureActiveScanConfig() async {
+    final char = _findCharacteristic(NanoGatt.gscisActiveScanConf);
+    if (char == null) {
+      _logger.warning('[SCAN] Active scan config characteristic not found!',
+          tag: 'BLE');
+      throw NirScanException('Active scan config characteristic not found');
+    }
+
+    // Read current active config
+    _logger.info('[SCAN] Reading current active config...', tag: 'BLE');
+    final configBytes = await char.read();
+    if (configBytes.length < 2) {
+      _logger.warning('[SCAN] Invalid config data: ${configBytes.length} bytes',
+          tag: 'BLE');
+      throw NirScanException('Invalid active config data');
+    }
+
+    // Parse as little-endian uint16
+    final currentConfig = (configBytes[1] << 8) | (configBytes[0] & 0xFF);
+    _logger.info(
+        '[SCAN] Current active config: 0x${currentConfig.toRadixString(16).toUpperCase().padLeft(4, '0')}',
+        tag: 'BLE');
+
+    // If not set (0xFFFF), write default config (index 0)
+    if (currentConfig == 0xFFFF) {
+      _logger.info('[SCAN] No active config set, writing default (index 0)...',
+          tag: 'BLE');
+      final defaultConfigBytes = [0x00, 0x00]; // Index 0, little-endian
+      await char.write(defaultConfigBytes);
+      _logger.info('[SCAN] Default config (0) written successfully',
+          tag: 'BLE');
+    } else {
+      _logger.info('[SCAN] Active config already set (index: $currentConfig)',
+          tag: 'BLE');
+    }
   }
 
   @override
