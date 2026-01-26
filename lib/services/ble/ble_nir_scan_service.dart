@@ -7,6 +7,7 @@ import '../../models/device_info.dart';
 import '../../models/device_status.dart';
 import '../../models/scan_configuration.dart';
 import '../../models/scan_data.dart';
+import '../logging/log_service.dart';
 import 'ble_adapter.dart';
 import 'multi_packet_receiver.dart';
 import 'nano_gatt.dart';
@@ -15,6 +16,7 @@ import 'nir_scan_service.dart';
 /// BLE implementation of [NirScanService] for NIRScan Nano devices.
 class BleNirScanService implements NirScanService {
   final BleAdapter _adapter;
+  final LogService _logger;
 
   final _connectionStateController =
       StreamController<NirConnectionState>.broadcast();
@@ -29,8 +31,11 @@ class BleNirScanService implements NirScanService {
   StreamSubscription<BluetoothConnectionState>? _connectionSubscription;
   final List<StreamSubscription> _notificationSubscriptions = [];
 
-  BleNirScanService({BleAdapter? adapter})
-      : _adapter = adapter ?? FlutterBluePlusAdapter() {
+  BleNirScanService({
+    BleAdapter? adapter,
+    required LogService logger,
+  })  : _adapter = adapter ?? FlutterBluePlusAdapter(),
+        _logger = logger {
     _connectionStateController.add(_currentState);
   }
 
@@ -77,29 +82,37 @@ class BleNirScanService implements NirScanService {
   @override
   Future<void> connect(String deviceId) async {
     _setConnectionState(NirConnectionState.connecting);
-    print('🔵 [BLE] Connecting to device: $deviceId');
+    _logger.info('[BLE] Connecting to device: $deviceId (timeout: 15s)',
+        tag: 'BLE');
 
     try {
       _bleDevice = _adapter.getDevice(deviceId);
 
       await _bleDevice!.connect(timeout: const Duration(seconds: 15));
-      print('✅ [BLE] Connected to device');
+      _logger.info(
+          '[BLE] Connected successfully | Device: ${_bleDevice!.platformName} | MTU: pending',
+          tag: 'BLE');
 
       _connectionSubscription = _bleDevice!.connectionState.listen((state) {
         if (state == BluetoothConnectionState.disconnected) {
-          print('⚠️  [BLE] Device disconnected');
+          _logger.warning(
+              '[BLE] Device disconnected | ID: $deviceId | State: ${_currentState.toString().split('.').last}',
+              tag: 'BLE');
           _handleDisconnection();
         }
       });
 
       _services = await _bleDevice!.discoverServices();
-      print('✅ [BLE] Services discovered: ${_services?.length ?? 0}');
+      _logger.info(
+          '[BLE] Services discovered: ${_services?.length ?? 0} services | Device: $deviceId',
+          tag: 'BLE');
 
       // Subscribe to all notifications as per protocol (Flow 1)
-      print(
-          '🔔 [BLE] Subscribing to ${NanoGatt.notificationCharacteristics.length} notification characteristics...');
+      _logger.info(
+          '[BLE] Subscribing to ${NanoGatt.notificationCharacteristics.length} notification characteristics...',
+          tag: 'BLE');
       await subscribeToAllNotifications(skipConnectionCheck: true);
-      print('✅ [BLE] All notifications subscribed');
+      _logger.info('[BLE] All notifications subscribed', tag: 'BLE');
 
       _connectedDevice = NirScanDevice(
         id: deviceId,
@@ -108,8 +121,9 @@ class BleNirScanService implements NirScanService {
       );
 
       _setConnectionState(NirConnectionState.connected);
-      print(
-          '🎉 [BLE] Connection fully established to ${_bleDevice!.platformName}');
+      _logger.info(
+          '[BLE] Connection fully established to ${_bleDevice!.platformName}',
+          tag: 'BLE');
     } catch (e) {
       _handleDisconnection();
       rethrow;
@@ -305,47 +319,85 @@ class BleNirScanService implements NirScanService {
   @override
   Future<ScanData> performScan({bool saveToSd = false}) async {
     _ensureConnected();
-    print('🔵 [SCAN] Starting scan...');
+    final deviceName = _connectedDevice?.name ?? 'Unknown';
+    _logger.info(
+        '[SCAN] Starting scan | Device: $deviceName | SaveToSD: $saveToSd',
+        tag: 'BLE');
 
     // Sync device time before scan (as per protocol Flow 4B)
-    print('🕐 [SCAN] Syncing device time...');
+    _logger.info(
+        '[SCAN] Syncing device time | Current: ${DateTime.now().toIso8601String()}',
+        tag: 'BLE');
     await syncTime();
-    print('✅ [SCAN] Time synced');
+    _logger.info('[SCAN] Time synced successfully', tag: 'BLE');
 
     // Ensure calibration data is cached (as per protocol Flow 4A)
-    print('🔬 [SCAN] Fetching calibration data...');
+    final calCached = _cachedRefCalCoeff != null && _cachedRefCalMatrix != null;
+    _logger.info('[SCAN] Calibration check | Cached: $calCached',
+        tag: 'BLE');
     await _ensureCalibrationData();
-    print(
-        '✅ [SCAN] Calibration cached: coeff=${_cachedRefCalCoeff?.length ?? 0} bytes, matrix=${_cachedRefCalMatrix?.length ?? 0} bytes');
+    _logger.info(
+        '[SCAN] Calibration ready | Coeff: ${_cachedRefCalCoeff?.length ?? 0}B | Matrix: ${_cachedRefCalMatrix?.length ?? 0}B',
+        tag: 'BLE');
 
     // 1. Subscribe to start scan notifications and trigger scan
+    _logger.info('[SCAN] Finding start scan characteristic...', tag: 'BLE');
     final startScanChar = _findCharacteristic(NanoGatt.gsdisStartScan);
     if (startScanChar == null) {
+      _logger.info('[SCAN] Start scan characteristic not found!', tag: 'BLE');
       throw NirScanException('Start scan characteristic not found');
     }
+    _logger.info('[SCAN] Start scan characteristic found', tag: 'BLE');
 
-    await startScanChar.setNotifyValue(true);
+    // NOTE: We already subscribed to this characteristic during connection setup
+    // No need to call setNotifyValue again
+    _logger.info(
+        '[SCAN] Already subscribed to notifications during connection',
+        tag: 'BLE');
 
     // Create completer to wait for scan complete notification
     final scanCompleter = Completer<List<int>>();
     late StreamSubscription<List<int>> startScanSubscription;
 
     startScanSubscription = startScanChar.onValueReceived.listen((data) {
+      final firstByte = data.isNotEmpty
+          ? '0x${data[0].toRadixString(16).toUpperCase().padLeft(2, '0')}'
+          : 'empty';
+      _logger.info(
+          '[SCAN] Notification | Size: ${data.length}B | First: $firstByte',
+          tag: 'BLE');
       if (!scanCompleter.isCompleted && data.isNotEmpty) {
+        if (data[0] == 0xFF) {
+          _logger.info('[SCAN] SUCCESS (0xFF)', tag: 'BLE');
+        } else {
+          _logger.warning('[SCAN] Unexpected: $firstByte', tag: 'BLE');
+        }
         scanCompleter.complete(data);
         startScanSubscription.cancel();
       }
     });
 
     // Write save flag to start scan
-    await startScanChar.write([saveToSd ? 0x01 : 0x00]);
+    final scanCmd = saveToSd ? 0x01 : 0x00;
+    _logger.info(
+        '[SCAN] Trigger | Cmd: 0x${scanCmd.toRadixString(16).toUpperCase()}',
+        tag: 'BLE');
+    await startScanChar.write([scanCmd]);
+    _logger.info('[SCAN] Command sent, awaiting device (timeout: 60s)...',
+        tag: 'BLE');
 
     // 2. Wait for scan complete notification
     final scanResult = await scanCompleter.future;
+    _logger.info('[SCAN] Hardware complete | Result: ${scanResult.length}B',
+        tag: 'BLE');
 
     if (scanResult.isEmpty || scanResult[0] != 0xFF) {
+      final errCode = scanResult.isNotEmpty
+          ? '0x${scanResult[0].toRadixString(16).toUpperCase()}'
+          : 'empty';
+      _logger.error('[SCAN] FAILED | Error: $errCode', tag: 'BLE');
       throw ScanFailedException(
-        'Scan did not complete successfully: ${scanResult.isNotEmpty ? scanResult[0] : "empty"}',
+        'Scan failed with error code: $errCode',
       );
     }
 
@@ -353,38 +405,57 @@ class BleNirScanService implements NirScanService {
     final scanIndex = scanResult.length >= 5
         ? scanResult.sublist(1, 5)
         : [0x00, 0x00, 0x00, 0x00];
+    _logger.info(
+        '[SCAN] Scan index: ${scanIndex.map((b) => b.toRadixString(16).padLeft(2, '0')).join(' ')}',
+        tag: 'BLE');
 
     // 4. Request scan metadata
+    _logger.info('[SCAN] Requesting scan name...', tag: 'BLE');
     final scanName = await _requestScanMetadata(
       NanoGatt.gsdisReqScanName,
       NanoGatt.gsdisRetScanName,
       scanIndex,
     );
+    _logger.info('[SCAN] Scan name: ${String.fromCharCodes(scanName)}',
+        tag: 'BLE');
 
+    _logger.info('[SCAN] Requesting scan type...', tag: 'BLE');
     final scanTypeBytes = await _requestScanMetadata(
       NanoGatt.gsdisReqScanType,
       NanoGatt.gsdisRetScanType,
       scanIndex,
     );
+    _logger.info(
+        '[SCAN] Scan type: ${scanTypeBytes.isNotEmpty ? scanTypeBytes[0].toRadixString(16) : "empty"}',
+        tag: 'BLE');
 
+    _logger.info('[SCAN] Requesting scan date...', tag: 'BLE');
     final scanDateBytes = await _requestScanMetadata(
       NanoGatt.gsdisReqScanDate,
       NanoGatt.gsdisRetScanDate,
       scanIndex,
     );
+    _logger.info('[SCAN] Scan date: ${String.fromCharCodes(scanDateBytes)}',
+        tag: 'BLE');
 
+    _logger.info('[SCAN] Requesting packet format version...', tag: 'BLE');
     final pktFmtVerBytes = await _requestScanMetadata(
       NanoGatt.gsdisReqPktFmtVer,
       NanoGatt.gsdisRetPktFmtVer,
       scanIndex,
     );
+    _logger.info('[SCAN] Packet format version received', tag: 'BLE');
 
     // 5. Request serialized scan data (multi-packet)
+    _logger.info('[SCAN] Requesting raw scan data (multi-packet)...',
+        tag: 'BLE');
     final rawData = await _requestMultiPacketData(
       NanoGatt.gsdisReqSerScanDataStruct,
       NanoGatt.gsdisRetSerScanDataStruct,
       scanIndex,
     );
+    _logger.info('[SCAN] Raw scan data received: ${rawData.length} bytes',
+        tag: 'BLE');
 
     // 6. Parse metadata and return ScanData
     final name = String.fromCharCodes(scanName);
@@ -406,20 +477,28 @@ class BleNirScanService implements NirScanService {
     );
 
     // Log scan completion
-    print('');
-    print('🎉 [SCAN] ============ SCAN COMPLETED ============');
-    print('📦 [SCAN] Raw Data Size: ${scanData.rawData.length} bytes');
-    print('📝 [SCAN] Name: ${scanData.name}');
-    print('📅 [SCAN] Date: ${scanData.date}');
-    print('🔢 [SCAN] Type: ${scanData.type}');
-    print('📌 [SCAN] Version: ${scanData.packetFormatVersion}');
-    print('🔬 [SCAN] First 20 bytes: ${scanData.rawData.take(20).toList()}');
-    print(
-        '🔬 [SCAN] Last 20 bytes: ${scanData.rawData.skip(scanData.rawData.length - 20).take(20).toList()}');
-    print(
-        '✅ [SCAN] Calibration available: coeff=${_cachedRefCalCoeff?.length ?? 0}B, matrix=${_cachedRefCalMatrix?.length ?? 0}B');
-    print('🎉 [SCAN] =========================================');
-    print('');
+    _logger.info('', tag: 'BLE');
+    _logger.info('[SCAN] ============ SCAN COMPLETED ============',
+        tag: 'BLE');
+    _logger.info('[SCAN] Raw Data Size: ${scanData.rawData.length} bytes',
+        tag: 'BLE');
+    _logger.info('📝 [SCAN] Name: ${scanData.name}', tag: 'BLE');
+    _logger.info('📅 [SCAN] Date: ${scanData.date}', tag: 'BLE');
+    _logger.info('🔢 [SCAN] Type: ${scanData.type}', tag: 'BLE');
+    _logger.info('📌 [SCAN] Version: ${scanData.packetFormatVersion}',
+        tag: 'BLE');
+    _logger.info(
+        '[SCAN] First 20 bytes: ${scanData.rawData.take(20).toList()}',
+        tag: 'BLE');
+    _logger.info(
+        '[SCAN] Last 20 bytes: ${scanData.rawData.skip(scanData.rawData.length - 20).take(20).toList()}',
+        tag: 'BLE');
+    _logger.info(
+        '[SCAN] Calibration available: coeff=${_cachedRefCalCoeff?.length ?? 0}B, matrix=${_cachedRefCalMatrix?.length ?? 0}B',
+        tag: 'BLE');
+    _logger.info('[SCAN] =========================================',
+        tag: 'BLE');
+    _logger.info('', tag: 'BLE');
 
     return scanData;
   }
@@ -436,7 +515,8 @@ class BleNirScanService implements NirScanService {
       throw NirScanException('Scan metadata characteristics not found');
     }
 
-    await responseChar.setNotifyValue(true);
+    // NOTE: Already subscribed during connection setup
+    // await responseChar.setNotifyValue(true);
 
     final completer = Completer<List<int>>();
     late StreamSubscription<List<int>> subscription;
@@ -465,7 +545,8 @@ class BleNirScanService implements NirScanService {
       throw NirScanException('Scan data characteristics not found');
     }
 
-    await responseChar.setNotifyValue(true);
+    // NOTE: Already subscribed during connection setup
+    // await responseChar.setNotifyValue(true);
 
     final receiver = MultiPacketReceiver();
     final completer = Completer<List<int>>();
@@ -571,74 +652,122 @@ class BleNirScanService implements NirScanService {
 
   /// Fetches reference calibration coefficients (multi-packet)
   Future<List<int>> _fetchCalibrationCoefficients() async {
+    _logger.info('[CAL] Starting calibration coefficient fetch...',
+        tag: 'BLE');
     final reqChar = _findCharacteristic(NanoGatt.gcisReqRefCalCoeff);
     final retChar = _findCharacteristic(NanoGatt.gcisRetRefCalCoeff);
 
     if (reqChar == null || retChar == null) {
+      _logger.info('[CAL] Calibration characteristics not found!',
+          tag: 'BLE');
       throw NirScanException(
           'Calibration coefficient characteristics not found');
     }
 
-    await retChar.setNotifyValue(true);
+    _logger.info('[CAL] Characteristics found, setting up listener...',
+        tag: 'BLE');
+    // NOTE: Already subscribed during connection setup
+    // await retChar.setNotifyValue(true);
 
     final receiver = MultiPacketReceiver();
     final completer = Completer<List<int>>();
+    int packetCount = 0;
 
     final subscription = retChar.onValueReceived.listen((data) {
+      packetCount++;
+      _logger.info(
+          '[CAL] Received coeff packet #$packetCount (${data.length} bytes)',
+          tag: 'BLE');
       receiver.onPacketReceived(data);
       if (receiver.isComplete) {
+        _logger.info(
+            '[CAL] Coefficient data complete (${receiver.data.length} bytes)',
+            tag: 'BLE');
         completer.complete(receiver.data);
       }
     });
 
     // Request calibration coefficients
+    _logger.info('[CAL] Requesting calibration coefficients...', tag: 'BLE');
     await reqChar.write([0x00]); // Dummy byte to trigger
+    _logger.info('[CAL] Request sent, waiting for response...', tag: 'BLE');
 
     try {
       final coeffData = await completer.future.timeout(
         const Duration(seconds: 10),
-        onTimeout: () =>
-            throw TimeoutException('Calibration coefficient fetch timeout'),
+        onTimeout: () {
+          _logger.info(
+              '[CAL] Coefficient fetch timeout! Received $packetCount packets',
+              tag: 'BLE');
+          throw TimeoutException('Calibration coefficient fetch timeout');
+        },
       );
+      _logger.info(
+          '[CAL] Coefficient fetch complete: ${coeffData.length} bytes',
+          tag: 'BLE');
       return coeffData;
     } finally {
       await subscription.cancel();
+      _logger.info('[CAL] Coefficient subscription cancelled', tag: 'BLE');
     }
   }
 
   /// Fetches reference calibration matrix (multi-packet)
   Future<List<int>> _fetchCalibrationMatrix() async {
+    _logger.info('[CAL] Starting calibration matrix fetch...', tag: 'BLE');
     final reqChar = _findCharacteristic(NanoGatt.gcisReqRefCalMatrix);
     final retChar = _findCharacteristic(NanoGatt.gcisRetRefCalMatrix);
 
     if (reqChar == null || retChar == null) {
+      _logger.info('[CAL] Matrix characteristics not found!', tag: 'BLE');
       throw NirScanException('Calibration matrix characteristics not found');
     }
 
-    await retChar.setNotifyValue(true);
+    _logger.info('[CAL] Matrix characteristics found, setting up listener...',
+        tag: 'BLE');
+    // NOTE: Already subscribed during connection setup
+    // await retChar.setNotifyValue(true);
 
     final receiver = MultiPacketReceiver();
     final completer = Completer<List<int>>();
+    int packetCount = 0;
 
     final subscription = retChar.onValueReceived.listen((data) {
+      packetCount++;
+      _logger.info(
+          '[CAL] Received matrix packet #$packetCount (${data.length} bytes)',
+          tag: 'BLE');
       receiver.onPacketReceived(data);
       if (receiver.isComplete) {
+        _logger.info(
+            '[CAL] Matrix data complete (${receiver.data.length} bytes)',
+            tag: 'BLE');
         completer.complete(receiver.data);
       }
     });
 
     // Request calibration matrix
+    _logger.info('[CAL] Requesting calibration matrix...', tag: 'BLE');
     await reqChar.write([0x00]); // Dummy byte to trigger
+    _logger.info('[CAL] Matrix request sent, waiting for response...',
+        tag: 'BLE');
 
     try {
       final matrixData = await completer.future.timeout(
         const Duration(seconds: 10),
-        onTimeout: () =>
-            throw TimeoutException('Calibration matrix fetch timeout'),
+        onTimeout: () {
+          _logger.info(
+              '[CAL] Matrix fetch timeout! Received $packetCount packets',
+              tag: 'BLE');
+          throw TimeoutException('Calibration matrix fetch timeout');
+        },
       );
+      _logger.info('[CAL] Matrix fetch complete: ${matrixData.length} bytes',
+          tag: 'BLE');
       return matrixData;
     } finally {
       await subscription.cancel();
+      _logger.info('[CAL] Matrix subscription cancelled', tag: 'BLE');
     }
   }
 

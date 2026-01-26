@@ -55,6 +55,12 @@ class LogService {
     }
 
     _logController.add(entry);
+
+    // Also print to console for debugging
+    final tagStr = tag != null ? '[$tag] ' : '';
+    final levelStr = level.toString().split('.').last.toUpperCase();
+    final timestamp = entry.timestamp.toIso8601String().substring(11, 23);
+    print('$timestamp $levelStr $tagStr$message');
   }
 
   void clear() {

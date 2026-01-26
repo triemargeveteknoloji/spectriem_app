@@ -9,9 +9,9 @@ import 'services/ble/nir_scan_service.dart';
 import 'services/ble/ble_nir_scan_service.dart';
 import 'services/logging/log_service.dart';
 
-NirScanService createNirScanService() {
+NirScanService createNirScanService(LogService logService) {
   if (Platform.isAndroid || Platform.isIOS) {
-    return BleNirScanService();
+    return BleNirScanService(logger: logService);
   }
   return MockNirScanService();
 }
@@ -35,8 +35,8 @@ class _SpecTriemAppState extends State<SpecTriemApp> {
   @override
   void initState() {
     super.initState();
-    _bleService = createNirScanService();
     _logService = LogService();
+    _bleService = createNirScanService(_logService);
   }
 
   @override
