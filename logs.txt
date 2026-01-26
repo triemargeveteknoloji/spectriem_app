@@ -1,0 +1,1505 @@
+A Dart VM Service on SM X900 is available at: http://127.0.0.1:63668/jW7h3Vtt4f0=/
+The Flutter DevTools debugger and profiler on SM X900 is available at: http://127.0.0.1:9101?uri=http://127.0.0.1:63668/jW7h3Vtt4f0=/
+I/IDS_TAG (27297): Closing IDS observe window
+I/IDS_TAG (27297): Getting Shared Preference for android.app.Application@54a9b18 uid = 10411
+I/IDS_TAG (27297): IDS count updated to 1 for android.app.Application@54a9b18
+I/Choreographer(27297): Skipped 174 frames!  The application may be doing too much work on its main thread.
+I/WindowExtensionsImpl(27297): Initializing Window Extensions, vendor API level=9, activity embedding enabled=true
+I/SV[79003940 MainActivity](27297): onWindowVisibilityChanged(0) true io.flutter.embedding.android.FlutterSurfaceView{4b58124 V.E...... ......I. 0,0-0,0} of VRI[MainActivity]@151079f
+D/SurfaceView(27297): 79003940 updateSurface: has no frame
+I/m.spectriem_app(27297): Compiler allocated 5101KB to compile void android.view.ViewRootImpl.performTraversals()
+E/BufferQueueProducer(27297): Unable to open libpenguin.so: dlopen failed: library "libpenguin.so" not found.
+E/m.spectriem_app(27297): Unable to open libpenguin.so: dlopen failed: library "libpenguin.so" not found.
+W/libc    (27297): Access denied finding property "vendor.display.enable_optimal_refresh_rate"
+I/BufferQueueProducer(27297): [](id:6aa100000000,api:0,p:1159871010,c:27297) setDequeueTimeout:2077252342
+I/BLASTBufferQueue_Java(27297): new BLASTBufferQueue, mName= VRI[MainActivity]@151079f mNativeObject= 0xb40000722fb37c60 caller= android.view.ViewRootImpl.updateBlastSurfaceIfNeeded:3585 android.view.ViewRootImpl.relayoutWindow:11685 android.view.ViewRootImpl.performTraversals:4804 android.view.ViewRootImpl.doTraversal:3924 android.view.ViewRootImpl$TraversalRunnable.run:12903 android.view.Choreographer$CallbackRecord.run:1901 android.view.Choreographer$CallbackRecord.run:1910 android.view.Choreographer.doCallbacks:1367 android.view.Choreographer.doFrame:1292 android.view.Choreographer$FrameDisplayEventReceiver.run:1870
+I/BLASTBufferQueue_Java(27297): update, w= 1848 h= 2960 mName = VRI[MainActivity]@151079f mNativeObject= 0xb40000722fb37c60 sc.mNativeObject= 0xb40000730faac910 format= -3 caller= android.view.ViewRootImpl.updateBlastSurfaceIfNeeded:3590 android.view.ViewRootImpl.relayoutWindow:11685 android.view.ViewRootImpl.performTraversals:4804 android.view.ViewRootImpl.doTraversal:3924 android.view.ViewRootImpl$TraversalRunnable.run:12903 android.view.Choreographer$CallbackRecord.run:1901
+W/libc    (27297): Access denied finding property "vendor.display.enable_optimal_refresh_rate"
+I/VRI[MainActivity]@151079f(27297): Relayout returned: old=(0,0,1848,2960) new=(0,0,1848,2960) relayoutAsync=false req=(1848,2960)0 dur=21 res=0x3 s={true 0xb40000724faaefa0} ch=true seqId=0
+D/VRI[MainActivity]@151079f(27297): mThreadedRenderer.initialize() mSurface={isValid=true 0xb40000724faaefa0} hwInitialized=true
+D/SurfaceView(27297): 79003940 updateSurface: has no frame
+I/SV[79003940 MainActivity](27297): windowStopped(false) true io.flutter.embedding.android.FlutterSurfaceView{4b58124 V.E...... ......ID 0,0-1848,2960} of VRI[MainActivity]@151079f
+D/SurfaceView(27297): 79003940 updateSurface: has no frame
+D/VRI[MainActivity]@151079f(27297): reportNextDraw android.view.ViewRootImpl.performTraversals:5443 android.view.ViewRootImpl.doTraversal:3924 android.view.ViewRootImpl$TraversalRunnable.run:12903 android.view.Choreographer$CallbackRecord.run:1901 android.view.Choreographer$CallbackRecord.run:1910
+I/SurfaceView(27297): 79003940 Changes: creating=true format=true size=true visible=true alpha=true hint=true left=true top=true z=false attached=true lifecycleStrategy=false
+W/libc    (27297): Access denied finding property "vendor.display.enable_optimal_refresh_rate"
+I/BufferQueueProducer(27297): [](id:6aa100000001,api:0,p:0,c:27297) setDequeueTimeout:2077252342
+I/BLASTBufferQueue_Java(27297): new BLASTBufferQueue, mName= 4b58124 SurfaceView[com.triem.spectriem_app/com.triem.spectriem_app.MainActivity]@0 mNativeObject= 0xb40000722fb3ecd0 caller= android.view.SurfaceView.createBlastSurfaceControls:1781 android.view.SurfaceView.updateSurface:1450 android.view.SurfaceView.lambda$new$0:280 android.view.SurfaceView.$r8$lambda$NfZyM_TG8F8lqzaOVZ7noREFjzU:0 android.view.SurfaceView$$ExternalSyntheticLambda1.onPreDraw:0 android.view.ViewTreeObserver.dispatchOnPreDraw:1229 android.view.ViewRootImpl.performTraversals:5448 android.view.ViewRootImpl.doTraversal:3924 android.view.ViewRootImpl$TraversalRunnable.run:12903 android.view.Choreographer$CallbackRecord.run:1901
+I/BLASTBufferQueue_Java(27297): update, w= 1848 h= 2960 mName = 4b58124 SurfaceView[com.triem.spectriem_app/com.triem.spectriem_app.MainActivity]@0 mNativeObject= 0xb40000722fb3ecd0 sc.mNativeObject= 0xb40000730fab2310 format= 4 caller= android.view.SurfaceView.createBlastSurfaceControls:1782 android.view.SurfaceView.updateSurface:1450 android.view.SurfaceView.lambda$new$0:280 android.view.SurfaceView.$r8$lambda$NfZyM_TG8F8lqzaOVZ7noREFjzU:0 android.view.SurfaceView$$ExternalSyntheticLambda1.onPreDraw:0 android.view.ViewTreeObserver.dispatchOnPreDraw:1229
+I/SurfaceView(27297): 79003940 Cur surface: Surface(name=null mNativeObject=0)/@0xf9b7a11
+D/SurfaceComposerClient(27297): setCornerRadius ## 4b58124 SurfaceView[com.triem.spectriem_app/com.triem.spectriem_app.MainActivity]@0#8259 cornerRadius=0.000000
+I/SV[79003940 MainActivity](27297): pST: sr = Rect(0, 0 - 1848, 2960) sw = 1848 sh = 2960
+D/SurfaceView(27297): 79003940 performSurfaceTransaction RenderWorker position = [0, 0, 1848, 2960] surfaceSize = 1848x2960
+W/libc    (27297): Access denied finding property "vendor.display.enable_optimal_refresh_rate"
+I/SV[79003940 MainActivity](27297): updateSurface: mVisible = true mSurface.isValid() = true
+I/SV[79003940 MainActivity](27297): updateSurface: mSurfaceCreated = false surfaceChanged = true visibleChanged = true
+I/SurfaceView(27297): 79003940 visibleChanged -- surfaceCreated
+I/SV[79003940 MainActivity](27297): surfaceCreated 1 #8 io.flutter.embedding.android.FlutterSurfaceView{4b58124 V.E...... ......ID 0,0-1848,2960}
+E/qdgralloc(27297): GetSize: Unrecognized pixel format: 0x38
+E/Gralloc4(27297): isSupported(1, 1, 56, 1, ...) failed with 5
+E/GraphicBufferAllocator(27297): Failed to allocate (4 x 4) layerCount 1 format 56 usage b00: 5
+E/AHardwareBuffer(27297): GraphicBuffer(w=4, h=4, lc=1) failed (Unknown error -5), handle=0x0
+E/qdgralloc(27297): GetSize: Unrecognized pixel format: 0x3b
+E/Gralloc4(27297): isSupported(1, 1, 59, 1, ...) failed with 5
+E/GraphicBufferAllocator(27297): Failed to allocate (4 x 4) layerCount 1 format 59 usage b00: 5
+E/AHardwareBuffer(27297): GraphicBuffer(w=4, h=4, lc=1) failed (Unknown error -5), handle=0x0
+E/qdgralloc(27297): GetSize: Unrecognized pixel format: 0x38
+E/Gralloc4(27297): isSupported(1, 1, 56, 1, ...) failed with 5
+E/GraphicBufferAllocator(27297): Failed to allocate (4 x 4) layerCount 1 format 56 usage b00: 5
+E/AHardwareBuffer(27297): GraphicBuffer(w=4, h=4, lc=1) failed (Unknown error -5), handle=0x0
+E/qdgralloc(27297): GetSize: Unrecognized pixel format: 0x3b
+E/Gralloc4(27297): isSupported(1, 1, 59, 1, ...) failed with 5
+E/GraphicBufferAllocator(27297): Failed to allocate (4 x 4) layerCount 1 format 59 usage b00: 5
+E/AHardwareBuffer(27297): GraphicBuffer(w=4, h=4, lc=1) failed (Unknown error -5), handle=0x0
+I/SurfaceView(27297): 79003940 surfaceChanged -- format=4 w=1848 h=2960
+I/SV[79003940 MainActivity](27297): surfaceChanged (1848,2960) 1 #8 io.flutter.embedding.android.FlutterSurfaceView{4b58124 V.E...... ......ID 0,0-1848,2960}
+I/SurfaceView(27297): 79003940 surfaceRedrawNeeded
+I/SurfaceView(27297): 79003940 finishedDrawing
+V/SurfaceView(27297): Layout: x=0 y=0 w=1848 h=2960, frame=Rect(0, 0 - 1848, 2960)
+D/VRI[MainActivity]@151079f(27297): Canceling draw. cancelDueToPreDrawListener=true cancelDueToSync=false
+D/HWUI    (27297): CacheManager::trimMemory(20)
+D/HWUI    (27297): HWUI - treat SMPTE_170M as sRGB
+I/VRI[MainActivity]@151079f(27297): stopped(true) old = false
+D/VRI[MainActivity]@151079f(27297): WindowStopped on com.triem.spectriem_app/com.triem.spectriem_app.MainActivity set to true
+D/HWUI    (27297): CacheManager::trimMemory(20)
+I/BLASTBufferQueue(27297): [4b58124 SurfaceView[com.triem.spectriem_app/com.triem.spectriem_app.MainActivity]@0#1](f:0,a:0,s:0) onFrameAvailable the first frame is available
+I/SurfaceComposerClient(27297): apply transaction with the first frame. layerId: 8260, bufferData(ID: 117239722278926, frameNumber: 1)
+I/SV[79003940 MainActivity](27297): windowStopped(true) false io.flutter.embedding.android.FlutterSurfaceView{4b58124 V.E...... ......ID 0,0-1848,2960} of VRI[MainActivity]@151079f
+I/SurfaceView(27297): 79003940 Changes: creating=false format=false size=false visible=true alpha=false hint=false left=false top=false z=false attached=true lifecycleStrategy=false
+I/SurfaceView(27297): 79003940 Cur surface: Surface(name=null mNativeObject=-5476376655919668640)/@0xf9b7a11
+D/SurfaceComposerClient(27297): setCornerRadius ## 4b58124 SurfaceView[com.triem.spectriem_app/com.triem.spectriem_app.MainActivity]@0#8259 cornerRadius=0.000000
+I/SurfaceView(27297): 79003940 surfaceDestroyed
+I/SV[79003940 MainActivity](27297): surfaceDestroyed callback.size 1 #1 io.flutter.embedding.android.FlutterSurfaceView{4b58124 V.E...... ......ID 0,0-1848,2960}
+I/SV[79003940 MainActivity](27297): updateSurface: mVisible = false mSurface.isValid() = true
+I/SV[79003940 MainActivity](27297): releaseSurfaces: viewRoot = VRI[MainActivity]@151079f
+V/SurfaceView(27297): Layout: x=0 y=0 w=1848 h=2960, frame=Rect(0, 0 - 1848, 2960)
+D/SV[79003940 MainActivity](27297): updateSurface: surface is not valid
+I/SV[79003940 MainActivity](27297): releaseSurfaces: viewRoot = VRI[MainActivity]@151079f
+D/SurfaceView(27297): 79003940 setAlpha: alpha=1.0
+I/SV[79003940 MainActivity](27297): onWindowVisibilityChanged(4) false io.flutter.embedding.android.FlutterSurfaceView{4b58124 G.E...... ......ID 0,0-1848,2960} of VRI[MainActivity]@151079f
+D/SV[79003940 MainActivity](27297): updateSurface: surface is not valid
+I/SV[79003940 MainActivity](27297): releaseSurfaces: viewRoot = VRI[MainActivity]@151079f
+D/HWUI    (27297): CacheManager::trimMemory(20)
+I/VRI[MainActivity]@151079f(27297): Relayout returned: old=(0,0,1848,2960) new=(0,0,1848,2960) relayoutAsync=false req=(1848,2960)4 dur=5 res=0x2 s={false 0x0} ch=false seqId=0
+D/SV[79003940 MainActivity](27297): updateSurface: surface is not valid
+I/SV[79003940 MainActivity](27297): releaseSurfaces: viewRoot = VRI[MainActivity]@151079f
+D/VRI[MainActivity]@151079f(27297): applyTransactionOnDraw applyImmediately
+D/VRI[MainActivity]@151079f(27297): applyTransactionOnDraw applyImmediately
+D/VRI[MainActivity]@151079f(27297): Setup new sync=wmsSync-VRI[MainActivity]@151079f#1
+I/VRI[MainActivity]@151079f(27297): Creating new active sync group VRI[MainActivity]@151079f#2
+D/VRI[MainActivity]@151079f(27297): Not drawing due to not visible. Reason=View.INVISIBLE
+D/VRI[MainActivity]@151079f(27297): reportDrawFinished seqId=0
+D/WindowLayoutComponentImpl(27297): Register WindowLayoutInfoListener on Context=com.triem.spectriem_app.MainActivity@3764b97, of which baseContext=android.app.ContextImpl@9e3d168
+I/VRI[MainActivity]@151079f(27297): Relayout returned: old=(0,0,1848,2960) new=(0,0,1848,2960) relayoutAsync=false req=(1848,2960)4 dur=4 res=0x2 s={false 0x0} ch=false seqId=0
+D/SV[79003940 MainActivity](27297): updateSurface: surface is not valid
+I/SV[79003940 MainActivity](27297): releaseSurfaces: viewRoot = VRI[MainActivity]@151079f
+D/VRI[MainActivity]@151079f(27297): applyTransactionOnDraw applyImmediately
+I/VRI[MainActivity]@151079f(27297): handleAppVisibility mAppVisible = true visible = false
+D/ProfileInstaller(27297): Installing profile for com.triem.spectriem_app
+I/VRI[MainActivity]@151079f(27297): onDisplayChanged oldDisplayState=1 newDisplayState=2
+I/SV[79003940 MainActivity](27297): onWindowVisibilityChanged(8) false io.flutter.embedding.android.FlutterSurfaceView{4b58124 G.E...... ......ID 0,0-1848,2960} of VRI[MainActivity]@151079f
+D/SV[79003940 MainActivity](27297): updateSurface: surface is not valid
+I/SV[79003940 MainActivity](27297): releaseSurfaces: viewRoot = VRI[MainActivity]@151079f
+D/VRI[MainActivity]@151079f(27297): applyTransactionOnDraw applyImmediately
+D/HWUI    (27297): CacheManager::trimMemory(20)
+I/VRI[MainActivity]@151079f(27297): Relayout returned: old=(0,0,1848,2960) new=(0,0,1848,2960) relayoutAsync=false req=(1848,2960)8 dur=3 res=0x0 s={false 0x0} ch=false seqId=0
+D/SV[79003940 MainActivity](27297): updateSurface: surface is not valid
+I/SV[79003940 MainActivity](27297): releaseSurfaces: viewRoot = VRI[MainActivity]@151079f
+D/VRI[MainActivity]@151079f(27297): applyTransactionOnDraw applyImmediately
+I/VRI[MainActivity]@151079f(27297): handleAppVisibility mAppVisible = false visible = true
+I/VRI[MainActivity]@151079f(27297): stopped(false) old = true
+D/VRI[MainActivity]@151079f(27297): WindowStopped on com.triem.spectriem_app/com.triem.spectriem_app.MainActivity set to false
+D/SV[79003940 MainActivity](27297): updateSurface: surface is not valid
+I/SV[79003940 MainActivity](27297): releaseSurfaces: viewRoot = VRI[MainActivity]@151079f
+D/VRI[MainActivity]@151079f(27297): applyTransactionOnDraw applyImmediately
+I/SV[79003940 MainActivity](27297): onWindowVisibilityChanged(0) false io.flutter.embedding.android.FlutterSurfaceView{4b58124 V.E...... ......ID 0,0-1848,2960} of VRI[MainActivity]@151079f
+D/SV[79003940 MainActivity](27297): updateSurface: surface is not valid
+I/SV[79003940 MainActivity](27297): releaseSurfaces: viewRoot = VRI[MainActivity]@151079f
+D/VRI[MainActivity]@151079f(27297): applyTransactionOnDraw applyImmediately
+W/libc    (27297): Access denied finding property "vendor.display.enable_optimal_refresh_rate"
+I/BufferQueueProducer(27297): [](id:6aa100000002,api:0,p:7078009,c:27297) setDequeueTimeout:2077252342
+I/BLASTBufferQueue_Java(27297): new BLASTBufferQueue, mName= VRI[MainActivity]@151079f mNativeObject= 0xb40000722fb57e60 caller= android.view.ViewRootImpl.updateBlastSurfaceIfNeeded:3585 android.view.ViewRootImpl.relayoutWindow:11685 android.view.ViewRootImpl.performTraversals:4804 android.view.ViewRootImpl.doTraversal:3924 android.view.ViewRootImpl$TraversalRunnable.run:12903 android.view.Choreographer$CallbackRecord.run:1901 android.view.Choreographer$CallbackRecord.run:1910 android.view.Choreographer.doCallbacks:1367 android.view.Choreographer.doFrame:1292 android.view.Choreographer$FrameDisplayEventReceiver.run:1870
+I/BLASTBufferQueue_Java(27297): update, w= 1848 h= 2960 mName = VRI[MainActivity]@151079f mNativeObject= 0xb40000722fb57e60 sc.mNativeObject= 0xb40000730fab5cd0 format= -3 caller= android.view.ViewRootImpl.updateBlastSurfaceIfNeeded:3590 android.view.ViewRootImpl.relayoutWindow:11685 android.view.ViewRootImpl.performTraversals:4804 android.view.ViewRootImpl.doTraversal:3924 android.view.ViewRootImpl$TraversalRunnable.run:12903 android.view.Choreographer$CallbackRecord.run:1901
+W/libc    (27297): Access denied finding property "vendor.display.enable_optimal_refresh_rate"
+I/VRI[MainActivity]@151079f(27297): Relayout returned: old=(0,0,1848,2960) new=(0,0,1848,2960) relayoutAsync=false req=(1848,2960)0 dur=6 res=0x3 s={true 0xb40000724faaaf40} ch=true seqId=0
+I/VRI[MainActivity]@151079f(27297): performConfigurationChange setNightDimText nightDimLevel=0
+D/VRI[MainActivity]@151079f(27297): mThreadedRenderer.initialize() mSurface={isValid=true 0xb40000724faaaf40} hwInitialized=true
+I/SV[79003940 MainActivity](27297): windowStopped(false) true io.flutter.embedding.android.FlutterSurfaceView{4b58124 V.E...... ......ID 0,0-1848,2960} of VRI[MainActivity]@151079f
+I/SurfaceView(27297): 79003940 Changes: creating=true format=false size=false visible=true alpha=false hint=false left=false top=false z=false attached=true lifecycleStrategy=false
+W/libc    (27297): Access denied finding property "vendor.display.enable_optimal_refresh_rate"
+I/BufferQueueProducer(27297): [](id:6aa100000003,api:0,p:0,c:27297) setDequeueTimeout:2077252342
+I/BLASTBufferQueue_Java(27297): new BLASTBufferQueue, mName= 4b58124 SurfaceView[com.triem.spectriem_app/com.triem.spectriem_app.MainActivity]@0 mNativeObject= 0xb40000722fb5bea0 caller= android.view.SurfaceView.createBlastSurfaceControls:1781 android.view.SurfaceView.updateSurface:1450 android.view.SurfaceView.setWindowStopped:539 android.view.SurfaceView.surfaceCreated:2327 android.view.ViewRootImpl.notifySurfaceCreated:3502 android.view.ViewRootImpl.performTraversals:5286 android.view.ViewRootImpl.doTraversal:3924 android.view.ViewRootImpl$TraversalRunnable.run:12903 android.view.Choreographer$CallbackRecord.run:1901 android.view.Choreographer$CallbackRecord.run:1910
+I/BLASTBufferQueue_Java(27297): update, w= 1848 h= 2960 mName = 4b58124 SurfaceView[com.triem.spectriem_app/com.triem.spectriem_app.MainActivity]@0 mNativeObject= 0xb40000722fb5bea0 sc.mNativeObject= 0xb40000730fac5810 format= 4 caller= android.view.SurfaceView.createBlastSurfaceControls:1782 android.view.SurfaceView.updateSurface:1450 android.view.SurfaceView.setWindowStopped:539 android.view.SurfaceView.surfaceCreated:2327 android.view.ViewRootImpl.notifySurfaceCreated:3502 android.view.ViewRootImpl.performTraversals:5286
+I/SurfaceView(27297): 79003940 Cur surface: Surface(name=null mNativeObject=0)/@0xf9b7a11
+D/SurfaceComposerClient(27297): setCornerRadius ## 4b58124 SurfaceView[com.triem.spectriem_app/com.triem.spectriem_app.MainActivity]@0#8271 cornerRadius=0.000000
+I/SV[79003940 MainActivity](27297): pST: sr = Rect(0, 0 - 1848, 2960) sw = 1848 sh = 2960
+D/SurfaceView(27297): 79003940 performSurfaceTransaction RenderWorker position = [0, 0, 1848, 2960] surfaceSize = 1848x2960
+W/libc    (27297): Access denied finding property "vendor.display.enable_optimal_refresh_rate"
+I/SV[79003940 MainActivity](27297): updateSurface: mVisible = true mSurface.isValid() = true
+I/SV[79003940 MainActivity](27297): updateSurface: mSurfaceCreated = false surfaceChanged = true visibleChanged = true
+I/SurfaceView(27297): 79003940 visibleChanged -- surfaceCreated
+I/SV[79003940 MainActivity](27297): surfaceCreated 1 #1 io.flutter.embedding.android.FlutterSurfaceView{4b58124 V.E...... ......ID 0,0-1848,2960}
+E/qdgralloc(27297): GetSize: Unrecognized pixel format: 0x38
+E/Gralloc4(27297): isSupported(1, 1, 56, 1, ...) failed with 5
+E/GraphicBufferAllocator(27297): Failed to allocate (4 x 4) layerCount 1 format 56 usage b00: 5
+E/AHardwareBuffer(27297): GraphicBuffer(w=4, h=4, lc=1) failed (Unknown error -5), handle=0x0
+E/qdgralloc(27297): GetSize: Unrecognized pixel format: 0x3b
+E/Gralloc4(27297): isSupported(1, 1, 59, 1, ...) failed with 5
+E/GraphicBufferAllocator(27297): Failed to allocate (4 x 4) layerCount 1 format 59 usage b00: 5
+E/AHardwareBuffer(27297): GraphicBuffer(w=4, h=4, lc=1) failed (Unknown error -5), handle=0x0
+E/qdgralloc(27297): GetSize: Unrecognized pixel format: 0x38
+E/Gralloc4(27297): isSupported(1, 1, 56, 1, ...) failed with 5
+E/GraphicBufferAllocator(27297): Failed to allocate (4 x 4) layerCount 1 format 56 usage b00: 5
+E/AHardwareBuffer(27297): GraphicBuffer(w=4, h=4, lc=1) failed (Unknown error -5), handle=0x0
+E/qdgralloc(27297): GetSize: Unrecognized pixel format: 0x3b
+E/Gralloc4(27297): isSupported(1, 1, 59, 1, ...) failed with 5
+E/GraphicBufferAllocator(27297): Failed to allocate (4 x 4) layerCount 1 format 59 usage b00: 5
+E/AHardwareBuffer(27297): GraphicBuffer(w=4, h=4, lc=1) failed (Unknown error -5), handle=0x0
+I/SurfaceView(27297): 79003940 surfaceChanged -- format=4 w=1848 h=2960
+I/SV[79003940 MainActivity](27297): surfaceChanged (1848,2960) 1 #1 io.flutter.embedding.android.FlutterSurfaceView{4b58124 V.E...... ......ID 0,0-1848,2960}
+I/SurfaceView(27297): 79003940 surfaceRedrawNeeded
+I/SurfaceView(27297): 79003940 finishedDrawing
+V/SurfaceView(27297): Layout: x=0 y=0 w=1848 h=2960, frame=Rect(0, 0 - 1848, 2960)
+D/VRI[MainActivity]@151079f(27297): reportNextDraw android.view.ViewRootImpl.performTraversals:5443 android.view.ViewRootImpl.doTraversal:3924 android.view.ViewRootImpl$TraversalRunnable.run:12903 android.view.Choreographer$CallbackRecord.run:1901 android.view.Choreographer$CallbackRecord.run:1910
+D/VRI[MainActivity]@151079f(27297): Setup new sync=wmsSync-VRI[MainActivity]@151079f#4
+I/VRI[MainActivity]@151079f(27297): Creating new active sync group VRI[MainActivity]@151079f#5
+D/VRI[MainActivity]@151079f(27297): Start draw after previous draw not visible
+D/VRI[MainActivity]@151079f(27297): registerCallbacksForSync syncBuffer=false
+D/SurfaceView(27297): 79003940 updateSurfacePosition RenderWorker, frameNr = 1, position = [0, 0, 1848, 2960] surfaceSize = 1848x2960
+I/SV[79003940 MainActivity](27297): uSP: rtp = Rect(0, 0 - 1848, 2960) rtsw = 1848 rtsh = 2960
+I/SV[79003940 MainActivity](27297): onSSPAndSRT: pl = 0 pt = 0 sx = 1.0 sy = 1.0
+I/SV[79003940 MainActivity](27297): aOrMT: VRI[MainActivity]@151079f t = android.view.SurfaceControl$Transaction@d4359ac fN = 1 android.view.SurfaceView.-$$Nest$mapplyOrMergeTransaction:0 android.view.SurfaceView$SurfaceViewPositionUpdateListener.positionChanged:1932 android.graphics.RenderNode$CompositePositionUpdateListener.positionChanged:401
+I/VRI[MainActivity]@151079f(27297): mWNT: t=0xb40000738faaf790 mBlastBufferQueue=0xb40000722fb57e60 fn= 1 HdrRenderState mRenderHdrSdrRatio=1.0 caller= android.view.SurfaceView.applyOrMergeTransaction:1863 android.view.SurfaceView.-$$Nest$mapplyOrMergeTransaction:0 android.view.SurfaceView$SurfaceViewPositionUpdateListener.positionChanged:1932
+D/VRI[MainActivity]@151079f(27297): Received frameDrawingCallback syncResult=0 frameNum=1.
+I/VRI[MainActivity]@151079f(27297): mWNT: t=0xb40000738faa7610 mBlastBufferQueue=0xb40000722fb57e60 fn= 1 HdrRenderState mRenderHdrSdrRatio=1.0 caller= android.view.ViewRootImpl$12.onFrameDraw:15441 android.view.ThreadedRenderer$1.onFrameDraw:718 <bottom of call stack>
+I/VRI[MainActivity]@151079f(27297): Setting up sync and frameCommitCallback
+I/BLASTBufferQueue(27297): [VRI[MainActivity]@151079f#2](f:0,a:0,s:0) onFrameAvailable the first frame is available
+I/SurfaceComposerClient(27297): apply transaction with the first frame. layerId: 8268, bufferData(ID: 117239722278950, frameNumber: 1)
+I/VRI[MainActivity]@151079f(27297): Received frameCommittedCallback lastAttemptedDrawFrameNum=1 didProduceBuffer=true
+D/HWUI    (27297): CFMS:: SetUp Pid : 27297    Tid : 27326
+D/VRI[MainActivity]@151079f(27297): reportDrawFinished seqId=0
+I/InsetsController(27297): onStateChanged: host=com.triem.spectriem_app/com.triem.spectriem_app.MainActivity, from=android.view.ViewRootImpl.onInsetsStateChanged:3026, state=InsetsState: {mDisplayFrame=Rect(0, 0 - 1848, 2960), mDisplayCutout=DisplayCutout{insets=Rect(0, 0 - 28, 0) waterfall=Insets{left=0, top=0, right=0, bottom=0} boundingRect={Bounds=[Rect(0, 0 - 0, 0), Rect(0, 0 - 0, 0), Rect(1820, 1393 - 1848, 1567), Rect(0, 0 - 0, 0)]} cutoutPathParserInfo={CutoutPathParserInfo{displayWidth=1848 displayHeight=2960 physicalDisplayWidth=1848 physicalDisplayHeight=2960 density={2.0} cutoutSpec={M 0,740 v -43.5 h -14 v 87 z @right @bind_right_cutout @dp} rotation={0} scale={1.0} physicalPixelDisplaySizeRatio={1.0}}} sideOverrides={}}, mRoundedCorners=RoundedCorners{[RoundedCorner{position=TopLeft, radius=26, center=Point(26, 26)}, RoundedCorner{position=TopRight, radius=26, center=Point(1822, 26)}, RoundedCorner{position=BottomRight, radius=26, center=Point(1822, 2934)}, RoundedCorner{position=BottomLeft, radius=26, center=Point(26, 2934)}]}  mRoundedCornerFrame=Rect(0, 0 - 1848, 2960), mPrivacyIndicatorBounds=PrivacyIndicatorBounds {static bounds=Rect(1760, 0 - 1848, 60) rotation=0}, mDisplayShape=DisplayShape{ spec=-311912193 displayWidth=1848 displayHeight=2960 physicalPixelDisplaySizeRatio=1.0 rotation=0 offsetX=0 offsetY=0 scale=1.0}, mSources= { InsetsSource: {3 mType=ime mFrame=[0,0][0,0] mVisible=false mFlags= mSideHint=NONE mBoundingRects=null}, InsetsSource: {47 mType=displayCutout mFrame=[1820,0][1848,2960] mVisible=true mFlags= mSideHint=RIGHT mBoundingRects=null}, InsetsSource: {3f320000 mType=statusBars mFrame=[0,0][1848,60] mVisible=true mFlags= mSideHint=TOP mBoundingRects=null}, InsetsSource: {3f320005 mType=mandatorySystemGestures mFrame=[0,0][1848,60] mVisible=true mFlags= mSideHint=TOP mBoundingRects=null}, InsetsSource: {3f320006 mType=tappableElement mFrame=[0,0][1848,60] mVisible=true mFlags= mSideHint=TOP mBoundingRects=null}, InsetsSource: {4a680001 mType=navigationBars mFrame=[0,2864][1848,2960] mVisible=true mFlags= mSideHint=BOTTOM mBoundingRects=null}, InsetsSource: {4a680004 mType=systemGestures mFrame=[0,0][0,0] mVisible=true mFlags= mSideHint=NONE mBoundingRects=null}, InsetsSource: {4a680005 mType=mandatorySystemGestures mFrame=[0,2864][1848,2960] mVisible=true mFlags= mSideHint=BOTTOM mBoundingRects=null}, InsetsSource: {4a680006 mType=tappableElement mFrame=[0,2864][1848,2960] mVisible=true mFlags= mSideHint=BOTTOM mBoundingRects=null}, InsetsSource: {4a680024 mType=systemGestures mFrame=[0,0][0,0] mVisible=true mFlags= mSideHint=NONE mBoundingRects=null} }
+I/VRI[MainActivity]@151079f(27297): handleResized, frames=ClientWindowFrames{frame=[0,0][1848,2960] display=[0,0][1848,2960] parentFrame=[0,0][0,0]} displayId=0 dragResizing=false compatScale=1.0 frameChanged=false attachedFrameChanged=false configChanged=false displayChanged=false compatScaleChanged=false dragResizingChanged=false
+I/VRI[MainActivity]@151079f(27297): handleResized mSyncSeqId = 0
+D/VRI[MainActivity]@151079f(27297): reportNextDraw android.view.ViewRootImpl.handleResized:2983 android.view.ViewRootImpl.-$$Nest$mhandleResized:0 android.view.ViewRootImpl$W.resized:14082 android.app.servertransaction.WindowStateResizeItem.execute:93 android.app.servertransaction.WindowStateTransactionItem.execute:62
+I/BLASTBufferQueue(27297): [4b58124 SurfaceView[com.triem.spectriem_app/com.triem.spectriem_app.MainActivity]@0#3](f:0,a:0,s:0) onFrameAvailable the first frame is available
+I/SurfaceComposerClient(27297): apply transaction with the first frame. layerId: 8272, bufferData(ID: 117239722278945, frameNumber: 1)
+D/VRI[MainActivity]@151079f(27297): Setup new sync=wmsSync-VRI[MainActivity]@151079f#6
+I/VRI[MainActivity]@151079f(27297): Creating new active sync group VRI[MainActivity]@151079f#7
+D/VRI[MainActivity]@151079f(27297): registerCallbacksForSync syncBuffer=false
+D/VRI[MainActivity]@151079f(27297): Received frameDrawingCallback syncResult=0 frameNum=2.
+I/VRI[MainActivity]@151079f(27297): Setting up sync and frameCommitCallback
+I/VRI[MainActivity]@151079f(27297): Received frameCommittedCallback lastAttemptedDrawFrameNum=2 didProduceBuffer=true
+D/VRI[MainActivity]@151079f(27297): reportDrawFinished seqId=0
+D/VRI[MainActivity]@151079f(27297): mThreadedRenderer.initializeIfNeeded()#2 mSurface={isValid=true 0xb40000724faaaf40}
+D/InputMethodManagerUtils(27297): startInputInner - Id : 0
+I/InputMethodManager(27297): startInputInner - IInputMethodManagerGlobalInvoker.startInputOrWindowGainedFocus
+I/InsetsSourceConsumer(27297): applyRequestedVisibilityToControl: visible=true, type=navigationBars, host=com.triem.spectriem_app/com.triem.spectriem_app.MainActivity
+I/InsetsSourceConsumer(27297): applyRequestedVisibilityToControl: visible=true, type=statusBars, host=com.triem.spectriem_app/com.triem.spectriem_app.MainActivity
+I/InputMethodManager(27297): handleMessage: setImeVisibility visible=false
+D/InputTransport(27297): Input channel constructed: 'ClientS', fd=172
+D/InsetsController(27297): hide(ime(), fromIme=false)
+I/ImeTracker(27297): com.triem.spectriem_app:e5a00316: onCancelled at PHASE_CLIENT_ALREADY_HIDDEN
+I/VRI[MainActivity]@151079f(27297): call setFrameRateCategory for touch hint category=high hint, reason=touch, vri=VRI[MainActivity]@151079f
+I/flutter (27297): 02:36:00.528 INFO [BLE] Starting device scan...
+D/[FBP-Android](27297): [FBP] onMethodCall: flutterRestart
+D/[FBP-Android](27297): [FBP] initializing BluetoothAdapter
+I/BluetoothAdapter(27297): BluetoothAdapter() : com.triem.spectriem_app
+D/[FBP-Android](27297): [FBP] disconnectAllDevices(flutterRestart)
+D/[FBP-Android](27297): [FBP] connectedPeripherals: 0
+D/[FBP-Android](27297): [FBP] onMethodCall: startScan
+D/BluetoothAdapter(27297): isLeEnabled(): ON
+D/BluetoothLeScanner(27297): Start Scan with callback
+D/BluetoothLeScanner(27297): onScannerRegistered() - status=0 scannerId=4 mScannerId=0
+I/BluetoothAdapter(27297): BluetoothAdapter() : com.triem.spectriem_app
+I/flutter (27297): 02:36:00.670 DEBUG [BLE] Found device: NIRScanNano
+I/flutter (27297): 02:36:00.774 DEBUG [BLE] Found device: NIRScanNano
+I/flutter (27297): 02:36:00.775 DEBUG [BLE] Found device: NIRScanNano
+I/flutter (27297): 02:36:00.775 DEBUG [BLE] Found device: NIRScanNano
+I/flutter (27297): 02:36:00.821 DEBUG [BLE] Found device: NIRScanNano
+I/flutter (27297): 02:36:00.903 DEBUG [BLE] Found device: NIRScanNano
+I/flutter (27297): 02:36:00.931 DEBUG [BLE] Found device: NIRScanNano
+I/flutter (27297): 02:36:01.116 DEBUG [BLE] Found device: NIRScanNano
+I/flutter (27297): 02:36:01.144 DEBUG [BLE] Found device: NIRScanNano
+I/flutter (27297): 02:36:01.285 DEBUG [BLE] Found device: NIRScanNano
+I/flutter (27297): 02:36:01.972 DEBUG [BLE] Found device: NIRScanNano
+I/flutter (27297): 02:36:02.030 INFO [BLE] Connecting to NIRScanNano...
+I/flutter (27297): 02:36:02.032 INFO [BLE] [BLE] Connecting to device: 90:7B:C6:49:B1:6A (timeout: 15s)
+D/[FBP-Android](27297): [FBP] onMethodCall: connect
+D/BluetoothGatt(27297): connect() - device: XX:XX:XX:XX:B1:6A, auto: false
+D/BluetoothGatt(27297): registerApp()
+D/BluetoothGatt(27297): registerApp() - UUID=7edb8c3c-6aae-4ddc-b337-8372318a5675
+D/BluetoothGatt(27297): onClientRegistered() - status=0 clientIf=70
+D/[FBP-Android](27297): [FBP] onMethodCall: getAdapterState
+I/flutter (27297): 02:36:02.137 DEBUG [BLE] Found device: NIRScanNano
+D/BluetoothGatt(27297): onClientConnectionState() - status=0 clientIf=70 connected=true device=XX:XX:XX:XX:B1:6A
+D/[FBP-Android](27297): [FBP] onConnectionStateChange:connected
+D/[FBP-Android](27297): [FBP]   status: SUCCESS
+I/flutter (27297): 02:36:02.431 DEBUG [BLE] Found device: NIRScanNano
+I/flutter (27297): 02:36:02.443 DEBUG [BLE] Found device: NIRScanNano
+I/flutter (27297): 02:36:02.501 DEBUG [BLE] Found device: NIRScanNano
+D/BluetoothGatt(27297): onConnectionUpdated() - Device=XX:XX:XX:XX:B1:6A interval=6 latency=0 timeout=500 status=0
+D/[FBP-Android](27297): [FBP] onMethodCall: requestMtu
+D/BluetoothGatt(27297): configureMTU() - device: XX:XX:XX:XX:B1:6A mtu: 512
+I/flutter (27297): 02:36:02.858 DEBUG [BLE] Found device: NIRScanNano
+I/flutter (27297): 02:36:03.119 DEBUG [BLE] Found device: NIRScanNano
+I/flutter (27297): 02:36:03.312 DEBUG [BLE] Found device: NIRScanNano
+I/flutter (27297): 02:36:03.538 DEBUG [BLE] Found device: NIRScanNano
+I/flutter (27297): 02:36:03.585 DEBUG [BLE] Found device: NIRScanNano
+I/flutter (27297): 02:36:03.588 DEBUG [BLE] Found device: NIRScanNano
+I/flutter (27297): 02:36:03.809 DEBUG [BLE] Found device: NIRScanNano
+I/flutter (27297): 02:36:03.852 DEBUG [BLE] Found device: NIRScanNano
+I/flutter (27297): 02:36:03.891 DEBUG [BLE] Found device: NIRScanNano
+I/flutter (27297): 02:36:03.953 DEBUG [BLE] Found device: NIRScanNano
+D/BluetoothGatt(27297): onConfigureMTU() - Device=XX:XX:XX:XX:B1:6A mtu=131 status=0
+D/[FBP-Android](27297): [FBP] onMtuChanged:
+D/[FBP-Android](27297): [FBP]   mtu: 131
+D/[FBP-Android](27297): [FBP]   status: GATT_SUCCESS (0)
+D/BluetoothGatt(27297): onConnectionUpdated() - Device=XX:XX:XX:XX:B1:6A interval=24 latency=0 timeout=500 status=0
+D/[FBP-Android](27297): [FBP] onMethodCall: requestMtu
+D/BluetoothGatt(27297): configureMTU() - device: XX:XX:XX:XX:B1:6A mtu: 512
+D/BluetoothGatt(27297): onConfigureMTU() - Device=XX:XX:XX:XX:B1:6A mtu=131 status=0
+D/[FBP-Android](27297): [FBP] onMtuChanged:
+D/[FBP-Android](27297): [FBP]   mtu: 131
+D/[FBP-Android](27297): [FBP]   status: GATT_SUCCESS (0)
+I/flutter (27297): 02:36:04.442 INFO [BLE] [BLE] Connected successfully | Device: NIRScanNano | MTU: 131
+D/[FBP-Android](27297): [FBP] onMethodCall: discoverServices
+D/BluetoothGatt(27297): discoverServices() - device: XX:XX:XX:XX:B1:6A
+D/BluetoothGatt(27297): onSearchComplete() = address=XX:XX:XX:XX:B1:6A status=0
+D/[FBP-Android](27297): [FBP] onServicesDiscovered:
+D/[FBP-Android](27297): [FBP]   count: 10
+D/[FBP-Android](27297): [FBP]   status: 0GATT_SUCCESS
+I/flutter (27297): 02:36:04.522 INFO [BLE] [BLE] Services discovered: 10 services | Device: 90:7B:C6:49:B1:6A
+I/flutter (27297): 02:36:04.524 INFO [BLE] [BLE] Subscribing to 13 notification characteristics...
+D/[FBP-Android](27297): [FBP] onMethodCall: setNotifyValue
+D/BluetoothGatt(27297): setCharacteristicNotification() - uuid: 4348410e-444c-5020-4e49-52204e616e6f enable: true
+D/[FBP-Android](27297): [FBP] onDescriptorWrite:
+D/[FBP-Android](27297): [FBP]   chr: 4348410e-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP]   desc: 2902
+D/[FBP-Android](27297): [FBP]   status: GATT_SUCCESS (0)
+D/[FBP-Android](27297): [FBP] onMethodCall: setNotifyValue
+D/BluetoothGatt(27297): setCharacteristicNotification() - uuid: 43484110-444c-5020-4e49-52204e616e6f enable: true
+D/[FBP-Android](27297): [FBP] onDescriptorWrite:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP]   desc: 2902
+D/[FBP-Android](27297): [FBP]   status: GATT_SUCCESS (0)
+D/[FBP-Android](27297): [FBP] onMethodCall: setNotifyValue
+D/BluetoothGatt(27297): setCharacteristicNotification() - uuid: 43484112-444c-5020-4e49-52204e616e6f enable: true
+D/[FBP-Android](27297): [FBP] onDescriptorWrite:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP]   desc: 2902
+D/[FBP-Android](27297): [FBP]   status: GATT_SUCCESS (0)
+I/VRI[MainActivity]@151079f(27297): call setFrameRateCategory for touch hint category=no preference, reason=boost timeout, vri=VRI[MainActivity]@151079f
+I/flutter (27297): 02:36:05.040 DEBUG [BLE] Found device: NIRScanNano
+D/[FBP-Android](27297): [FBP] onMethodCall: setNotifyValue
+D/BluetoothGatt(27297): setCharacteristicNotification() - uuid: 4348411d-444c-5020-4e49-52204e616e6f enable: true
+W/[FBP-Android](27297): [FBP] CCCD descriptor for characteristic not found: 4348411d-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onMethodCall: setNotifyValue
+D/BluetoothGatt(27297): setCharacteristicNotification() - uuid: 43484120-444c-5020-4e49-52204e616e6f enable: true
+D/[FBP-Android](27297): [FBP] onDescriptorWrite:
+D/[FBP-Android](27297): [FBP]   chr: 43484120-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP]   desc: 2902
+D/[FBP-Android](27297): [FBP]   status: GATT_SUCCESS (0)
+D/[FBP-Android](27297): [FBP] onMethodCall: setNotifyValue
+D/BluetoothGatt(27297): setCharacteristicNotification() - uuid: 43484122-444c-5020-4e49-52204e616e6f enable: true
+D/[FBP-Android](27297): [FBP] onDescriptorWrite:
+D/[FBP-Android](27297): [FBP]   chr: 43484122-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP]   desc: 2902
+D/[FBP-Android](27297): [FBP]   status: GATT_SUCCESS (0)
+D/[FBP-Android](27297): [FBP] onMethodCall: setNotifyValue
+D/BluetoothGatt(27297): setCharacteristicNotification() - uuid: 43484124-444c-5020-4e49-52204e616e6f enable: true
+D/[FBP-Android](27297): [FBP] onDescriptorWrite:
+D/[FBP-Android](27297): [FBP]   chr: 43484124-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP]   desc: 2902
+D/[FBP-Android](27297): [FBP]   status: GATT_SUCCESS (0)
+D/[FBP-Android](27297): [FBP] onMethodCall: setNotifyValue
+D/BluetoothGatt(27297): setCharacteristicNotification() - uuid: 43484126-444c-5020-4e49-52204e616e6f enable: true
+D/[FBP-Android](27297): [FBP] onDescriptorWrite:
+D/[FBP-Android](27297): [FBP]   chr: 43484126-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP]   desc: 2902
+D/[FBP-Android](27297): [FBP]   status: GATT_SUCCESS (0)
+D/[FBP-Android](27297): [FBP] onMethodCall: setNotifyValue
+D/BluetoothGatt(27297): setCharacteristicNotification() - uuid: 43484128-444c-5020-4e49-52204e616e6f enable: true
+D/[FBP-Android](27297): [FBP] onDescriptorWrite:
+D/[FBP-Android](27297): [FBP]   chr: 43484128-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP]   desc: 2902
+D/[FBP-Android](27297): [FBP]   status: GATT_SUCCESS (0)
+D/[FBP-Android](27297): [FBP] onMethodCall: setNotifyValue
+D/BluetoothGatt(27297): setCharacteristicNotification() - uuid: 43484115-444c-5020-4e49-52204e616e6f enable: true
+D/[FBP-Android](27297): [FBP] onDescriptorWrite:
+D/[FBP-Android](27297): [FBP]   chr: 43484115-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP]   desc: 2902
+D/[FBP-Android](27297): [FBP]   status: GATT_SUCCESS (0)
+D/[FBP-Android](27297): [FBP] onMethodCall: setNotifyValue
+D/BluetoothGatt(27297): setCharacteristicNotification() - uuid: 4348411b-444c-5020-4e49-52204e616e6f enable: true
+D/[FBP-Android](27297): [FBP] onDescriptorWrite:
+D/[FBP-Android](27297): [FBP]   chr: 4348411b-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP]   desc: 2902
+D/[FBP-Android](27297): [FBP]   status: GATT_SUCCESS (0)
+D/[FBP-Android](27297): [FBP] onMethodCall: setNotifyValue
+D/BluetoothGatt(27297): setCharacteristicNotification() - uuid: 4348411e-444c-5020-4e49-52204e616e6f enable: true
+W/[FBP-Android](27297): [FBP] CCCD descriptor for characteristic not found: 4348411e-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onMethodCall: setNotifyValue
+D/BluetoothGatt(27297): setCharacteristicNotification() - uuid: 43484117-444c-5020-4e49-52204e616e6f enable: true
+D/[FBP-Android](27297): [FBP] onDescriptorWrite:
+D/[FBP-Android](27297): [FBP]   chr: 43484117-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP]   desc: 2902
+D/[FBP-Android](27297): [FBP]   status: GATT_SUCCESS (0)
+I/flutter (27297): 02:36:06.763 INFO [BLE] [BLE] All notifications subscribed
+I/flutter (27297): 02:36:06.766 INFO [BLE] [BLE] Connection fully established to NIRScanNano
+I/flutter (27297): 02:36:06.774 DEBUG [BLE] Loading device info...
+I/flutter (27297): 02:36:06.798 ERROR [UI] Failed to load configurations: Unsupported operation: getScanConfigurations not implemented yet
+D/[FBP-Android](27297): [FBP] onMethodCall: readCharacteristic
+D/[FBP-Android](27297): [FBP] onCharacteristicRead:
+D/[FBP-Android](27297): [FBP]   chr: 2a29
+D/[FBP-Android](27297): [FBP]   status: GATT_SUCCESS (0)
+D/[FBP-Android](27297): [FBP]   instanceId: 0
+D/[FBP-Android](27297): [FBP] onMethodCall: readCharacteristic
+D/[FBP-Android](27297): [FBP] onCharacteristicRead:
+D/[FBP-Android](27297): [FBP]   chr: 2a24
+D/[FBP-Android](27297): [FBP]   status: GATT_SUCCESS (0)
+D/[FBP-Android](27297): [FBP]   instanceId: 0
+D/[FBP-Android](27297): [FBP] onMethodCall: readCharacteristic
+D/[FBP-Android](27297): [FBP] onCharacteristicRead:
+D/[FBP-Android](27297): [FBP]   chr: 2a25
+D/[FBP-Android](27297): [FBP]   status: GATT_SUCCESS (0)
+D/[FBP-Android](27297): [FBP]   instanceId: 0
+D/[FBP-Android](27297): [FBP] onMethodCall: readCharacteristic
+D/[FBP-Android](27297): [FBP] onCharacteristicRead:
+D/[FBP-Android](27297): [FBP]   chr: 2a27
+D/[FBP-Android](27297): [FBP]   status: GATT_SUCCESS (0)
+D/[FBP-Android](27297): [FBP]   instanceId: 0
+D/[FBP-Android](27297): [FBP] onMethodCall: readCharacteristic
+D/[FBP-Android](27297): [FBP] onCharacteristicRead:
+D/[FBP-Android](27297): [FBP]   chr: 2a26
+D/[FBP-Android](27297): [FBP]   status: GATT_SUCCESS (0)
+D/[FBP-Android](27297): [FBP]   instanceId: 0
+D/[FBP-Android](27297): [FBP] onMethodCall: readCharacteristic
+D/[FBP-Android](27297): [FBP] onCharacteristicRead:
+D/[FBP-Android](27297): [FBP]   chr: 2a28
+D/[FBP-Android](27297): [FBP]   status: GATT_SUCCESS (0)
+D/[FBP-Android](27297): [FBP]   instanceId: 0
+D/[FBP-Android](27297): [FBP] onMethodCall: readCharacteristic
+D/[FBP-Android](27297): [FBP] onCharacteristicRead:
+D/[FBP-Android](27297): [FBP]   chr: 2a19
+D/[FBP-Android](27297): [FBP]   status: GATT_SUCCESS (0)
+D/[FBP-Android](27297): [FBP]   instanceId: 0
+D/[FBP-Android](27297): [FBP] onMethodCall: readCharacteristic
+I/VRI[MainActivity]@151079f(27297): call setFrameRateCategory for touch hint category=high hint, reason=touch, vri=VRI[MainActivity]@151079f
+D/[FBP-Android](27297): [FBP] onCharacteristicRead:
+D/[FBP-Android](27297): [FBP]   chr: 43484101-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:07.910 DEBUG [BLE] Found device: NIRScanNano
+D/[FBP-Android](27297): [FBP]   status: GATT_SUCCESS (0)
+D/[FBP-Android](27297): [FBP]   instanceId: 0
+D/[FBP-Android](27297): [FBP] onMethodCall: readCharacteristic
+I/flutter (27297): 02:36:08.361 DEBUG [BLE] Found device: NIRScanNano
+D/[FBP-Android](27297): [FBP] onCharacteristicRead:
+D/[FBP-Android](27297): [FBP]   chr: 43484102-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP]   status: GATT_SUCCESS (0)
+D/[FBP-Android](27297): [FBP]   instanceId: 0
+D/[FBP-Android](27297): [FBP] onMethodCall: readCharacteristic
+D/[FBP-Android](27297): [FBP] onCharacteristicRead:
+D/[FBP-Android](27297): [FBP]   chr: 43484103-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP]   status: GATT_SUCCESS (0)
+D/[FBP-Android](27297): [FBP]   instanceId: 0
+D/[FBP-Android](27297): [FBP] onMethodCall: readCharacteristic
+I/flutter (27297): 02:36:09.006 DEBUG [BLE] Found device: NIRScanNano
+D/[FBP-Android](27297): [FBP] onCharacteristicRead:
+D/[FBP-Android](27297): [FBP]   chr: 43484104-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP]   status: GATT_SUCCESS (0)
+D/[FBP-Android](27297): [FBP]   instanceId: 0
+I/flutter (27297): 02:36:09.422 INFO [BLE] Device: Texas Instruments
+I/flutter (27297):  DLPNIRNANOEVM
+D/[FBP-Android](27297): [FBP] onMethodCall: stopScan
+D/BluetoothAdapter(27297): isLeEnabled(): ON
+D/BluetoothLeScanner(27297): Stop Scan with callback
+I/VRI[MainActivity]@151079f(27297): call setFrameRateCategory for touch hint category=no preference, reason=boost timeout, vri=VRI[MainActivity]@151079f
+I/VRI[MainActivity]@151079f(27297): call setFrameRateCategory for touch hint category=high hint, reason=touch, vri=VRI[MainActivity]@151079f
+I/flutter (27297): 02:36:15.875 INFO [UI] ↑ CMD: performScan
+I/flutter (27297): 02:36:15.880 INFO [BLE] [SCAN] Starting scan | Device: NIRScanNano | SaveToSD: false
+I/flutter (27297): 02:36:15.880 INFO [BLE] [SCAN] Syncing device time | Current: 2026-01-27T02:36:15.880661
+D/[FBP-Android](27297): [FBP] onMethodCall: writeCharacteristic
+D/[FBP-Android](27297): [FBP] onCharacteristicWrite:
+D/[FBP-Android](27297): [FBP]   chr: 4348410c-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP]   status: GATT_SUCCESS (0)
+I/flutter (27297): 02:36:15.993 INFO [BLE] [SCAN] Time synced successfully
+I/flutter (27297): 02:36:15.994 INFO [BLE] [SCAN] Calibration check | Cached: false
+I/flutter (27297): 02:36:15.996 INFO [BLE] [CAL] Starting calibration coefficient fetch...
+I/flutter (27297): 02:36:15.997 INFO [BLE] [CAL] Characteristics found, setting up listener...
+I/flutter (27297): 02:36:15.999 INFO [BLE] [CAL] Requesting calibration coefficients...
+D/[FBP-Android](27297): [FBP] onMethodCall: writeCharacteristic
+D/[FBP-Android](27297): [FBP] onCharacteristicWrite:
+D/[FBP-Android](27297): [FBP]   chr: 4348410f-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP]   status: GATT_SUCCESS (0)
+I/flutter (27297): 02:36:16.047 INFO [BLE] [CAL] Request sent, waiting for response...
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:16.693 INFO [BLE] [CAL] Received coeff packet #1 (5 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:16.697 INFO [BLE] [CAL] Received coeff packet #2 (20 bytes)
+I/flutter (27297): 02:36:16.700 INFO [BLE] [CAL] Received coeff packet #3 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:16.702 INFO [BLE] [CAL] Received coeff packet #4 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:16.705 INFO [BLE] [CAL] Received coeff packet #5 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:16.707 INFO [BLE] [CAL] Received coeff packet #6 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:16.709 INFO [BLE] [CAL] Received coeff packet #7 (20 bytes)
+I/flutter (27297): 02:36:16.711 INFO [BLE] [CAL] Received coeff packet #8 (20 bytes)
+I/flutter (27297): 02:36:16.713 INFO [BLE] [CAL] Received coeff packet #9 (20 bytes)
+I/flutter (27297): 02:36:16.716 INFO [BLE] [CAL] Received coeff packet #10 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:16.719 INFO [BLE] [CAL] Received coeff packet #11 (20 bytes)
+I/flutter (27297): 02:36:16.720 INFO [BLE] [CAL] Received coeff packet #12 (20 bytes)
+I/flutter (27297): 02:36:16.721 INFO [BLE] [CAL] Received coeff packet #13 (20 bytes)
+I/flutter (27297): 02:36:16.722 INFO [BLE] [CAL] Received coeff packet #14 (20 bytes)
+I/flutter (27297): 02:36:16.723 INFO [BLE] [CAL] Received coeff packet #15 (20 bytes)
+I/flutter (27297): 02:36:16.724 INFO [BLE] [CAL] Received coeff packet #16 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:16.733 INFO [BLE] [CAL] Received coeff packet #17 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:16.734 INFO [BLE] [CAL] Received coeff packet #18 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:16.736 INFO [BLE] [CAL] Received coeff packet #19 (20 bytes)
+I/flutter (27297): 02:36:16.737 INFO [BLE] [CAL] Received coeff packet #20 (20 bytes)
+I/flutter (27297): 02:36:16.738 INFO [BLE] [CAL] Received coeff packet #21 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:16.741 INFO [BLE] [CAL] Received coeff packet #22 (20 bytes)
+I/flutter (27297): 02:36:16.742 INFO [BLE] [CAL] Received coeff packet #23 (20 bytes)
+I/flutter (27297): 02:36:16.744 INFO [BLE] [CAL] Received coeff packet #24 (20 bytes)
+I/flutter (27297): 02:36:16.745 INFO [BLE] [CAL] Received coeff packet #25 (20 bytes)
+I/flutter (27297): 02:36:16.746 INFO [BLE] [CAL] Received coeff packet #26 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:16.762 INFO [BLE] [CAL] Received coeff packet #27 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+I/flutter (27297): 02:36:16.763 INFO [BLE] [CAL] Received coeff packet #28 (20 bytes)
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:16.764 INFO [BLE] [CAL] Received coeff packet #29 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:16.773 INFO [BLE] [CAL] Received coeff packet #30 (20 bytes)
+I/flutter (27297): 02:36:16.776 INFO [BLE] [CAL] Received coeff packet #31 (20 bytes)
+I/flutter (27297): 02:36:16.779 INFO [BLE] [CAL] Received coeff packet #32 (20 bytes)
+I/flutter (27297): 02:36:16.780 INFO [BLE] [CAL] Received coeff packet #33 (20 bytes)
+I/flutter (27297): 02:36:16.781 INFO [BLE] [CAL] Received coeff packet #34 (20 bytes)
+I/flutter (27297): 02:36:16.782 INFO [BLE] [CAL] Received coeff packet #35 (20 bytes)
+I/flutter (27297): 02:36:16.783 INFO [BLE] [CAL] Received coeff packet #36 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:16.795 INFO [BLE] [CAL] Received coeff packet #37 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:16.796 INFO [BLE] [CAL] Received coeff packet #38 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:16.799 INFO [BLE] [CAL] Received coeff packet #39 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:16.800 INFO [BLE] [CAL] Received coeff packet #40 (20 bytes)
+I/flutter (27297): 02:36:16.801 INFO [BLE] [CAL] Received coeff packet #41 (20 bytes)
+I/flutter (27297): 02:36:16.803 INFO [BLE] [CAL] Received coeff packet #42 (20 bytes)
+I/flutter (27297): 02:36:16.804 INFO [BLE] [CAL] Received coeff packet #43 (20 bytes)
+I/flutter (27297): 02:36:16.806 INFO [BLE] [CAL] Received coeff packet #44 (20 bytes)
+I/flutter (27297): 02:36:16.807 INFO [BLE] [CAL] Received coeff packet #45 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:16.860 INFO [BLE] [CAL] Received coeff packet #46 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:16.862 INFO [BLE] [CAL] Received coeff packet #47 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+I/flutter (27297): 02:36:16.865 INFO [BLE] [CAL] Received coeff packet #48 (20 bytes)
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:16.867 INFO [BLE] [CAL] Received coeff packet #49 (20 bytes)
+I/flutter (27297): 02:36:16.869 INFO [BLE] [CAL] Received coeff packet #50 (20 bytes)
+I/flutter (27297): 02:36:16.872 INFO [BLE] [CAL] Received coeff packet #51 (20 bytes)
+I/flutter (27297): 02:36:16.874 INFO [BLE] [CAL] Received coeff packet #52 (20 bytes)
+I/flutter (27297): 02:36:16.876 INFO [BLE] [CAL] Received coeff packet #53 (20 bytes)
+I/flutter (27297): 02:36:16.876 INFO [BLE] [CAL] Received coeff packet #54 (20 bytes)
+I/flutter (27297): 02:36:16.877 INFO [BLE] [CAL] Received coeff packet #55 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:16.881 INFO [BLE] [CAL] Received coeff packet #56 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:16.882 INFO [BLE] [CAL] Received coeff packet #57 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:16.882 INFO [BLE] [CAL] Received coeff packet #58 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:16.883 INFO [BLE] [CAL] Received coeff packet #59 (20 bytes)
+I/flutter (27297): 02:36:16.891 INFO [BLE] [CAL] Received coeff packet #60 (20 bytes)
+I/flutter (27297): 02:36:16.892 INFO [BLE] [CAL] Received coeff packet #61 (20 bytes)
+I/flutter (27297): 02:36:16.893 INFO [BLE] [CAL] Received coeff packet #62 (20 bytes)
+I/flutter (27297): 02:36:16.893 INFO [BLE] [CAL] Received coeff packet #63 (20 bytes)
+I/flutter (27297): 02:36:16.894 INFO [BLE] [CAL] Received coeff packet #64 (20 bytes)
+I/flutter (27297): 02:36:16.895 INFO [BLE] [CAL] Received coeff packet #65 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:16.914 INFO [BLE] [CAL] Received coeff packet #66 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:16.919 INFO [BLE] [CAL] Received coeff packet #67 (20 bytes)
+I/flutter (27297): 02:36:16.920 INFO [BLE] [CAL] Received coeff packet #68 (20 bytes)
+I/flutter (27297): 02:36:16.922 INFO [BLE] [CAL] Received coeff packet #69 (20 bytes)
+I/flutter (27297): 02:36:16.923 INFO [BLE] [CAL] Received coeff packet #70 (20 bytes)
+I/flutter (27297): 02:36:16.924 INFO [BLE] [CAL] Received coeff packet #71 (20 bytes)
+I/flutter (27297): 02:36:16.925 INFO [BLE] [CAL] Received coeff packet #72 (20 bytes)
+I/flutter (27297): 02:36:16.927 INFO [BLE] [CAL] Received coeff packet #73 (20 bytes)
+I/flutter (27297): 02:36:16.928 INFO [BLE] [CAL] Received coeff packet #74 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:16.942 INFO [BLE] [CAL] Received coeff packet #75 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:16.944 INFO [BLE] [CAL] Received coeff packet #76 (20 bytes)
+I/flutter (27297): 02:36:16.944 INFO [BLE] [CAL] Received coeff packet #77 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:16.945 INFO [BLE] [CAL] Received coeff packet #78 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:16.946 INFO [BLE] [CAL] Received coeff packet #79 (20 bytes)
+I/flutter (27297): 02:36:16.947 INFO [BLE] [CAL] Received coeff packet #80 (20 bytes)
+I/flutter (27297): 02:36:16.948 INFO [BLE] [CAL] Received coeff packet #81 (20 bytes)
+I/flutter (27297): 02:36:16.949 INFO [BLE] [CAL] Received coeff packet #82 (20 bytes)
+I/flutter (27297): 02:36:16.949 INFO [BLE] [CAL] Received coeff packet #83 (20 bytes)
+I/flutter (27297): 02:36:16.950 INFO [BLE] [CAL] Received coeff packet #84 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:16.973 INFO [BLE] [CAL] Received coeff packet #85 (20 bytes)
+I/flutter (27297): 02:36:16.976 INFO [BLE] [CAL] Received coeff packet #86 (20 bytes)
+I/flutter (27297): 02:36:16.977 INFO [BLE] [CAL] Received coeff packet #87 (20 bytes)
+I/flutter (27297): 02:36:16.979 INFO [BLE] [CAL] Received coeff packet #88 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:17.005 INFO [BLE] [CAL] Received coeff packet #89 (20 bytes)
+I/flutter (27297): 02:36:17.007 INFO [BLE] [CAL] Received coeff packet #90 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+I/flutter (27297): 02:36:17.009 INFO [BLE] [CAL] Received coeff packet #91 (20 bytes)
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:17.011 INFO [BLE] [CAL] Received coeff packet #92 (20 bytes)
+I/flutter (27297): 02:36:17.013 INFO [BLE] [CAL] Received coeff packet #93 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+I/flutter (27297): 02:36:17.015 INFO [BLE] [CAL] Received coeff packet #94 (20 bytes)
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:17.018 INFO [BLE] [CAL] Received coeff packet #95 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:17.020 INFO [BLE] [CAL] Received coeff packet #96 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:17.021 INFO [BLE] [CAL] Received coeff packet #97 (20 bytes)
+I/flutter (27297): 02:36:17.023 INFO [BLE] [CAL] Received coeff packet #98 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:17.031 INFO [BLE] [CAL] Received coeff packet #99 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:17.032 INFO [BLE] [CAL] Received coeff packet #100 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:17.032 INFO [BLE] [CAL] Received coeff packet #101 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+I/flutter (27297): 02:36:17.033 INFO [BLE] [CAL] Received coeff packet #102 (20 bytes)
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+I/flutter (27297): 02:36:17.034 INFO [BLE] [CAL] Received coeff packet #103 (20 bytes)
+I/flutter (27297): 02:36:17.035 INFO [BLE] [CAL] Received coeff packet #104 (20 bytes)
+I/flutter (27297): 02:36:17.036 INFO [BLE] [CAL] Received coeff packet #105 (20 bytes)
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:17.039 INFO [BLE] [CAL] Received coeff packet #106 (20 bytes)
+I/flutter (27297): 02:36:17.040 INFO [BLE] [CAL] Received coeff packet #107 (20 bytes)
+I/flutter (27297): 02:36:17.041 INFO [BLE] [CAL] Received coeff packet #108 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+I/flutter (27297): 02:36:17.064 INFO [BLE] [CAL] Received coeff packet #109 (20 bytes)
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:17.065 INFO [BLE] [CAL] Received coeff packet #110 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:17.067 INFO [BLE] [CAL] Received coeff packet #111 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+I/flutter (27297): 02:36:17.070 INFO [BLE] [CAL] Received coeff packet #112 (20 bytes)
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:17.072 INFO [BLE] [CAL] Received coeff packet #113 (20 bytes)
+I/flutter (27297): 02:36:17.074 INFO [BLE] [CAL] Received coeff packet #114 (20 bytes)
+I/flutter (27297): 02:36:17.076 INFO [BLE] [CAL] Received coeff packet #115 (20 bytes)
+I/flutter (27297): 02:36:17.077 INFO [BLE] [CAL] Received coeff packet #116 (20 bytes)
+I/flutter (27297): 02:36:17.079 INFO [BLE] [CAL] Received coeff packet #117 (20 bytes)
+I/flutter (27297): 02:36:17.081 INFO [BLE] [CAL] Received coeff packet #118 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:17.134 INFO [BLE] [CAL] Received coeff packet #119 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+I/flutter (27297): 02:36:17.137 INFO [BLE] [CAL] Received coeff packet #120 (20 bytes)
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:17.139 INFO [BLE] [CAL] Received coeff packet #121 (20 bytes)
+I/flutter (27297): 02:36:17.141 INFO [BLE] [CAL] Received coeff packet #122 (20 bytes)
+I/flutter (27297): 02:36:17.143 INFO [BLE] [CAL] Received coeff packet #123 (20 bytes)
+I/flutter (27297): 02:36:17.145 INFO [BLE] [CAL] Received coeff packet #124 (20 bytes)
+I/flutter (27297): 02:36:17.146 INFO [BLE] [CAL] Received coeff packet #125 (20 bytes)
+I/flutter (27297): 02:36:17.148 INFO [BLE] [CAL] Received coeff packet #126 (20 bytes)
+I/flutter (27297): 02:36:17.149 INFO [BLE] [CAL] Received coeff packet #127 (20 bytes)
+I/flutter (27297): 02:36:17.150 INFO [BLE] [CAL] Received coeff packet #128 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:17.152 INFO [BLE] [CAL] Received coeff packet #129 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:17.152 INFO [BLE] [CAL] Received coeff packet #130 (20 bytes)
+I/flutter (27297): 02:36:17.153 INFO [BLE] [CAL] Received coeff packet #131 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:17.154 INFO [BLE] [CAL] Received coeff packet #132 (20 bytes)
+I/flutter (27297): 02:36:17.155 INFO [BLE] [CAL] Received coeff packet #133 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:17.156 INFO [BLE] [CAL] Received coeff packet #134 (20 bytes)
+I/flutter (27297): 02:36:17.157 INFO [BLE] [CAL] Received coeff packet #135 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:17.158 INFO [BLE] [CAL] Received coeff packet #136 (20 bytes)
+I/flutter (27297): 02:36:17.158 INFO [BLE] [CAL] Received coeff packet #137 (20 bytes)
+I/flutter (27297): 02:36:17.159 INFO [BLE] [CAL] Received coeff packet #138 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:17.183 INFO [BLE] [CAL] Received coeff packet #139 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+I/flutter (27297): 02:36:17.183 INFO [BLE] [CAL] Received coeff packet #140 (20 bytes)
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:17.184 INFO [BLE] [CAL] Received coeff packet #141 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:17.186 INFO [BLE] [CAL] Received coeff packet #142 (20 bytes)
+I/flutter (27297): 02:36:17.187 INFO [BLE] [CAL] Received coeff packet #143 (20 bytes)
+I/flutter (27297): 02:36:17.188 INFO [BLE] [CAL] Received coeff packet #144 (20 bytes)
+I/flutter (27297): 02:36:17.189 INFO [BLE] [CAL] Received coeff packet #145 (20 bytes)
+I/flutter (27297): 02:36:17.190 INFO [BLE] [CAL] Received coeff packet #146 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+I/flutter (27297): 02:36:17.215 INFO [BLE] [CAL] Received coeff packet #147 (20 bytes)
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:17.216 INFO [BLE] [CAL] Received coeff packet #148 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:17.218 INFO [BLE] [CAL] Received coeff packet #149 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:17.219 INFO [BLE] [CAL] Received coeff packet #150 (20 bytes)
+I/flutter (27297): 02:36:17.220 INFO [BLE] [CAL] Received coeff packet #151 (20 bytes)
+I/flutter (27297): 02:36:17.222 INFO [BLE] [CAL] Received coeff packet #152 (20 bytes)
+I/flutter (27297): 02:36:17.223 INFO [BLE] [CAL] Received coeff packet #153 (20 bytes)
+I/flutter (27297): 02:36:17.225 INFO [BLE] [CAL] Received coeff packet #154 (20 bytes)
+I/flutter (27297): 02:36:17.226 INFO [BLE] [CAL] Received coeff packet #155 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+I/flutter (27297): 02:36:17.241 INFO [BLE] [CAL] Received coeff packet #156 (20 bytes)
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+I/flutter (27297): 02:36:17.243 INFO [BLE] [CAL] Received coeff packet #157 (20 bytes)
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:17.244 INFO [BLE] [CAL] Received coeff packet #158 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:17.246 INFO [BLE] [CAL] Received coeff packet #159 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+I/flutter (27297): 02:36:17.247 INFO [BLE] [CAL] Received coeff packet #160 (20 bytes)
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:17.249 INFO [BLE] [CAL] Received coeff packet #161 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+I/flutter (27297): 02:36:17.250 INFO [BLE] [CAL] Received coeff packet #162 (20 bytes)
+I/flutter (27297): 02:36:17.252 INFO [BLE] [CAL] Received coeff packet #163 (20 bytes)
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:17.255 INFO [BLE] [CAL] Received coeff packet #164 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+I/flutter (27297): 02:36:17.276 INFO [BLE] [CAL] Received coeff packet #165 (20 bytes)
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:17.277 INFO [BLE] [CAL] Received coeff packet #166 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:17.279 INFO [BLE] [CAL] Received coeff packet #167 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:17.281 INFO [BLE] [CAL] Received coeff packet #168 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:17.282 INFO [BLE] [CAL] Received coeff packet #169 (20 bytes)
+I/flutter (27297): 02:36:17.284 INFO [BLE] [CAL] Received coeff packet #170 (20 bytes)
+I/flutter (27297): 02:36:17.285 INFO [BLE] [CAL] Received coeff packet #171 (20 bytes)
+I/flutter (27297): 02:36:17.287 INFO [BLE] [CAL] Received coeff packet #172 (20 bytes)
+I/flutter (27297): 02:36:17.288 INFO [BLE] [CAL] Received coeff packet #173 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:17.303 INFO [BLE] [CAL] Received coeff packet #174 (20 bytes)
+I/flutter (27297): 02:36:17.304 INFO [BLE] [CAL] Received coeff packet #175 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:17.304 INFO [BLE] [CAL] Received coeff packet #176 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:17.305 INFO [BLE] [CAL] Received coeff packet #177 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:17.306 INFO [BLE] [CAL] Received coeff packet #178 (20 bytes)
+I/flutter (27297): 02:36:17.307 INFO [BLE] [CAL] Received coeff packet #179 (20 bytes)
+I/flutter (27297): 02:36:17.308 INFO [BLE] [CAL] Received coeff packet #180 (20 bytes)
+I/flutter (27297): 02:36:17.309 INFO [BLE] [CAL] Received coeff packet #181 (20 bytes)
+I/flutter (27297): 02:36:17.309 INFO [BLE] [CAL] Received coeff packet #182 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:17.333 INFO [BLE] [CAL] Received coeff packet #183 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:17.334 INFO [BLE] [CAL] Received coeff packet #184 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+I/flutter (27297): 02:36:17.336 INFO [BLE] [CAL] Received coeff packet #185 (20 bytes)
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:17.338 INFO [BLE] [CAL] Received coeff packet #186 (20 bytes)
+I/flutter (27297): 02:36:17.340 INFO [BLE] [CAL] Received coeff packet #187 (20 bytes)
+I/flutter (27297): 02:36:17.341 INFO [BLE] [CAL] Received coeff packet #188 (20 bytes)
+I/flutter (27297): 02:36:17.343 INFO [BLE] [CAL] Received coeff packet #189 (20 bytes)
+I/flutter (27297): 02:36:17.345 INFO [BLE] [CAL] Received coeff packet #190 (20 bytes)
+I/flutter (27297): 02:36:17.346 INFO [BLE] [CAL] Received coeff packet #191 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+I/flutter (27297): 02:36:17.400 INFO [BLE] [CAL] Received coeff packet #192 (20 bytes)
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:17.403 INFO [BLE] [CAL] Received coeff packet #193 (20 bytes)
+I/flutter (27297): 02:36:17.405 INFO [BLE] [CAL] Received coeff packet #194 (20 bytes)
+I/flutter (27297): 02:36:17.407 INFO [BLE] [CAL] Received coeff packet #195 (20 bytes)
+I/flutter (27297): 02:36:17.409 INFO [BLE] [CAL] Received coeff packet #196 (20 bytes)
+I/flutter (27297): 02:36:17.410 INFO [BLE] [CAL] Received coeff packet #197 (20 bytes)
+I/flutter (27297): 02:36:17.412 INFO [BLE] [CAL] Received coeff packet #198 (20 bytes)
+I/flutter (27297): 02:36:17.414 INFO [BLE] [CAL] Received coeff packet #199 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:17.423 INFO [BLE] [CAL] Received coeff packet #200 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:17.425 INFO [BLE] [CAL] Received coeff packet #201 (20 bytes)
+I/flutter (27297): 02:36:17.427 INFO [BLE] [CAL] Received coeff packet #202 (20 bytes)
+I/flutter (27297): 02:36:17.428 INFO [BLE] [CAL] Received coeff packet #203 (4 bytes)
+I/flutter (27297): 02:36:17.432 INFO [BLE] [CAL] Coefficient data complete (3822 bytes)
+I/flutter (27297): 02:36:17.433 INFO [BLE] [CAL] Coefficient fetch complete: 3822 bytes
+I/flutter (27297): 02:36:17.434 INFO [BLE] [CAL] Coefficient subscription cancelled
+I/flutter (27297): 02:36:17.436 INFO [BLE] [CAL] Starting calibration matrix fetch...
+I/flutter (27297): 02:36:17.438 INFO [BLE] [CAL] Matrix characteristics found, setting up listener...
+I/flutter (27297): 02:36:17.438 INFO [BLE] [CAL] Requesting calibration matrix...
+D/[FBP-Android](27297): [FBP] onMethodCall: writeCharacteristic
+D/[FBP-Android](27297): [FBP] onCharacteristicWrite:
+D/[FBP-Android](27297): [FBP]   chr: 43484111-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP]   status: GATT_SUCCESS (0)
+I/flutter (27297): 02:36:17.515 INFO [BLE] [CAL] Matrix request sent, waiting for response...
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:18.001 INFO [BLE] [CAL] Received matrix packet #1 (5 bytes)
+I/flutter (27297): 02:36:18.004 INFO [BLE] [CAL] Received matrix packet #2 (20 bytes)
+I/flutter (27297): 02:36:18.006 INFO [BLE] [CAL] Received matrix packet #3 (20 bytes)
+I/flutter (27297): 02:36:18.008 INFO [BLE] [CAL] Received matrix packet #4 (20 bytes)
+I/flutter (27297): 02:36:18.010 INFO [BLE] [CAL] Received matrix packet #5 (20 bytes)
+I/flutter (27297): 02:36:18.011 INFO [BLE] [CAL] Received matrix packet #6 (20 bytes)
+I/flutter (27297): 02:36:18.012 INFO [BLE] [CAL] Received matrix packet #7 (20 bytes)
+I/flutter (27297): 02:36:18.013 INFO [BLE] [CAL] Received matrix packet #8 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:18.020 INFO [BLE] [CAL] Received matrix packet #9 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:18.021 INFO [BLE] [CAL] Received matrix packet #10 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:18.022 INFO [BLE] [CAL] Received matrix packet #11 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+I/flutter (27297): 02:36:18.023 INFO [BLE] [CAL] Received matrix packet #12 (20 bytes)
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:18.024 INFO [BLE] [CAL] Received matrix packet #13 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:18.024 INFO [BLE] [CAL] Received matrix packet #14 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:18.026 INFO [BLE] [CAL] Received matrix packet #15 (20 bytes)
+I/flutter (27297): 02:36:18.027 INFO [BLE] [CAL] Received matrix packet #16 (20 bytes)
+I/flutter (27297): 02:36:18.028 INFO [BLE] [CAL] Received matrix packet #17 (20 bytes)
+I/flutter (27297): 02:36:18.029 INFO [BLE] [CAL] Received matrix packet #18 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:18.051 INFO [BLE] [CAL] Received matrix packet #19 (20 bytes)
+I/flutter (27297): 02:36:18.053 INFO [BLE] [CAL] Received matrix packet #20 (20 bytes)
+I/flutter (27297): 02:36:18.054 INFO [BLE] [CAL] Received matrix packet #21 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+I/flutter (27297): 02:36:18.057 INFO [BLE] [CAL] Received matrix packet #22 (20 bytes)
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:18.060 INFO [BLE] [CAL] Received matrix packet #23 (20 bytes)
+I/flutter (27297): 02:36:18.061 INFO [BLE] [CAL] Received matrix packet #24 (20 bytes)
+I/flutter (27297): 02:36:18.062 INFO [BLE] [CAL] Received matrix packet #25 (20 bytes)
+I/flutter (27297): 02:36:18.064 INFO [BLE] [CAL] Received matrix packet #26 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:18.082 INFO [BLE] [CAL] Received matrix packet #27 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+I/flutter (27297): 02:36:18.083 INFO [BLE] [CAL] Received matrix packet #28 (20 bytes)
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:18.086 INFO [BLE] [CAL] Received matrix packet #29 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:18.088 INFO [BLE] [CAL] Received matrix packet #30 (20 bytes)
+I/flutter (27297): 02:36:18.089 INFO [BLE] [CAL] Received matrix packet #31 (20 bytes)
+I/flutter (27297): 02:36:18.090 INFO [BLE] [CAL] Received matrix packet #32 (20 bytes)
+I/flutter (27297): 02:36:18.091 INFO [BLE] [CAL] Received matrix packet #33 (20 bytes)
+I/flutter (27297): 02:36:18.092 INFO [BLE] [CAL] Received matrix packet #34 (20 bytes)
+I/flutter (27297): 02:36:18.093 INFO [BLE] [CAL] Received matrix packet #35 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:18.119 INFO [BLE] [CAL] Received matrix packet #36 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:18.122 INFO [BLE] [CAL] Received matrix packet #37 (20 bytes)
+I/flutter (27297): 02:36:18.123 INFO [BLE] [CAL] Received matrix packet #38 (20 bytes)
+I/flutter (27297): 02:36:18.126 INFO [BLE] [CAL] Received matrix packet #39 (20 bytes)
+I/flutter (27297): 02:36:18.128 INFO [BLE] [CAL] Received matrix packet #40 (20 bytes)
+I/flutter (27297): 02:36:18.129 INFO [BLE] [CAL] Received matrix packet #41 (20 bytes)
+I/flutter (27297): 02:36:18.131 INFO [BLE] [CAL] Received matrix packet #42 (20 bytes)
+I/flutter (27297): 02:36:18.132 INFO [BLE] [CAL] Received matrix packet #43 (20 bytes)
+I/flutter (27297): 02:36:18.134 INFO [BLE] [CAL] Received matrix packet #44 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+I/flutter (27297): 02:36:18.142 INFO [BLE] [CAL] Received matrix packet #45 (20 bytes)
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:18.143 INFO [BLE] [CAL] Received matrix packet #46 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+I/flutter (27297): 02:36:18.143 INFO [BLE] [CAL] Received matrix packet #47 (20 bytes)
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:18.144 INFO [BLE] [CAL] Received matrix packet #48 (20 bytes)
+I/flutter (27297): 02:36:18.145 INFO [BLE] [CAL] Received matrix packet #49 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:18.145 INFO [BLE] [CAL] Received matrix packet #50 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:18.146 INFO [BLE] [CAL] Received matrix packet #51 (20 bytes)
+I/flutter (27297): 02:36:18.147 INFO [BLE] [CAL] Received matrix packet #52 (20 bytes)
+I/flutter (27297): 02:36:18.148 INFO [BLE] [CAL] Received matrix packet #53 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:18.171 INFO [BLE] [CAL] Received matrix packet #54 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+I/flutter (27297): 02:36:18.172 INFO [BLE] [CAL] Received matrix packet #55 (20 bytes)
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+I/flutter (27297): 02:36:18.172 INFO [BLE] [CAL] Received matrix packet #56 (20 bytes)
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:18.173 INFO [BLE] [CAL] Received matrix packet #57 (20 bytes)
+I/flutter (27297): 02:36:18.174 INFO [BLE] [CAL] Received matrix packet #58 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:18.174 INFO [BLE] [CAL] Received matrix packet #59 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:18.175 INFO [BLE] [CAL] Received matrix packet #60 (20 bytes)
+I/flutter (27297): 02:36:18.175 INFO [BLE] [CAL] Received matrix packet #61 (20 bytes)
+I/flutter (27297): 02:36:18.176 INFO [BLE] [CAL] Received matrix packet #62 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+I/flutter (27297): 02:36:18.203 INFO [BLE] [CAL] Received matrix packet #63 (20 bytes)
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:18.205 INFO [BLE] [CAL] Received matrix packet #64 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:18.206 INFO [BLE] [CAL] Received matrix packet #65 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:18.208 INFO [BLE] [CAL] Received matrix packet #66 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:18.209 INFO [BLE] [CAL] Received matrix packet #67 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+I/flutter (27297): 02:36:18.210 INFO [BLE] [CAL] Received matrix packet #68 (20 bytes)
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:18.212 INFO [BLE] [CAL] Received matrix packet #69 (20 bytes)
+I/flutter (27297): 02:36:18.213 INFO [BLE] [CAL] Received matrix packet #70 (20 bytes)
+I/flutter (27297): 02:36:18.214 INFO [BLE] [CAL] Received matrix packet #71 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+I/flutter (27297): 02:36:18.230 INFO [BLE] [CAL] Received matrix packet #72 (20 bytes)
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:18.231 INFO [BLE] [CAL] Received matrix packet #73 (20 bytes)
+I/flutter (27297): 02:36:18.232 INFO [BLE] [CAL] Received matrix packet #74 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:18.233 INFO [BLE] [CAL] Received matrix packet #75 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:18.235 INFO [BLE] [CAL] Received matrix packet #76 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:18.237 INFO [BLE] [CAL] Received matrix packet #77 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+I/flutter (27297): 02:36:18.239 INFO [BLE] [CAL] Received matrix packet #78 (20 bytes)
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:18.241 INFO [BLE] [CAL] Received matrix packet #79 (20 bytes)
+I/flutter (27297): 02:36:18.242 INFO [BLE] [CAL] Received matrix packet #80 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:18.261 INFO [BLE] [CAL] Received matrix packet #81 (20 bytes)
+I/flutter (27297): 02:36:18.262 INFO [BLE] [CAL] Received matrix packet #82 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:18.293 INFO [BLE] [CAL] Received matrix packet #83 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:18.296 INFO [BLE] [CAL] Received matrix packet #84 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:18.298 INFO [BLE] [CAL] Received matrix packet #85 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:18.300 INFO [BLE] [CAL] Received matrix packet #86 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:18.302 INFO [BLE] [CAL] Received matrix packet #87 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:18.305 INFO [BLE] [CAL] Received matrix packet #88 (20 bytes)
+I/flutter (27297): 02:36:18.307 INFO [BLE] [CAL] Received matrix packet #89 (20 bytes)
+I/flutter (27297): 02:36:18.309 INFO [BLE] [CAL] Received matrix packet #90 (20 bytes)
+I/flutter (27297): 02:36:18.311 INFO [BLE] [CAL] Received matrix packet #91 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:18.321 INFO [BLE] [CAL] Received matrix packet #92 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:18.323 INFO [BLE] [CAL] Received matrix packet #93 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:18.324 INFO [BLE] [CAL] Received matrix packet #94 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:18.325 INFO [BLE] [CAL] Received matrix packet #95 (20 bytes)
+I/flutter (27297): 02:36:18.326 INFO [BLE] [CAL] Received matrix packet #96 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+I/flutter (27297): 02:36:18.328 INFO [BLE] [CAL] Received matrix packet #97 (20 bytes)
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:18.329 INFO [BLE] [CAL] Received matrix packet #98 (20 bytes)
+I/flutter (27297): 02:36:18.331 INFO [BLE] [CAL] Received matrix packet #99 (20 bytes)
+I/flutter (27297): 02:36:18.333 INFO [BLE] [CAL] Received matrix packet #100 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:18.353 INFO [BLE] [CAL] Received matrix packet #101 (20 bytes)
+I/flutter (27297): 02:36:18.355 INFO [BLE] [CAL] Received matrix packet #102 (20 bytes)
+I/flutter (27297): 02:36:18.357 INFO [BLE] [CAL] Received matrix packet #103 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:18.384 INFO [BLE] [CAL] Received matrix packet #104 (20 bytes)
+I/flutter (27297): 02:36:18.386 INFO [BLE] [CAL] Received matrix packet #105 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:18.388 INFO [BLE] [CAL] Received matrix packet #106 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:18.394 INFO [BLE] [CAL] Received matrix packet #107 (20 bytes)
+I/flutter (27297): 02:36:18.395 INFO [BLE] [CAL] Received matrix packet #108 (20 bytes)
+I/flutter (27297): 02:36:18.396 INFO [BLE] [CAL] Received matrix packet #109 (20 bytes)
+I/flutter (27297): 02:36:18.397 INFO [BLE] [CAL] Received matrix packet #110 (20 bytes)
+I/flutter (27297): 02:36:18.398 INFO [BLE] [CAL] Received matrix packet #111 (20 bytes)
+I/flutter (27297): 02:36:18.399 INFO [BLE] [CAL] Received matrix packet #112 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:18.412 INFO [BLE] [CAL] Received matrix packet #113 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:18.413 INFO [BLE] [CAL] Received matrix packet #114 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:18.414 INFO [BLE] [CAL] Received matrix packet #115 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+I/flutter (27297): 02:36:18.414 INFO [BLE] [CAL] Received matrix packet #116 (20 bytes)
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:18.415 INFO [BLE] [CAL] Received matrix packet #117 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:18.416 INFO [BLE] [CAL] Received matrix packet #118 (20 bytes)
+I/flutter (27297): 02:36:18.417 INFO [BLE] [CAL] Received matrix packet #119 (20 bytes)
+I/flutter (27297): 02:36:18.418 INFO [BLE] [CAL] Received matrix packet #120 (20 bytes)
+I/flutter (27297): 02:36:18.419 INFO [BLE] [CAL] Received matrix packet #121 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:18.442 INFO [BLE] [CAL] Received matrix packet #122 (20 bytes)
+I/flutter (27297): 02:36:18.443 INFO [BLE] [CAL] Received matrix packet #123 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:18.474 INFO [BLE] [CAL] Received matrix packet #124 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:18.476 INFO [BLE] [CAL] Received matrix packet #125 (20 bytes)
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP] onCharacteristicChanged:
+I/flutter (27297): 02:36:18.478 INFO [BLE] [CAL] Received matrix packet #126 (20 bytes)
+D/[FBP-Android](27297): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (27297): 02:36:18.481 INFO [BLE] [CAL] Received matrix packet #127 (20 bytes)
+I/flutter (27297): 02:36:18.483 INFO [BLE] [CAL] Received matrix packet #128 (20 bytes)
+I/flutter (27297): 02:36:18.485 INFO [BLE] [CAL] Received matrix packet #129 (16 bytes)
+I/flutter (27297): 02:36:18.486 INFO [BLE] [CAL] Matrix data complete (2428 bytes)
+I/flutter (27297): 02:36:18.487 INFO [BLE] [CAL] Matrix fetch complete: 2428 bytes
+I/flutter (27297): 02:36:18.488 INFO [BLE] [CAL] Matrix subscription cancelled
+I/flutter (27297): 02:36:18.489 INFO [BLE] [SCAN] Calibration ready | Coeff: 3822B | Matrix: 2428B
+I/flutter (27297): 02:36:18.489 INFO [BLE] [SCAN] Checking active scan configuration...
+I/flutter (27297): 02:36:18.492 INFO [BLE] [SCAN] Reading current active config...
+D/[FBP-Android](27297): [FBP] onMethodCall: readCharacteristic
+D/[FBP-Android](27297): [FBP] onCharacteristicRead:
+D/[FBP-Android](27297): [FBP]   chr: 43484118-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP]   status: GATT_SUCCESS (0)
+D/[FBP-Android](27297): [FBP]   instanceId: 0
+I/flutter (27297): 02:36:18.566 INFO [BLE] [SCAN] Current active config: 0x0006
+I/flutter (27297): 02:36:18.566 INFO [BLE] [SCAN] Active config already set (index: 6)
+I/flutter (27297): 02:36:18.567 INFO [BLE] [SCAN] Active scan configuration confirmed
+I/flutter (27297): 02:36:18.567 INFO [BLE] [SCAN] Finding start scan characteristic...
+I/flutter (27297): 02:36:18.569 INFO [BLE] [SCAN] Start scan characteristic found
+I/flutter (27297): 02:36:18.569 INFO [BLE] [SCAN] Already subscribed to notifications during connection
+I/flutter (27297): 02:36:18.570 INFO [BLE] [SCAN] Trigger | Cmd: 0x0
+D/[FBP-Android](27297): [FBP] onMethodCall: writeCharacteristic
+D/[FBP-Android](27297): [FBP] onCharacteristicWrite:
+D/[FBP-Android](27297): [FBP]   chr: 4348411d-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](27297): [FBP]   status: GATT_SUCCESS (0)
+I/flutter (27297): 02:36:18.686 INFO [BLE] [SCAN] Command sent, awaiting device (timeout: 60s)...
+I/VRI[MainActivity]@151079f(27297): call setFrameRateCategory for touch hint category=no preference, reason=boost timeout, vri=VRI[MainActivity]@151079f
+D/BluetoothGatt(27297): onClientConnectionState() - status=8 clientIf=70 connected=false device=XX:XX:XX:XX:B1:6A
+D/BluetoothGatt(27297): unregisterApp() - mClientIf=70
+D/[FBP-Android](27297): [FBP] onConnectionStateChange:disconnected
+D/[FBP-Android](27297): [FBP]   status: LINK_SUPERVISION_TIMEOUT
+D/BluetoothGatt(27297): close()
+I/flutter (27297): 02:36:24.166 WARNING [BLE] [BLE] Device disconnected | ID: 90:7B:C6:49:B1:6A | State: connected
+I/VRI[MainActivity]@151079f(27297): handleAppVisibility mAppVisible = true visible = false
+D/VRI[MainActivity]@151079f(27297): visibilityChanged oldVisibility=true newVisibility=false
+I/VRI[MainActivity]@151079f(27297): stopped(true) old = false
+D/VRI[MainActivity]@151079f(27297): WindowStopped on com.triem.spectriem_app/com.triem.spectriem_app.MainActivity set to true
+D/HWUI    (27297): CacheManager::trimMemory(20)
+D/SurfaceView(27297): 118820190 windowPositionLost, frameNr = 0
+I/SV[79003940 MainActivity](27297): aOrMT: VRI[MainActivity]@151079f t = android.view.SurfaceControl$Transaction@2bd853f fN = 0 android.view.SurfaceView.-$$Nest$mapplyOrMergeTransaction:0 android.view.SurfaceView$SurfaceViewPositionUpdateListener.positionLost:2025 android.graphics.RenderNode$CompositePositionUpdateListener.positionLost:418
+I/VRI[MainActivity]@151079f(27297): mWNT: t=0xb40000738fa9fb90 mBlastBufferQueue=0xb40000722fb57e60 fn= 0 HdrRenderState mRenderHdrSdrRatio=1.0 caller= android.view.SurfaceView.applyOrMergeTransaction:1863 android.view.SurfaceView.-$$Nest$mapplyOrMergeTransaction:0 android.view.SurfaceView$SurfaceViewPositionUpdateListener.positionLost:2025
+I/SV[79003940 MainActivity](27297): windowStopped(true) false io.flutter.embedding.android.FlutterSurfaceView{4b58124 V.E...... ........ 0,0-1848,2960} of VRI[MainActivity]@151079f
+I/SurfaceView(27297): 79003940 Changes: creating=false format=false size=false visible=true alpha=false hint=false left=false top=false z=false attached=true lifecycleStrategy=false
+I/SurfaceView(27297): 79003940 Cur surface: Surface(name=null mNativeObject=-5476376655919724672)/@0xf9b7a11
+D/SurfaceComposerClient(27297): setCornerRadius ## 4b58124 SurfaceView[com.triem.spectriem_app/com.triem.spectriem_app.MainActivity]@0#8271 cornerRadius=0.000000
+I/SurfaceView(27297): 79003940 surfaceDestroyed
+I/SV[79003940 MainActivity](27297): surfaceDestroyed callback.size 1 #1 io.flutter.embedding.android.FlutterSurfaceView{4b58124 V.E...... ........ 0,0-1848,2960}
+I/SV[79003940 MainActivity](27297): updateSurface: mVisible = false mSurface.isValid() = true
+I/SV[79003940 MainActivity](27297): releaseSurfaces: viewRoot = VRI[MainActivity]@151079f
+V/SurfaceView(27297): Layout: x=0 y=0 w=1848 h=2960, frame=Rect(0, 0 - 1848, 2960)
+D/SV[79003940 MainActivity](27297): updateSurface: surface is not valid
+I/SV[79003940 MainActivity](27297): releaseSurfaces: viewRoot = VRI[MainActivity]@151079f
+I/SV[79003940 MainActivity](27297): onWindowVisibilityChanged(8) false io.flutter.embedding.android.FlutterSurfaceView{4b58124 G.E...... ......I. 0,0-1848,2960} of VRI[MainActivity]@151079f
+D/SV[79003940 MainActivity](27297): updateSurface: surface is not valid
+I/SV[79003940 MainActivity](27297): releaseSurfaces: viewRoot = VRI[MainActivity]@151079f
+D/HWUI    (27297): CacheManager::trimMemory(20)
+I/VRI[MainActivity]@151079f(27297): Relayout returned: old=(0,0,1848,2960) new=(0,0,1848,2960) relayoutAsync=false req=(1848,2960)8 dur=4 res=0x2 s={false 0x0} ch=false seqId=0
+D/SV[79003940 MainActivity](27297): updateSurface: surface is not valid
+I/SV[79003940 MainActivity](27297): releaseSurfaces: viewRoot = VRI[MainActivity]@151079f
+D/VRI[MainActivity]@151079f(27297): applyTransactionOnDraw applyImmediately
+D/VRI[MainActivity]@151079f(27297): Not drawing due to not visible. Reason=!mAppVisible && !mForceDecorViewVisibility
+D/VRI[MainActivity]@151079f(27297): Pending transaction will not be applied in sync with a draw due to view not visible
+I/VRI[MainActivity]@151079f(27297): mWNT: t=0xb40000738faa00d0 mBlastBufferQueue=0xnull fn= 0 HdrRenderState mRenderHdrSdrRatio=1.0 caller= android.view.ViewRootImpl.handleSyncRequestWhenNoAsyncDraw:6733 android.view.ViewRootImpl.performTraversals:5504 android.view.ViewRootImpl.doTraversal:3924
+D/HWUI    (27297): CacheManager::trimMemory(20)
+I/VRI[MainActivity]@151079f(27297): onDisplayChanged oldDisplayState=2 newDisplayState=1
+I/ImeFocusController(27297): onPreWindowFocus: skipped hasWindowFocus=false mHasImeFocus=true
+I/ImeFocusController(27297): onPostWindowFocus: skipped hasWindowFocus=false mHasImeFocus=true

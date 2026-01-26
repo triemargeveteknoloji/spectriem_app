@@ -1,0 +1,1046 @@
+I/flutter (23414): 01:48:26.011 INFO [UI] 
+ CMD: performScan
+I/flutter (23414): 01:48:26.015 INFO [BLE] [SCAN] Starting scan | Device: NIRScanNano | SaveToSD: false
+I/flutter (23414): 01:48:26.015 INFO [BLE] [SCAN] Syncing device time | Current: 2026-01-27T01:48:26.015757
+D/[FBP-Android](23414): [FBP] onMethodCall: writeCharacteristic
+D/[FBP-Android](23414): [FBP] onCharacteristicWrite:
+D/[FBP-Android](23414): [FBP]   chr: 4348410c-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](23414): [FBP]   status: GATT_SUCCESS (0)
+I/flutter (23414): 01:48:26.100 INFO [BLE] [SCAN] Time synced successfully
+I/flutter (23414): 01:48:26.101 INFO [BLE] [SCAN] Calibration check | Cached: false
+I/flutter (23414): 01:48:26.102 INFO [BLE] [CAL] Starting calibration coefficient fetch...
+I/flutter (23414): 01:48:26.104 INFO [BLE] [CAL] Characteristics found, setting up listener...
+I/flutter (23414): 01:48:26.105 INFO [BLE] [CAL] Requesting calibration coefficients...
+D/[FBP-Android](23414): [FBP] onMethodCall: writeCharacteristic
+D/[FBP-Android](23414): [FBP] onCharacteristicWrite:
+D/[FBP-Android](23414): [FBP]   chr: 4348410f-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](23414): [FBP]   status: GATT_SUCCESS (0)
+I/flutter (23414): 01:48:26.157 INFO [BLE] [CAL] Request sent, waiting for response...
+D/[FBP-Android](23414): [FBP] onCharacteristicChanged:
+D/[FBP-Android](23414): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](23414): [FBP] onCharacteristicChanged:
+D/[FBP-Android](23414): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](23414): [FBP] onCharacteristicChanged:
+D/[FBP-Android](23414): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](23414): [FBP] onCharacteristicChanged:
+D/[FBP-Android](23414): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](23414): [FBP] onCharacteristicChanged:
+D/[FBP-Android](23414): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](23414): [FBP] onCharacteristicChanged:
+D/[FBP-Android](23414): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (23414): 01:48:27.374 INFO [BLE] [CAL] Received coeff packet #1 (5 bytes)
+D/[FBP-Android](23414): [FBP] onCharacteristicChanged:
+D/[FBP-Android](23414): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](23414): [FBP] onCharacteristicChanged:
+D/[FBP-Android](23414): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](23414): [FBP] onCharacteristicChanged:
+D/[FBP-Android](23414): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](23414): [FBP] onCharacteristicChanged:
+D/[FBP-Android](23414): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](23414): [FBP] onCharacteristicChanged:
+D/[FBP-Android](23414): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (23414): 01:48:27.382 INFO [BLE] [CAL] Received coeff packet #2 (20 bytes)
+I/flutter (23414): 01:48:27.385 INFO [BLE] [CAL] Received coeff packet #3 (20 bytes)
+I/flutter (21991): 01:37:57.416 INFO [BLE] [CAL] Received coeff packet #3 (20 bytes)
+I/flutter (21991): 01:37:57.418 INFO [BLE] [CAL] Received coeff packet #4 (20 bytes)
+I/flutter (21991): 01:37:57.420 INFO [BLE] [CAL] Received coeff packet #5 (20 bytes)
+I/flutter (21991): 01:37:57.421 INFO [BLE] [CAL] Received coeff packet #6 (20 bytes)
+I/flutter (21991): 01:37:57.422 INFO [BLE] [CAL] Received coeff packet #7 (20 bytes)
+I/flutter (21991): 01:37:57.423 INFO [BLE] [CAL] Received coeff packet #8 (20 bytes)
+I/flutter (21991): 01:37:57.424 INFO [BLE] [CAL] Received coeff packet #9 (20 bytes)
+I/flutter (21991): 01:37:57.425 INFO [BLE] [CAL] Received coeff packet #10 (20 bytes)
+I/flutter (21991): 01:37:57.426 INFO [BLE] [CAL] Received coeff packet #11 (20 bytes)
+I/flutter (21991): 01:37:57.427 INFO [BLE] [CAL] Received coeff packet #12 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:57.488 INFO [BLE] [CAL] Received coeff packet #13 (20 bytes)
+I/flutter (21991): 01:37:57.488 INFO [BLE] [CAL] Received coeff packet #14 (20 bytes)
+I/flutter (21991): 01:37:57.489 INFO [BLE] [CAL] Received coeff packet #15 (20 bytes)
+I/flutter (21991): 01:37:57.489 INFO [BLE] [CAL] Received coeff packet #16 (20 bytes)
+I/flutter (21991): 01:37:57.490 INFO [BLE] [CAL] Received coeff packet #17 (20 bytes)
+I/flutter (21991): 01:37:57.490 INFO [BLE] [CAL] Received coeff packet #18 (20 bytes)
+I/flutter (21991): 01:37:57.491 INFO [BLE] [CAL] Received coeff packet #19 (20 bytes)
+I/flutter (21991): 01:37:57.491 INFO [BLE] [CAL] Received coeff packet #20 (20 bytes)
+I/flutter (21991): 01:37:57.492 INFO [BLE] [CAL] Received coeff packet #21 (20 bytes)
+I/flutter (21991): 01:37:57.492 INFO [BLE] [CAL] Received coeff packet #22 (20 bytes)
+I/flutter (21991): 01:37:57.493 INFO [BLE] [CAL] Received coeff packet #23 (20 bytes)
+I/flutter (21991): 01:37:57.493 INFO [BLE] [CAL] Received coeff packet #24 (20 bytes)
+I/flutter (21991): 01:37:57.494 INFO [BLE] [CAL] Received coeff packet #25 (20 bytes)
+I/flutter (21991): 01:37:57.494 INFO [BLE] [CAL] Received coeff packet #26 (20 bytes)
+I/flutter (21991): 01:37:57.495 INFO [BLE] [CAL] Received coeff packet #27 (20 bytes)
+I/flutter (21991): 01:37:57.495 INFO [BLE] [CAL] Received coeff packet #28 (20 bytes)
+I/flutter (21991): 01:37:57.496 INFO [BLE] [CAL] Received coeff packet #29 (20 bytes)
+I/flutter (21991): 01:37:57.496 INFO [BLE] [CAL] Received coeff packet #30 (20 bytes)
+I/flutter (21991): 01:37:57.497 INFO [BLE] [CAL] Received coeff packet #31 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:57.528 INFO [BLE] [CAL] Received coeff packet #32 (20 bytes)
+I/flutter (21991): 01:37:57.529 INFO [BLE] [CAL] Received coeff packet #33 (20 bytes)
+I/flutter (21991): 01:37:57.530 INFO [BLE] [CAL] Received coeff packet #34 (20 bytes)
+I/flutter (21991): 01:37:57.530 INFO [BLE] [CAL] Received coeff packet #35 (20 bytes)
+I/flutter (21991): 01:37:57.544 INFO [BLE] [CAL] Received coeff packet #36 (20 bytes)
+I/flutter (21991): 01:37:57.545 INFO [BLE] [CAL] Received coeff packet #37 (20 bytes)
+I/flutter (21991): 01:37:57.545 INFO [BLE] [CAL] Received coeff packet #38 (20 bytes)
+I/flutter (21991): 01:37:57.546 INFO [BLE] [CAL] Received coeff packet #39 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:57.558 INFO [BLE] [CAL] Received coeff packet #40 (20 bytes)
+I/flutter (21991): 01:37:57.559 INFO [BLE] [CAL] Received coeff packet #41 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:57.559 INFO [BLE] [CAL] Received coeff packet #42 (20 bytes)
+I/flutter (21991): 01:37:57.560 INFO [BLE] [CAL] Received coeff packet #43 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:57.560 INFO [BLE] [CAL] Received coeff packet #44 (20 bytes)
+I/flutter (21991): 01:37:57.561 INFO [BLE] [CAL] Received coeff packet #45 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+I/flutter (21991): 01:37:57.562 INFO [BLE] [CAL] Received coeff packet #46 (20 bytes)
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:57.563 INFO [BLE] [CAL] Received coeff packet #47 (20 bytes)
+I/flutter (21991): 01:37:57.564 INFO [BLE] [CAL] Received coeff packet #48 (20 bytes)
+I/flutter (21991): 01:37:57.564 INFO [BLE] [CAL] Received coeff packet #49 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:57.593 INFO [BLE] [CAL] Received coeff packet #50 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+I/flutter (21991): 01:37:57.594 INFO [BLE] [CAL] Received coeff packet #51 (20 bytes)
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:57.595 INFO [BLE] [CAL] Received coeff packet #52 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+I/flutter (21991): 01:37:57.595 INFO [BLE] [CAL] Received coeff packet #53 (20 bytes)
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:57.596 INFO [BLE] [CAL] Received coeff packet #54 (20 bytes)
+I/flutter (21991): 01:37:57.597 INFO [BLE] [CAL] Received coeff packet #55 (20 bytes)
+I/flutter (21991): 01:37:57.598 INFO [BLE] [CAL] Received coeff packet #56 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:57.618 INFO [BLE] [CAL] Received coeff packet #57 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:57.619 INFO [BLE] [CAL] Received coeff packet #58 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:57.620 INFO [BLE] [CAL] Received coeff packet #59 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:57.620 INFO [BLE] [CAL] Received coeff packet #60 (20 bytes)
+I/flutter (21991): 01:37:57.621 INFO [BLE] [CAL] Received coeff packet #61 (20 bytes)
+I/flutter (21991): 01:37:57.621 INFO [BLE] [CAL] Received coeff packet #62 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+I/flutter (21991): 01:37:57.621 INFO [BLE] [CAL] Received coeff packet #63 (20 bytes)
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:57.622 INFO [BLE] [CAL] Received coeff packet #64 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:57.622 INFO [BLE] [CAL] Received coeff packet #65 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+I/flutter (21991): 01:37:57.623 INFO [BLE] [CAL] Received coeff packet #66 (20 bytes)
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:57.624 INFO [BLE] [CAL] Received coeff packet #67 (20 bytes)
+I/flutter (21991): 01:37:57.624 INFO [BLE] [CAL] Received coeff packet #68 (20 bytes)
+I/flutter (21991): 01:37:57.625 INFO [BLE] [CAL] Received coeff packet #69 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:57.652 INFO [BLE] [CAL] Received coeff packet #70 (20 bytes)
+I/flutter (21991): 01:37:57.653 INFO [BLE] [CAL] Received coeff packet #71 (20 bytes)
+I/flutter (21991): 01:37:57.654 INFO [BLE] [CAL] Received coeff packet #72 (20 bytes)
+I/flutter (21991): 01:37:57.654 INFO [BLE] [CAL] Received coeff packet #73 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+I/flutter (21991): 01:37:57.655 INFO [BLE] [CAL] Received coeff packet #74 (20 bytes)
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:57.657 INFO [BLE] [CAL] Received coeff packet #75 (20 bytes)
+I/flutter (21991): 01:37:57.658 INFO [BLE] [CAL] Received coeff packet #76 (20 bytes)
+I/flutter (21991): 01:37:57.659 INFO [BLE] [CAL] Received coeff packet #77 (20 bytes)
+I/flutter (21991): 01:37:57.660 INFO [BLE] [CAL] Received coeff packet #78 (20 bytes)
+I/flutter (21991): 01:37:57.661 INFO [BLE] [CAL] Received coeff packet #79 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:57.716 INFO [BLE] [CAL] Received coeff packet #80 (20 bytes)
+I/flutter (21991): 01:37:57.716 INFO [BLE] [CAL] Received coeff packet #81 (20 bytes)
+I/flutter (21991): 01:37:57.717 INFO [BLE] [CAL] Received coeff packet #82 (20 bytes)
+I/flutter (21991): 01:37:57.717 INFO [BLE] [CAL] Received coeff packet #83 (20 bytes)
+I/flutter (21991): 01:37:57.718 INFO [BLE] [CAL] Received coeff packet #84 (20 bytes)
+I/flutter (21991): 01:37:57.718 INFO [BLE] [CAL] Received coeff packet #85 (20 bytes)
+I/flutter (21991): 01:37:57.719 INFO [BLE] [CAL] Received coeff packet #86 (20 bytes)
+I/flutter (21991): 01:37:57.720 INFO [BLE] [CAL] Received coeff packet #87 (20 bytes)
+I/flutter (21991): 01:37:57.720 INFO [BLE] [CAL] Received coeff packet #88 (20 bytes)
+I/flutter (21991): 01:37:57.721 INFO [BLE] [CAL] Received coeff packet #89 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:57.743 INFO [BLE] [CAL] Received coeff packet #90 (20 bytes)
+I/flutter (21991): 01:37:57.744 INFO [BLE] [CAL] Received coeff packet #91 (20 bytes)
+I/flutter (21991): 01:37:57.745 INFO [BLE] [CAL] Received coeff packet #92 (20 bytes)
+I/flutter (21991): 01:37:57.745 INFO [BLE] [CAL] Received coeff packet #93 (20 bytes)
+I/flutter (21991): 01:37:57.746 INFO [BLE] [CAL] Received coeff packet #94 (20 bytes)
+I/flutter (21991): 01:37:57.758 INFO [BLE] [CAL] Received coeff packet #95 (20 bytes)
+I/flutter (21991): 01:37:57.761 INFO [BLE] [CAL] Received coeff packet #96 (20 bytes)
+I/flutter (21991): 01:37:57.762 INFO [BLE] [CAL] Received coeff packet #97 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:57.774 INFO [BLE] [CAL] Received coeff packet #98 (20 bytes)
+I/flutter (21991): 01:37:57.775 INFO [BLE] [CAL] Received coeff packet #99 (20 bytes)
+I/flutter (21991): 01:37:57.776 INFO [BLE] [CAL] Received coeff packet #100 (20 bytes)
+I/flutter (21991): 01:37:57.777 INFO [BLE] [CAL] Received coeff packet #101 (20 bytes)
+I/flutter (21991): 01:37:57.777 INFO [BLE] [CAL] Received coeff packet #102 (20 bytes)
+I/flutter (21991): 01:37:57.778 INFO [BLE] [CAL] Received coeff packet #103 (20 bytes)
+I/flutter (21991): 01:37:57.779 INFO [BLE] [CAL] Received coeff packet #104 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:57.804 INFO [BLE] [CAL] Received coeff packet #105 (20 bytes)
+I/flutter (21991): 01:37:57.805 INFO [BLE] [CAL] Received coeff packet #106 (20 bytes)
+I/flutter (21991): 01:37:57.805 INFO [BLE] [CAL] Received coeff packet #107 (20 bytes)
+I/flutter (21991): 01:37:57.806 INFO [BLE] [CAL] Received coeff packet #108 (20 bytes)
+I/flutter (21991): 01:37:57.806 INFO [BLE] [CAL] Received coeff packet #109 (20 bytes)
+I/flutter (21991): 01:37:57.807 INFO [BLE] [CAL] Received coeff packet #110 (20 bytes)
+I/flutter (21991): 01:37:57.807 INFO [BLE] [CAL] Received coeff packet #111 (20 bytes)
+I/flutter (21991): 01:37:57.808 INFO [BLE] [CAL] Received coeff packet #112 (20 bytes)
+I/flutter (21991): 01:37:57.809 INFO [BLE] [CAL] Received coeff packet #113 (20 bytes)
+I/flutter (21991): 01:37:57.809 INFO [BLE] [CAL] Received coeff packet #114 (20 bytes)
+I/flutter (21991): 01:37:57.810 INFO [BLE] [CAL] Received coeff packet #115 (20 bytes)
+I/flutter (21991): 01:37:57.811 INFO [BLE] [CAL] Received coeff packet #116 (20 bytes)
+I/flutter (21991): 01:37:57.812 INFO [BLE] [CAL] Received coeff packet #117 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:57.829 INFO [BLE] [CAL] Received coeff packet #118 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:57.831 INFO [BLE] [CAL] Received coeff packet #119 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:57.831 INFO [BLE] [CAL] Received coeff packet #120 (20 bytes)
+I/flutter (21991): 01:37:57.831 INFO [BLE] [CAL] Received coeff packet #121 (20 bytes)
+I/flutter (21991): 01:37:57.832 INFO [BLE] [CAL] Received coeff packet #122 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:57.832 INFO [BLE] [CAL] Received coeff packet #123 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:57.833 INFO [BLE] [CAL] Received coeff packet #124 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:57.834 INFO [BLE] [CAL] Received coeff packet #125 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:57.834 INFO [BLE] [CAL] Received coeff packet #126 (20 bytes)
+I/flutter (21991): 01:37:57.835 INFO [BLE] [CAL] Received coeff packet #127 (20 bytes)
+I/flutter (21991): 01:37:57.836 INFO [BLE] [CAL] Received coeff packet #128 (20 bytes)
+I/flutter (21991): 01:37:57.836 INFO [BLE] [CAL] Received coeff packet #129 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:57.860 INFO [BLE] [CAL] Received coeff packet #130 (20 bytes)
+I/flutter (21991): 01:37:57.861 INFO [BLE] [CAL] Received coeff packet #131 (20 bytes)
+I/flutter (21991): 01:37:57.862 INFO [BLE] [CAL] Received coeff packet #132 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:57.874 INFO [BLE] [CAL] Received coeff packet #133 (20 bytes)
+I/flutter (21991): 01:37:57.875 INFO [BLE] [CAL] Received coeff packet #134 (20 bytes)
+I/flutter (21991): 01:37:57.876 INFO [BLE] [CAL] Received coeff packet #135 (20 bytes)
+I/flutter (21991): 01:37:57.876 INFO [BLE] [CAL] Received coeff packet #136 (20 bytes)
+I/flutter (21991): 01:37:57.877 INFO [BLE] [CAL] Received coeff packet #137 (20 bytes)
+I/flutter (21991): 01:37:57.877 INFO [BLE] [CAL] Received coeff packet #138 (20 bytes)
+I/flutter (21991): 01:37:57.878 INFO [BLE] [CAL] Received coeff packet #139 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:57.890 INFO [BLE] [CAL] Received coeff packet #140 (20 bytes)
+I/flutter (21991): 01:37:57.890 INFO [BLE] [CAL] Received coeff packet #141 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:57.891 INFO [BLE] [CAL] Received coeff packet #142 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:57.891 INFO [BLE] [CAL] Received coeff packet #143 (20 bytes)
+I/flutter (21991): 01:37:57.892 INFO [BLE] [CAL] Received coeff packet #144 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:57.892 INFO [BLE] [CAL] Received coeff packet #145 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:57.893 INFO [BLE] [CAL] Received coeff packet #146 (20 bytes)
+I/flutter (21991): 01:37:57.893 INFO [BLE] [CAL] Received coeff packet #147 (20 bytes)
+I/flutter (21991): 01:37:57.894 INFO [BLE] [CAL] Received coeff packet #148 (20 bytes)
+I/flutter (21991): 01:37:57.894 INFO [BLE] [CAL] Received coeff packet #149 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:57.920 INFO [BLE] [CAL] Received coeff packet #150 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:57.999 INFO [BLE] [CAL] Received coeff packet #151 (20 bytes)
+I/flutter (21991): 01:37:58.000 INFO [BLE] [CAL] Received coeff packet #152 (20 bytes)
+I/flutter (21991): 01:37:58.000 INFO [BLE] [CAL] Received coeff packet #153 (20 bytes)
+I/flutter (21991): 01:37:58.001 INFO [BLE] [CAL] Received coeff packet #154 (20 bytes)
+I/flutter (21991): 01:37:58.001 INFO [BLE] [CAL] Received coeff packet #155 (20 bytes)
+I/flutter (21991): 01:37:58.002 INFO [BLE] [CAL] Received coeff packet #156 (20 bytes)
+I/flutter (21991): 01:37:58.002 INFO [BLE] [CAL] Received coeff packet #157 (20 bytes)
+I/flutter (21991): 01:37:58.003 INFO [BLE] [CAL] Received coeff packet #158 (20 bytes)
+I/flutter (21991): 01:37:58.003 INFO [BLE] [CAL] Received coeff packet #159 (20 bytes)
+I/flutter (21991): 01:37:58.004 INFO [BLE] [CAL] Received coeff packet #160 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:58.008 INFO [BLE] [CAL] Received coeff packet #161 (20 bytes)
+I/flutter (21991): 01:37:58.009 INFO [BLE] [CAL] Received coeff packet #162 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:58.009 INFO [BLE] [CAL] Received coeff packet #163 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:58.010 INFO [BLE] [CAL] Received coeff packet #164 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:58.010 INFO [BLE] [CAL] Received coeff packet #165 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:58.022 INFO [BLE] [CAL] Received coeff packet #166 (20 bytes)
+I/flutter (21991): 01:37:58.023 INFO [BLE] [CAL] Received coeff packet #167 (20 bytes)
+I/flutter (21991): 01:37:58.024 INFO [BLE] [CAL] Received coeff packet #168 (20 bytes)
+I/flutter (21991): 01:37:58.024 INFO [BLE] [CAL] Received coeff packet #169 (20 bytes)
+I/flutter (21991): 01:37:58.025 INFO [BLE] [CAL] Received coeff packet #170 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+I/flutter (21991): 01:37:58.037 INFO [BLE] [CAL] Received coeff packet #171 (20 bytes)
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:58.038 INFO [BLE] [CAL] Received coeff packet #172 (20 bytes)
+I/flutter (21991): 01:37:58.038 INFO [BLE] [CAL] Received coeff packet #173 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:58.039 INFO [BLE] [CAL] Received coeff packet #174 (20 bytes)
+I/flutter (21991): 01:37:58.040 INFO [BLE] [CAL] Received coeff packet #175 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:58.040 INFO [BLE] [CAL] Received coeff packet #176 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:58.041 INFO [BLE] [CAL] Received coeff packet #177 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:58.042 INFO [BLE] [CAL] Received coeff packet #178 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:58.052 INFO [BLE] [CAL] Received coeff packet #179 (20 bytes)
+I/flutter (21991): 01:37:58.053 INFO [BLE] [CAL] Received coeff packet #180 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:58.070 INFO [BLE] [CAL] Received coeff packet #181 (20 bytes)
+I/flutter (21991): 01:37:58.070 INFO [BLE] [CAL] Received coeff packet #182 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+I/flutter (21991): 01:37:58.098 INFO [BLE] [CAL] Received coeff packet #183 (20 bytes)
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:58.099 INFO [BLE] [CAL] Received coeff packet #184 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:58.099 INFO [BLE] [CAL] Received coeff packet #185 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:58.100 INFO [BLE] [CAL] Received coeff packet #186 (20 bytes)
+I/flutter (21991): 01:37:58.101 INFO [BLE] [CAL] Received coeff packet #187 (20 bytes)
+I/flutter (21991): 01:37:58.101 INFO [BLE] [CAL] Received coeff packet #188 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:58.103 INFO [BLE] [CAL] Received coeff packet #189 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:58.104 INFO [BLE] [CAL] Received coeff packet #190 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:58.104 INFO [BLE] [CAL] Received coeff packet #191 (20 bytes)
+I/flutter (21991): 01:37:58.105 INFO [BLE] [CAL] Received coeff packet #192 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484110-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:58.212 INFO [BLE] [CAL] Received coeff packet #193 (20 bytes)
+I/flutter (21991): 01:37:58.213 INFO [BLE] [CAL] Received coeff packet #194 (20 bytes)
+I/flutter (21991): 01:37:58.214 INFO [BLE] [CAL] Received coeff packet #195 (20 bytes)
+I/flutter (21991): 01:37:58.214 INFO [BLE] [CAL] Received coeff packet #196 (20 bytes)
+I/flutter (21991): 01:37:58.214 INFO [BLE] [CAL] Received coeff packet #197 (20 bytes)
+I/flutter (21991): 01:37:58.215 INFO [BLE] [CAL] Received coeff packet #198 (20 bytes)
+I/flutter (21991): 01:37:58.215 INFO [BLE] [CAL] Received coeff packet #199 (20 bytes)
+I/flutter (21991): 01:37:58.216 INFO [BLE] [CAL] Received coeff packet #200 (20 bytes)
+I/flutter (21991): 01:37:58.216 INFO [BLE] [CAL] Received coeff packet #201 (20 bytes)
+I/flutter (21991): 01:37:58.217 INFO [BLE] [CAL] Received coeff packet #202 (20 bytes)
+I/flutter (21991): 01:37:58.217 INFO [BLE] [CAL] Received coeff packet #203 (4 bytes)
+I/flutter (21991): 01:37:58.217 INFO [BLE] [CAL] Coefficient data complete (3822 bytes)
+I/flutter (21991): 01:37:58.218 INFO [BLE] [CAL] Coefficient fetch complete: 3822 bytes
+I/flutter (21991): 01:37:58.218 INFO [BLE] [CAL] Coefficient subscription cancelled
+I/flutter (21991): 01:37:58.218 INFO [BLE] [CAL] Starting calibration matrix fetch...
+I/flutter (21991): 01:37:58.219 INFO [BLE] [CAL] Matrix characteristics found, setting up listener...
+I/flutter (21991): 01:37:58.219 INFO [BLE] [CAL] Requesting calibration matrix...
+D/[FBP-Android](21991): [FBP] onMethodCall: writeCharacteristic
+D/[FBP-Android](21991): [FBP] onCharacteristicWrite:
+D/[FBP-Android](21991): [FBP]   chr: 43484111-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP]   status: GATT_SUCCESS (0)
+I/flutter (21991): 01:37:58.356 INFO [BLE] [CAL] Matrix request sent, waiting for response...
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:58.773 INFO [BLE] [CAL] Received matrix packet #1 (5 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:58.776 INFO [BLE] [CAL] Received matrix packet #2 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:58.779 INFO [BLE] [CAL] Received matrix packet #3 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:58.781 INFO [BLE] [CAL] Received matrix packet #4 (20 bytes)
+I/flutter (21991): 01:37:58.782 INFO [BLE] [CAL] Received matrix packet #5 (20 bytes)
+I/flutter (21991): 01:37:58.783 INFO [BLE] [CAL] Received matrix packet #6 (20 bytes)
+I/flutter (21991): 01:37:58.783 INFO [BLE] [CAL] Received matrix packet #7 (20 bytes)
+I/flutter (21991): 01:37:58.784 INFO [BLE] [CAL] Received matrix packet #8 (20 bytes)
+I/flutter (21991): 01:37:58.785 INFO [BLE] [CAL] Received matrix packet #9 (20 bytes)
+I/flutter (21991): 01:37:58.786 INFO [BLE] [CAL] Received matrix packet #10 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:58.862 INFO [BLE] [CAL] Received matrix packet #11 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:58.864 INFO [BLE] [CAL] Received matrix packet #12 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:58.866 INFO [BLE] [CAL] Received matrix packet #13 (20 bytes)
+I/flutter (21991): 01:37:58.867 INFO [BLE] [CAL] Received matrix packet #14 (20 bytes)
+I/flutter (21991): 01:37:58.869 INFO [BLE] [CAL] Received matrix packet #15 (20 bytes)
+I/flutter (21991): 01:37:58.870 INFO [BLE] [CAL] Received matrix packet #16 (20 bytes)
+I/flutter (21991): 01:37:58.872 INFO [BLE] [CAL] Received matrix packet #17 (20 bytes)
+I/flutter (21991): 01:37:58.873 INFO [BLE] [CAL] Received matrix packet #18 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:58.908 INFO [BLE] [CAL] Received matrix packet #19 (20 bytes)
+I/flutter (21991): 01:37:58.909 INFO [BLE] [CAL] Received matrix packet #20 (20 bytes)
+I/flutter (21991): 01:37:58.910 INFO [BLE] [CAL] Received matrix packet #21 (20 bytes)
+I/flutter (21991): 01:37:58.910 INFO [BLE] [CAL] Received matrix packet #22 (20 bytes)
+I/flutter (21991): 01:37:58.911 INFO [BLE] [CAL] Received matrix packet #23 (20 bytes)
+I/flutter (21991): 01:37:58.912 INFO [BLE] [CAL] Received matrix packet #24 (20 bytes)
+I/flutter (21991): 01:37:58.912 INFO [BLE] [CAL] Received matrix packet #25 (20 bytes)
+I/flutter (21991): 01:37:58.913 INFO [BLE] [CAL] Received matrix packet #26 (20 bytes)
+I/flutter (21991): 01:37:58.913 INFO [BLE] [CAL] Received matrix packet #27 (20 bytes)
+I/flutter (21991): 01:37:58.914 INFO [BLE] [CAL] Received matrix packet #28 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+I/flutter (21991): 01:37:58.915 INFO [BLE] [CAL] Received matrix packet #29 (20 bytes)
+I/flutter (21991): 01:37:58.915 INFO [BLE] [CAL] Received matrix packet #30 (20 bytes)
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:58.917 INFO [BLE] [CAL] Received matrix packet #31 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:58.918 INFO [BLE] [CAL] Received matrix packet #32 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:58.921 INFO [BLE] [CAL] Received matrix packet #33 (20 bytes)
+I/flutter (21991): 01:37:58.921 INFO [BLE] [CAL] Received matrix packet #34 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:58.951 INFO [BLE] [CAL] Received matrix packet #35 (20 bytes)
+I/flutter (21991): 01:37:58.952 INFO [BLE] [CAL] Received matrix packet #36 (20 bytes)
+I/flutter (21991): 01:37:58.953 INFO [BLE] [CAL] Received matrix packet #37 (20 bytes)
+I/flutter (21991): 01:37:58.954 INFO [BLE] [CAL] Received matrix packet #38 (20 bytes)
+I/flutter (21991): 01:37:58.965 INFO [BLE] [CAL] Received matrix packet #39 (20 bytes)
+I/flutter (21991): 01:37:58.966 INFO [BLE] [CAL] Received matrix packet #40 (20 bytes)
+I/flutter (21991): 01:37:58.966 INFO [BLE] [CAL] Received matrix packet #41 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:58.967 INFO [BLE] [CAL] Received matrix packet #42 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:58.967 INFO [BLE] [CAL] Received matrix packet #43 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:58.968 INFO [BLE] [CAL] Received matrix packet #44 (20 bytes)
+I/flutter (21991): 01:37:58.968 INFO [BLE] [CAL] Received matrix packet #45 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:58.969 INFO [BLE] [CAL] Received matrix packet #46 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:58.969 INFO [BLE] [CAL] Received matrix packet #47 (20 bytes)
+I/flutter (21991): 01:37:58.970 INFO [BLE] [CAL] Received matrix packet #48 (20 bytes)
+I/flutter (21991): 01:37:58.970 INFO [BLE] [CAL] Received matrix packet #49 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:58.980 INFO [BLE] [CAL] Received matrix packet #50 (20 bytes)
+I/flutter (21991): 01:37:58.980 INFO [BLE] [CAL] Received matrix packet #51 (20 bytes)
+I/flutter (21991): 01:37:58.981 INFO [BLE] [CAL] Received matrix packet #52 (20 bytes)
+I/flutter (21991): 01:37:58.981 INFO [BLE] [CAL] Received matrix packet #53 (20 bytes)
+I/flutter (21991): 01:37:58.982 INFO [BLE] [CAL] Received matrix packet #54 (20 bytes)
+I/flutter (21991): 01:37:58.982 INFO [BLE] [CAL] Received matrix packet #55 (20 bytes)
+I/flutter (21991): 01:37:58.983 INFO [BLE] [CAL] Received matrix packet #56 (20 bytes)
+I/flutter (21991): 01:37:58.983 INFO [BLE] [CAL] Received matrix packet #57 (20 bytes)
+I/flutter (21991): 01:37:58.984 INFO [BLE] [CAL] Received matrix packet #58 (20 bytes)
+I/flutter (21991): 01:37:58.984 INFO [BLE] [CAL] Received matrix packet #59 (20 bytes)
+I/flutter (21991): 01:37:58.984 INFO [BLE] [CAL] Received matrix packet #60 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:58.998 INFO [BLE] [CAL] Received matrix packet #61 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:59.029 INFO [BLE] [CAL] Received matrix packet #62 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:59.030 INFO [BLE] [CAL] Received matrix packet #63 (20 bytes)
+I/flutter (21991): 01:37:59.031 INFO [BLE] [CAL] Received matrix packet #64 (20 bytes)
+I/flutter (21991): 01:37:59.031 INFO [BLE] [CAL] Received matrix packet #65 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:59.092 INFO [BLE] [CAL] Received matrix packet #66 (20 bytes)
+I/flutter (21991): 01:37:59.093 INFO [BLE] [CAL] Received matrix packet #67 (20 bytes)
+I/flutter (21991): 01:37:59.094 INFO [BLE] [CAL] Received matrix packet #68 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:59.095 INFO [BLE] [CAL] Received matrix packet #69 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:59.095 INFO [BLE] [CAL] Received matrix packet #70 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:59.096 INFO [BLE] [CAL] Received matrix packet #71 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:59.097 INFO [BLE] [CAL] Received matrix packet #72 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:59.097 INFO [BLE] [CAL] Received matrix packet #73 (20 bytes)
+I/flutter (21991): 01:37:59.098 INFO [BLE] [CAL] Received matrix packet #74 (20 bytes)
+I/flutter (21991): 01:37:59.098 INFO [BLE] [CAL] Received matrix packet #75 (20 bytes)
+I/flutter (21991): 01:37:59.099 INFO [BLE] [CAL] Received matrix packet #76 (20 bytes)
+I/flutter (21991): 01:37:59.100 INFO [BLE] [CAL] Received matrix packet #77 (20 bytes)
+I/flutter (21991): 01:37:59.101 INFO [BLE] [CAL] Received matrix packet #78 (20 bytes)
+I/flutter (21991): 01:37:59.101 INFO [BLE] [CAL] Received matrix packet #79 (20 bytes)
+I/flutter (21991): 01:37:59.102 INFO [BLE] [CAL] Received matrix packet #80 (20 bytes)
+I/flutter (21991): 01:37:59.102 INFO [BLE] [CAL] Received matrix packet #81 (20 bytes)
+I/flutter (21991): 01:37:59.102 INFO [BLE] [CAL] Received matrix packet #82 (20 bytes)
+I/flutter (21991): 01:37:59.112 INFO [BLE] [CAL] Received matrix packet #83 (20 bytes)
+I/flutter (21991): 01:37:59.118 INFO [BLE] [CAL] Received matrix packet #84 (20 bytes)
+I/flutter (21991): 01:37:59.118 INFO [BLE] [CAL] Received matrix packet #85 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:59.126 INFO [BLE] [CAL] Received matrix packet #86 (20 bytes)
+I/flutter (21991): 01:37:59.127 INFO [BLE] [CAL] Received matrix packet #87 (20 bytes)
+I/flutter (21991): 01:37:59.128 INFO [BLE] [CAL] Received matrix packet #88 (20 bytes)
+I/flutter (21991): 01:37:59.128 INFO [BLE] [CAL] Received matrix packet #89 (20 bytes)
+I/flutter (21991): 01:37:59.129 INFO [BLE] [CAL] Received matrix packet #90 (20 bytes)
+I/flutter (21991): 01:37:59.129 INFO [BLE] [CAL] Received matrix packet #91 (20 bytes)
+I/flutter (21991): 01:37:59.130 INFO [BLE] [CAL] Received matrix packet #92 (20 bytes)
+I/flutter (21991): 01:37:59.130 INFO [BLE] [CAL] Received matrix packet #93 (20 bytes)
+I/flutter (21991): 01:37:59.130 INFO [BLE] [CAL] Received matrix packet #94 (20 bytes)
+I/flutter (21991): 01:37:59.131 INFO [BLE] [CAL] Received matrix packet #95 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:59.148 INFO [BLE] [CAL] Received matrix packet #96 (20 bytes)
+I/flutter (21991): 01:37:59.149 INFO [BLE] [CAL] Received matrix packet #97 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:59.180 INFO [BLE] [CAL] Received matrix packet #98 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:59.181 INFO [BLE] [CAL] Received matrix packet #99 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+I/flutter (21991): 01:37:59.182 INFO [BLE] [CAL] Received matrix packet #100 (20 bytes)
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:59.183 INFO [BLE] [CAL] Received matrix packet #101 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:59.184 INFO [BLE] [CAL] Received matrix packet #102 (20 bytes)
+I/flutter (21991): 01:37:59.185 INFO [BLE] [CAL] Received matrix packet #103 (20 bytes)
+D/[FBP-Android
+I/flutter (21991): 01:37:59.185 INFO [BLE] [CAL] Received matrix packet #103 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:59.187 INFO [BLE] [CAL] Received matrix packet #104 (20 bytes)
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:59.245 INFO [BLE] [CAL] Received matrix packet #105 (20 bytes)
+I/flutter (21991): 01:37:59.246 INFO [BLE] [CAL] Received matrix packet #106 (20 bytes)
+I/flutter (21991): 01:37:59.246 INFO [BLE] [CAL] Received matrix packet #107 (20 bytes)
+I/flutter (21991): 01:37:59.247 INFO [BLE] [CAL] Received matrix packet #108 (20 bytes)
+I/flutter (21991): 01:37:59.247 INFO [BLE] [CAL] Received matrix packet #109 (20 bytes)
+I/flutter (21991): 01:37:59.248 INFO [BLE] [CAL] Received matrix packet #110 (20 bytes)
+I/flutter (21991): 01:37:59.248 INFO [BLE] [CAL] Received matrix packet #111 (20 bytes)
+I/flutter (21991): 01:37:59.249 INFO [BLE] [CAL] Received matrix packet #112 (20 bytes)
+I/flutter (21991): 01:37:59.249 INFO [BLE] [CAL] Received matrix packet #113 (20 bytes)
+I/flutter (21991): 01:37:59.250 INFO [BLE] [CAL] Received matrix packet #114 (20 bytes)
+I/flutter (21991): 01:37:59.250 INFO [BLE] [CAL] Received matrix packet #115 (20 bytes)
+I/flutter (21991): 01:37:59.251 INFO [BLE] [CAL] Received matrix packet #116 (20 bytes)
+I/flutter (21991): 01:37:59.251 INFO [BLE] [CAL] Received matrix packet #117 (20 bytes)
+I/flutter (21991): 01:37:59.252 INFO [BLE] [CAL] Received matrix packet #118 (20 bytes)
+I/flutter (21991): 01:37:59.259 INFO [BLE] [CAL] Received matrix packet #119 (20 bytes)
+I/flutter (21991): 01:37:59.260 INFO [BLE] [CAL] Received matrix packet #120 (20 bytes)
+I/flutter (21991): 01:37:59.261 INFO [BLE] [CAL] Received matrix packet #121 (20 bytes)
+I/flutter (21991): 01:37:59.261 INFO [BLE] [CAL] Received matrix packet #122 (20 bytes)
+I/flutter (21991): 01:37:59.261 INFO [BLE] [CAL] Received matrix packet #123 (20 bytes)
+I/flutter (21991): 01:37:59.262 INFO [BLE] [CAL] Received matrix packet #124 (20 bytes)
+I/flutter (21991): 01:37:59.262 INFO [BLE] [CAL] Received matrix packet #125 (20 bytes)
+I/flutter (21991): 01:37:59.263 INFO [BLE] [CAL] Received matrix packet #126 (20 bytes)
+I/flutter (21991): 01:37:59.263 INFO [BLE] [CAL] Received matrix packet #127 (20 bytes)
+I/VRI[MainActivity]@151079f(21991): call setFrameRateCategory for touch hint category=no preference, reason=boost timeout, vri=VRI[MainActivity]@151079f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP] onCharacteristicChanged:
+D/[FBP-Android](21991): [FBP]   chr: 43484112-444c-5020-4e49-52204e616e6f
+I/flutter (21991): 01:37:59.301 INFO [BLE] [CAL] Received matrix packet #128 (20 bytes)
+I/flutter (21991): 01:37:59.381 INFO [BLE] [CAL] Received matrix packet #129 (16 bytes)
+I/flutter (21991): 01:37:59.381 INFO [BLE] [CAL] Matrix data complete (2428 bytes)
+I/flutter (21991): 01:37:59.382 INFO [BLE] [CAL] Matrix fetch complete: 2428 bytes
+I/flutter (21991): 01:37:59.382 INFO [BLE] [CAL] Matrix subscription cancelled
+I/flutter (21991): 01:37:59.382 INFO [BLE] [SCAN] Calibration ready | Coeff: 3822B | Matrix: 2428B
+I/flutter (21991): 01:37:59.382 INFO [BLE] [SCAN] Finding start scan characteristic...
+I/flutter (21991): 01:37:59.382 INFO [BLE] [SCAN] Start scan characteristic found
+I/flutter (21991): 01:37:59.383 INFO [BLE] [SCAN] Already subscribed to notifications during connection
+I/flutter (21991): 01:37:59.383 INFO [BLE] [SCAN] Trigger | Cmd: 0x0
+D/[FBP-Android](21991): [FBP] onMethodCall: writeCharacteristic
+D/[FBP-Android](21991): [FBP] onCharacteristicWrite:
+D/[FBP-Android](21991): [FBP]   chr: 4348411d-444c-5020-4e49-52204e616e6f
+D/[FBP-Android](21991): [FBP]   status: GATT_SUCCESS (0)
+I/flutter (21991): 01:37:59.497 INFO [BLE] [SCAN] Command sent, awaiting device (timeout: 60s)...
+D/BluetoothGatt(21991): onClientConnectionState() - status=8 clientIf=66 connected=false device=XX:XX:XX:XX:B1:6A
+D/BluetoothGatt(21991): unregisterApp() - mClientIf=66
+D/[FBP-Android](21991): [FBP] onConnectionStateChange:disconnected
+D/[FBP-Android](21991): [FBP]   status: LINK_SUPERVISION_TIMEOUT
+D/BluetoothGatt(21991): close()
+I/flutter (21991): 01:38:04.990 WARNING [BLE] [BLE] Device disconnected | ID: 90:7B:C6:49:B1:6A | State: connected

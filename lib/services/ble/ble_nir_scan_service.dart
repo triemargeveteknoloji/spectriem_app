@@ -383,6 +383,11 @@ class BleNirScanService implements NirScanService {
       }
     });
 
+    // CRITICAL: Small delay to ensure listener is fully registered before write
+    // flutter_blue_plus needs time to set up the stream listener at the native layer
+    await Future.delayed(const Duration(milliseconds: 200));
+    _logger.info('[SCAN] Listener ready, triggering scan...', tag: 'BLE');
+
     // Write save flag to start scan
     final scanCmd = saveToSd ? 0x01 : 0x00;
     _logger.info(

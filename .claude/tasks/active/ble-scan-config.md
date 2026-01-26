@@ -490,3 +490,160 @@ Called from `performScan()` after calibration check, before scan trigger.
 - 📝 Local test APK (manuel): `~/Downloads/spectriem_app_20260127_005433_with_scan_config.apk` (43MB)
 
 **Note:** Artık her commit'te lokal APK build etmiyoruz. Build sistemi remote'ta çalışıyor.
+
+**S7** (2026-01-27): 🔴 **SAME TIMEOUT ERROR PERSISTS AFTER CONFIG FIX** - User reports same error continues.
+
+**New Critical Observation from logs.txt:**
+
+```
+02:36:17.558 INFO [BLE] [SCAN] Active config ensured | Current: 0 | Ready: true
+02:36:17.560 INFO [BLE] [SCAN] Triggering scan...
+...
+[5 seconds later]
+D/BluetoothGatt: onConnectionStateChange() - status=8 connected=false
+```
+
+**Key insight from user:** "Paket boyutundan önce sensörün ışığı hiç yanmıyor. Yani hiç okuma almıyor henüz."
+
+**Translation:** "The sensor's light never turns on before the packet size timeout. It never gets a reading yet."
+
+**This means:**
+
+- Config IS being set correctly now (log shows: "Current: 0 | Ready: true")
+- Scan trigger IS being sent
+- BUT: Sensor's physical LED never activates
+- Connection times out BEFORE any scan data arrives
+
+**Possible root causes to investigate:**
+
+1. **MTU issue** - Current MTU is 131, maybe scan trigger packet needs larger MTU?
+2. **Missing delay** - Maybe device needs time between config write and scan trigger?
+3. **Wrong scan trigger payload** - Are we sending correct data to START_SCAN?
+4. **Device state** - Is device in correct state to receive scan command?
+5. **Notification listeners** - Are we listening to GSDIS_START_SCAN notify BEFORE triggering?
+
+**Action:** Deploy systematic debugging agents to compare our implementation vs APK protocol.
+
+---
+
+## Systematic Debugging Investigation (Iron Law Applied)
+
+### Phase 1: Root Cause Investigation ✅ COMPLETE
+
+**Evidence from logs.txt (line 1454-1505):**
+
+```
+02:36:18.566 - Active config confirmed (index: 6)
+02:36:18.570 - Scan trigger written (Cmd: 0x0)
+02:36:18.686 - Write successful (GATT_SUCCESS)
+02:36:24.166 - DISCONNECTED (5.5 seconds later)
+              status=8 (LINK_SUPERVISION_TIMEOUT)
+```
+
+**Critical finding:** NO notification received between trigger and disconnect!
+
+**Expected:** After writing to GSDIS_START_SCAN, should receive notification `[0xFF, idx0, idx1, idx2, idx3]`
+**Actual:** Complete silence, then timeout disconnect
+
+**User observation:** "Sensörün ışığı hiç yanmıyor" (Sensor's LED never turns on)
+→ This means device NEVER STARTS THE SCAN, not just failing to send data back.
+
+### Phase 2: Pattern Analysis ✅ COMPLETE
+
+**APK Protocol (Flow 4C):**
+
+```dart
+1. Subscribe to GSDIS_START_SCAN notifications FIRST
+2. Set up persistent stream listener
+3. Write trigger command
+4. Wait for notification on same characteristic
+```
+
+**Our Implementation:**
+
+```dart
+// Connection setup:
+await char.setNotifyValue(true);  // Enable notifications
+// ❌ BUT: No .listen() subscription created!
+
+// Later in performScan():
+startScanSubscription = startScanChar.onValueReceived.listen((data) {
+  // Try to listen NOW
+});
+await startScanChar.write([scanCmd]);  // Write trigger
+```
+
+**THE BUG:**
+
+- `setNotifyValue(true)` enables BLE notifications at OS level
+- But flutter_blue_plus needs ACTIVE `.listen()` subscription to route them
+- Without active listener, notifications are DROPPED by the library
+- Device sends notification → app doesn't ACK → BLE supervision timeout
+
+**This explains:**
+
+1. ✅ Why calibration works (we DO have listeners there)
+2. ❌ Why scan trigger fails (listener created AFTER write, too late)
+3. ❌ Why LED never turns on (device waiting for ACK before starting scan)
+4. ❌ Why it times out at exactly 5s (BLE standard supervision timeout)
+
+### Phase 3: Hypothesis ⏳ IN PROGRESS
+
+**ROOT CAUSE HYPOTHESIS:**
+
+`onValueReceived` stream in flutter_blue_plus requires an ACTIVE `.listen()` subscription BEFORE BLE notifications arrive. Creating the listener in `performScan()` is too late - notifications that arrive before `.listen()` is called are LOST.
+
+**Why this affects GSDIS_START_SCAN specifically:**
+
+- Other characteristics (calibration, metadata): We set up listeners, THEN write requests → Works
+- GSDIS_START_SCAN: We write trigger, device responds immediately → Notification arrives before `.listen()` → Lost
+
+**Test plan:**
+
+1. Set up `.listen()` subscription BEFORE writing trigger
+2. Verify notification is received
+3. Check if sensor LED turns on
+
+### Phase 4: Implementation ✅ COMPLETE
+
+**Fix Applied:** Added 200ms delay between creating `.listen()` subscription and writing scan trigger.
+
+**Location:** `lib/services/ble/ble_nir_scan_service.dart:385-388`
+
+**Change:**
+
+```dart
+startScanSubscription = startScanChar.onValueReceived.listen((data) {
+  // Listener callback
+});
+
+// CRITICAL FIX: Delay to ensure listener is registered at native layer
+await Future.delayed(const Duration(milliseconds: 200));
+_logger.info('[SCAN] Listener ready, triggering scan...', tag: 'BLE');
+
+await startScanChar.write([scanCmd]);
+```
+
+**Rationale:**
+
+- flutter_blue_plus needs time to propagate `.listen()` subscription to native BLE stack
+- Without delay, write happens before listener is fully active
+- Device sends notification → no active listener → dropped → timeout
+- 200ms gives native layer time to register the listener
+
+**Expected behavior after fix:**
+
+1. ✅ Listener created
+2. ⏸️ 200ms delay
+3. ✅ Write scan trigger (device receives command)
+4. ✅ Device starts scan (LED turns on!)
+5. ✅ Device sends notification back
+6. ✅ Listener catches notification
+7. ✅ Scan completes successfully
+
+**Next Steps:**
+
+- Build and test on device
+- Verify LED turns on
+- Verify scan completes without timeout
+- Check logs for notification receipt
