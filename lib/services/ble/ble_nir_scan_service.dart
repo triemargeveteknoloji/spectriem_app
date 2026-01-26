@@ -77,19 +77,29 @@ class BleNirScanService implements NirScanService {
   @override
   Future<void> connect(String deviceId) async {
     _setConnectionState(NirConnectionState.connecting);
+    print('🔵 [BLE] Connecting to device: $deviceId');
 
     try {
       _bleDevice = _adapter.getDevice(deviceId);
 
       await _bleDevice!.connect(timeout: const Duration(seconds: 15));
+      print('✅ [BLE] Connected to device');
 
       _connectionSubscription = _bleDevice!.connectionState.listen((state) {
         if (state == BluetoothConnectionState.disconnected) {
+          print('⚠️  [BLE] Device disconnected');
           _handleDisconnection();
         }
       });
 
       _services = await _bleDevice!.discoverServices();
+      print('✅ [BLE] Services discovered: ${_services?.length ?? 0}');
+
+      // Subscribe to all notifications as per protocol (Flow 1)
+      print(
+          '🔔 [BLE] Subscribing to ${NanoGatt.notificationCharacteristics.length} notification characteristics...');
+      await subscribeToAllNotifications(skipConnectionCheck: true);
+      print('✅ [BLE] All notifications subscribed');
 
       _connectedDevice = NirScanDevice(
         id: deviceId,
@@ -98,6 +108,8 @@ class BleNirScanService implements NirScanService {
       );
 
       _setConnectionState(NirConnectionState.connected);
+      print(
+          '🎉 [BLE] Connection fully established to ${_bleDevice!.platformName}');
     } catch (e) {
       _handleDisconnection();
       rethrow;
@@ -162,12 +174,17 @@ class BleNirScanService implements NirScanService {
   Future<DeviceInfo> getDeviceInfo() async {
     _ensureConnected();
 
-    final manufacturerName = await _readStringCharacteristic(NanoGatt.disManufName);
-    final modelNumber = await _readStringCharacteristic(NanoGatt.disModelNumber);
-    final serialNumber = await _readStringCharacteristic(NanoGatt.disSerialNumber);
+    final manufacturerName =
+        await _readStringCharacteristic(NanoGatt.disManufName);
+    final modelNumber =
+        await _readStringCharacteristic(NanoGatt.disModelNumber);
+    final serialNumber =
+        await _readStringCharacteristic(NanoGatt.disSerialNumber);
     final hardwareRevision = await _readStringCharacteristic(NanoGatt.disHwRev);
-    final tivaFirmwareRevision = await _readStringCharacteristic(NanoGatt.disTivaFwRev);
-    final spectrumLibraryRevision = await _readUint16Characteristic(NanoGatt.disSpeccRev);
+    final tivaFirmwareRevision =
+        await _readStringCharacteristic(NanoGatt.disTivaFwRev);
+    final spectrumLibraryRevision =
+        await _readUint16Characteristic(NanoGatt.disSpeccRev);
 
     return DeviceInfo(
       manufacturerName: manufacturerName,
@@ -244,10 +261,14 @@ class BleNirScanService implements NirScanService {
 
   /// Subscribe to all notification characteristics in sequence.
   /// This should be called after connection for full sensor functionality.
+  /// Can be called from connect() or manually after connection is established.
   Future<void> subscribeToAllNotifications({
     Duration delayBetween = const Duration(milliseconds: 100),
+    bool skipConnectionCheck = false,
   }) async {
-    _ensureConnected();
+    if (!skipConnectionCheck) {
+      _ensureConnected();
+    }
 
     for (final uuid in NanoGatt.notificationCharacteristics) {
       final char = _findCharacteristic(uuid);
@@ -263,10 +284,14 @@ class BleNirScanService implements NirScanService {
     _ensureConnected();
 
     final batteryLevel = await _readUint8Characteristic(NanoGatt.basBattLvl);
-    final tempRaw = await _readInt16Characteristic(NanoGatt.ggisTempMeasurement);
-    final humidRaw = await _readUint16Characteristic(NanoGatt.ggisHumidMeasurement);
-    final devStatusRaw = await _readUint16Characteristic(NanoGatt.ggisDevStatus);
-    final errStatusRaw = await _readUint16Characteristic(NanoGatt.ggisErrStatus);
+    final tempRaw =
+        await _readInt16Characteristic(NanoGatt.ggisTempMeasurement);
+    final humidRaw =
+        await _readUint16Characteristic(NanoGatt.ggisHumidMeasurement);
+    final devStatusRaw =
+        await _readUint16Characteristic(NanoGatt.ggisDevStatus);
+    final errStatusRaw =
+        await _readUint16Characteristic(NanoGatt.ggisErrStatus);
 
     return DeviceStatus(
       batteryLevel: batteryLevel,
@@ -280,6 +305,18 @@ class BleNirScanService implements NirScanService {
   @override
   Future<ScanData> performScan({bool saveToSd = false}) async {
     _ensureConnected();
+    print('🔵 [SCAN] Starting scan...');
+
+    // Sync device time before scan (as per protocol Flow 4B)
+    print('🕐 [SCAN] Syncing device time...');
+    await syncTime();
+    print('✅ [SCAN] Time synced');
+
+    // Ensure calibration data is cached (as per protocol Flow 4A)
+    print('🔬 [SCAN] Fetching calibration data...');
+    await _ensureCalibrationData();
+    print(
+        '✅ [SCAN] Calibration cached: coeff=${_cachedRefCalCoeff?.length ?? 0} bytes, matrix=${_cachedRefCalMatrix?.length ?? 0} bytes');
 
     // 1. Subscribe to start scan notifications and trigger scan
     final startScanChar = _findCharacteristic(NanoGatt.gsdisStartScan);
@@ -359,7 +396,7 @@ class BleNirScanService implements NirScanService {
         ? _parseUint32LittleEndian(pktFmtVerBytes).toString()
         : '0';
 
-    return ScanData(
+    final scanData = ScanData(
       name: name,
       type: type,
       date: date,
@@ -367,6 +404,24 @@ class BleNirScanService implements NirScanService {
       rawData: Uint8List.fromList(rawData),
       scanIndex: scanIndex,
     );
+
+    // Log scan completion
+    print('');
+    print('🎉 [SCAN] ============ SCAN COMPLETED ============');
+    print('📦 [SCAN] Raw Data Size: ${scanData.rawData.length} bytes');
+    print('📝 [SCAN] Name: ${scanData.name}');
+    print('📅 [SCAN] Date: ${scanData.date}');
+    print('🔢 [SCAN] Type: ${scanData.type}');
+    print('📌 [SCAN] Version: ${scanData.packetFormatVersion}');
+    print('🔬 [SCAN] First 20 bytes: ${scanData.rawData.take(20).toList()}');
+    print(
+        '🔬 [SCAN] Last 20 bytes: ${scanData.rawData.skip(scanData.rawData.length - 20).take(20).toList()}');
+    print(
+        '✅ [SCAN] Calibration available: coeff=${_cachedRefCalCoeff?.length ?? 0}B, matrix=${_cachedRefCalMatrix?.length ?? 0}B');
+    print('🎉 [SCAN] =========================================');
+    print('');
+
+    return scanData;
   }
 
   Future<List<int>> _requestScanMetadata(
@@ -482,15 +537,109 @@ class BleNirScanService implements NirScanService {
     final now = DateTime.now();
     final timeBytes = [
       now.year - 2000, // Year offset from 2000 (0-99)
-      now.month,       // Month (1-12)
-      now.day,         // Day (1-31)
+      now.month, // Month (1-12)
+      now.day, // Day (1-31)
       now.weekday % 7, // DayOfWeek (0=Sunday, 1=Monday, ..., 6=Saturday)
-      now.hour,        // Hour (0-23)
-      now.minute,      // Minute (0-59)
-      now.second,      // Second (0-59)
+      now.hour, // Hour (0-23)
+      now.minute, // Minute (0-59)
+      now.second, // Second (0-59)
     ];
 
     await char.write(timeBytes);
+  }
+
+  // Calibration data cache
+  List<int>? _cachedRefCalCoeff;
+  List<int>? _cachedRefCalMatrix;
+
+  /// Ensures calibration data is available (fetches if not cached)
+  Future<void> _ensureCalibrationData() async {
+    if (_cachedRefCalCoeff != null && _cachedRefCalMatrix != null) {
+      return; // Already cached
+    }
+
+    // Fetch calibration coefficients
+    if (_cachedRefCalCoeff == null) {
+      _cachedRefCalCoeff = await _fetchCalibrationCoefficients();
+    }
+
+    // Fetch calibration matrix
+    if (_cachedRefCalMatrix == null) {
+      _cachedRefCalMatrix = await _fetchCalibrationMatrix();
+    }
+  }
+
+  /// Fetches reference calibration coefficients (multi-packet)
+  Future<List<int>> _fetchCalibrationCoefficients() async {
+    final reqChar = _findCharacteristic(NanoGatt.gcisReqRefCalCoeff);
+    final retChar = _findCharacteristic(NanoGatt.gcisRetRefCalCoeff);
+
+    if (reqChar == null || retChar == null) {
+      throw NirScanException(
+          'Calibration coefficient characteristics not found');
+    }
+
+    await retChar.setNotifyValue(true);
+
+    final receiver = MultiPacketReceiver();
+    final completer = Completer<List<int>>();
+
+    final subscription = retChar.onValueReceived.listen((data) {
+      receiver.onPacketReceived(data);
+      if (receiver.isComplete) {
+        completer.complete(receiver.data);
+      }
+    });
+
+    // Request calibration coefficients
+    await reqChar.write([0x00]); // Dummy byte to trigger
+
+    try {
+      final coeffData = await completer.future.timeout(
+        const Duration(seconds: 10),
+        onTimeout: () =>
+            throw TimeoutException('Calibration coefficient fetch timeout'),
+      );
+      return coeffData;
+    } finally {
+      await subscription.cancel();
+    }
+  }
+
+  /// Fetches reference calibration matrix (multi-packet)
+  Future<List<int>> _fetchCalibrationMatrix() async {
+    final reqChar = _findCharacteristic(NanoGatt.gcisReqRefCalMatrix);
+    final retChar = _findCharacteristic(NanoGatt.gcisRetRefCalMatrix);
+
+    if (reqChar == null || retChar == null) {
+      throw NirScanException('Calibration matrix characteristics not found');
+    }
+
+    await retChar.setNotifyValue(true);
+
+    final receiver = MultiPacketReceiver();
+    final completer = Completer<List<int>>();
+
+    final subscription = retChar.onValueReceived.listen((data) {
+      receiver.onPacketReceived(data);
+      if (receiver.isComplete) {
+        completer.complete(receiver.data);
+      }
+    });
+
+    // Request calibration matrix
+    await reqChar.write([0x00]); // Dummy byte to trigger
+
+    try {
+      final matrixData = await completer.future.timeout(
+        const Duration(seconds: 10),
+        onTimeout: () =>
+            throw TimeoutException('Calibration matrix fetch timeout'),
+      );
+      return matrixData;
+    } finally {
+      await subscription.cancel();
+    }
   }
 
   @override
