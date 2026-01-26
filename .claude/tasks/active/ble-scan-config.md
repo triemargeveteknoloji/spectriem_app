@@ -483,4 +483,10 @@ Future<void> _ensureActiveScanConfig() async {
 
 Called from `performScan()` after calibration check, before scan trigger.
 
-**Result:** APK built with scan config fix: `~/Downloads/spectriem_app_20260127_005433_with_scan_config.apk` (43MB). Ready for device testing.
+**Result:**
+
+- ✅ Code committed and pushed (commit: c13bc46)
+- ⚠️ **APK build yapılmadı** - Build işlemi uzaktan yapılıyor (remote build system kullanılıyor)
+- 📝 Local test APK (manuel): `~/Downloads/spectriem_app_20260127_005433_with_scan_config.apk` (43MB)
+
+**Note:** Artık her commit'te lokal APK build etmiyoruz. Build sistemi remote'ta çalışıyor.

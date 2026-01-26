@@ -89,8 +89,11 @@ class BleNirScanService implements NirScanService {
       _bleDevice = _adapter.getDevice(deviceId);
 
       await _bleDevice!.connect(timeout: const Duration(seconds: 15));
+
+      // Request larger MTU for efficient data transfer
+      final mtu = await _bleDevice!.requestMtu(512);
       _logger.info(
-          '[BLE] Connected successfully | Device: ${_bleDevice!.platformName} | MTU: pending',
+          '[BLE] Connected successfully | Device: ${_bleDevice!.platformName} | MTU: $mtu',
           tag: 'BLE');
 
       _connectionSubscription = _bleDevice!.connectionState.listen((state) {
