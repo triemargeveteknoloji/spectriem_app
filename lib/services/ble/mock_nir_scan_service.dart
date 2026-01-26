@@ -28,6 +28,9 @@ class MockNirScanService implements NirScanService {
   /// Simulated delay for scan operations
   final Duration scanDelay;
 
+  /// Interval between device emissions during scan
+  final Duration deviceEmitInterval;
+
   /// Whether to simulate errors randomly
   final bool simulateErrors;
 
@@ -39,6 +42,7 @@ class MockNirScanService implements NirScanService {
   MockNirScanService({
     this.operationDelay = const Duration(milliseconds: 100),
     this.scanDelay = const Duration(seconds: 2),
+    this.deviceEmitInterval = const Duration(milliseconds: 500),
     this.simulateErrors = false,
     this.errorProbability = 0.1,
   });
@@ -67,21 +71,39 @@ class MockNirScanService implements NirScanService {
 
   @override
   Future<void> startDeviceScan({Duration? timeout}) async {
-    await Future.delayed(operationDelay);
+    // Skip delay if zero (for testing)
+    if (operationDelay > Duration.zero) {
+      await Future.delayed(operationDelay);
+    }
 
-    // Emit some mock devices
-    _scanTimer = Timer.periodic(const Duration(milliseconds: 500), (timer) {
-      if (timer.tick <= 3) {
-        _discoveredDevicesController.add(NirScanDevice(
-          id: 'mock-device-${timer.tick}',
-          name: 'NIRScan Nano ${String.fromCharCode(65 + timer.tick)}',
-          rssi: -60 - _random.nextInt(30),
-        ));
+    // Emit mock devices immediately if interval is zero (for testing)
+    if (deviceEmitInterval == Duration.zero) {
+      // Create all devices first
+      const devices = [
+        NirScanDevice(id: 'mock-device-1', name: 'NIRScan Nano B', rssi: -65),
+        NirScanDevice(id: 'mock-device-2', name: 'NIRScan Nano C', rssi: -70),
+        NirScanDevice(id: 'mock-device-3', name: 'NIRScan Nano D', rssi: -75),
+      ];
+      // Emit each device and yield to event loop
+      for (final device in devices) {
+        _discoveredDevicesController.add(device);
+        await Future.value(); // Yield to allow listener processing
       }
-    });
+    } else {
+      // Emit devices at configured interval
+      _scanTimer = Timer.periodic(deviceEmitInterval, (timer) {
+        if (timer.tick <= 3) {
+          _discoveredDevicesController.add(NirScanDevice(
+            id: 'mock-device-${timer.tick}',
+            name: 'NIRScan Nano ${String.fromCharCode(65 + timer.tick)}',
+            rssi: -60 - _random.nextInt(30),
+          ));
+        }
+      });
+    }
 
-    // Auto-stop after timeout
-    if (timeout != null) {
+    // Auto-stop after timeout (skip if testing mode with zero delays)
+    if (timeout != null && timeout > Duration.zero && operationDelay > Duration.zero) {
       Future.delayed(timeout, stopDeviceScan);
     }
   }
@@ -95,7 +117,9 @@ class MockNirScanService implements NirScanService {
   @override
   Future<void> connect(String deviceId) async {
     _setState(NirConnectionState.connecting);
-    await Future.delayed(operationDelay * 5);
+    if (operationDelay > Duration.zero) {
+      await Future.delayed(operationDelay * 5);
+    }
 
     _checkError('connect');
 
@@ -110,7 +134,9 @@ class MockNirScanService implements NirScanService {
   @override
   Future<void> disconnect() async {
     _setState(NirConnectionState.disconnecting);
-    await Future.delayed(operationDelay);
+    if (operationDelay > Duration.zero) {
+      await Future.delayed(operationDelay);
+    }
 
     _connectedDevice = null;
     _setState(NirConnectionState.disconnected);
@@ -125,7 +151,9 @@ class MockNirScanService implements NirScanService {
   @override
   Future<DeviceInfo> getDeviceInfo() async {
     _ensureConnected();
-    await Future.delayed(operationDelay * 3);
+    if (operationDelay > Duration.zero) {
+      await Future.delayed(operationDelay * 3);
+    }
     _checkError('getDeviceInfo');
 
     return const DeviceInfo(
@@ -141,7 +169,9 @@ class MockNirScanService implements NirScanService {
   @override
   Future<DeviceStatus> getDeviceStatus() async {
     _ensureConnected();
-    await Future.delayed(operationDelay * 2);
+    if (operationDelay > Duration.zero) {
+      await Future.delayed(operationDelay * 2);
+    }
     _checkError('getDeviceStatus');
 
     return DeviceStatus(
