@@ -12,8 +12,8 @@ import 'multi_packet_receiver.dart';
 import 'nano_gatt.dart';
 import 'nir_scan_service.dart';
 
-/// Real BLE implementation of [NirScanService] for NIRScan Nano devices.
-class RealNirScanService implements NirScanService {
+/// BLE implementation of [NirScanService] for NIRScan Nano devices.
+class BleNirScanService implements NirScanService {
   final BleAdapter _adapter;
 
   final _connectionStateController =
@@ -29,7 +29,7 @@ class RealNirScanService implements NirScanService {
   StreamSubscription<BluetoothConnectionState>? _connectionSubscription;
   final List<StreamSubscription> _notificationSubscriptions = [];
 
-  RealNirScanService({BleAdapter? adapter})
+  BleNirScanService({BleAdapter? adapter})
       : _adapter = adapter ?? FlutterBluePlusAdapter() {
     _connectionStateController.add(_currentState);
   }
@@ -62,6 +62,9 @@ class RealNirScanService implements NirScanService {
     });
 
     await _adapter.startScan(timeout: timeout);
+
+    // Wait until scanning stops (either by timeout or manual stop)
+    await _adapter.isScanning.firstWhere((isScanning) => !isScanning);
   }
 
   @override

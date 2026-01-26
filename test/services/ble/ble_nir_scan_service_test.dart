@@ -6,13 +6,13 @@ import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:spectriem_app/services/ble/ble_adapter.dart';
 import 'package:spectriem_app/services/ble/nir_scan_service.dart';
-import 'package:spectriem_app/services/ble/real_nir_scan_service.dart';
+import 'package:spectriem_app/services/ble/ble_nir_scan_service.dart';
 
-import 'real_nir_scan_service_test.mocks.dart';
+import 'ble_nir_scan_service_test.mocks.dart';
 
 @GenerateMocks([BluetoothDevice, BluetoothService, BluetoothCharacteristic, BleAdapter])
 void main() {
-  late RealNirScanService service;
+  late BleNirScanService service;
   late MockBleAdapter mockAdapter;
   late StreamController<List<ScanResult>> scanResultsController;
 
@@ -28,7 +28,7 @@ void main() {
     )).thenAnswer((_) async {});
     when(mockAdapter.stopScan()).thenAnswer((_) async {});
 
-    service = RealNirScanService(adapter: mockAdapter);
+    service = BleNirScanService(adapter: mockAdapter);
   });
 
   tearDown(() {
@@ -36,7 +36,7 @@ void main() {
     scanResultsController.close();
   });
 
-  group('RealNirScanService', () {
+  group('BleNirScanService', () {
     group('connection state stream', () {
       test('starts in disconnected state', () {
         // Service starts with no connected device (disconnected)

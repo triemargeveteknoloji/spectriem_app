@@ -33,7 +33,7 @@ class NirScanDevice {
 /// Abstract interface for NIRScan Nano communication.
 ///
 /// This interface can be implemented by:
-/// - [RealNirScanService] for actual BLE communication
+/// - [BleNirScanService] for actual BLE communication
 /// - [MockNirScanService] for testing without hardware
 abstract class NirScanService {
   /// Stream of connection state changes
