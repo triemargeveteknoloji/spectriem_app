@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:spectriem_app/providers/log_provider.dart';
 import 'package:spectriem_app/services/logging/log_service.dart';
 import 'package:spectriem_app/widgets/log_viewer_widget.dart';
 
@@ -18,12 +20,16 @@ void main() {
     LogLevel? filterLevel,
     bool expanded = true,
   }) {
-    return MaterialApp(
-      home: Scaffold(
-        body: LogViewerWidget(
-          logService: logService,
-          filterLevel: filterLevel,
-          expanded: expanded,
+    return ProviderScope(
+      overrides: [
+        logServiceProvider.overrideWithValue(logService),
+      ],
+      child: MaterialApp(
+        home: Scaffold(
+          body: LogViewerWidget(
+            filterLevel: filterLevel,
+            expanded: expanded,
+          ),
         ),
       ),
     );

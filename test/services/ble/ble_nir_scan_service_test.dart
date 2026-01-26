@@ -7,6 +7,7 @@ import 'package:mockito/mockito.dart';
 import 'package:spectriem_app/services/ble/ble_adapter.dart';
 import 'package:spectriem_app/services/ble/nir_scan_service.dart';
 import 'package:spectriem_app/services/ble/ble_nir_scan_service.dart';
+import 'package:spectriem_app/services/logging/log_service.dart';
 
 import 'ble_nir_scan_service_test.mocks.dart';
 
@@ -15,10 +16,12 @@ import 'ble_nir_scan_service_test.mocks.dart';
 void main() {
   late BleNirScanService service;
   late MockBleAdapter mockAdapter;
+  late LogService logService;
   late StreamController<List<ScanResult>> scanResultsController;
 
   setUp(() {
     mockAdapter = MockBleAdapter();
+    logService = LogService();
     scanResultsController = StreamController<List<ScanResult>>.broadcast();
 
     when(mockAdapter.scanResults)
@@ -30,11 +33,12 @@ void main() {
     )).thenAnswer((_) async {});
     when(mockAdapter.stopScan()).thenAnswer((_) async {});
 
-    service = BleNirScanService(adapter: mockAdapter);
+    service = BleNirScanService(adapter: mockAdapter, logger: logService);
   });
 
   tearDown(() {
     service.dispose();
+    logService.dispose();
     scanResultsController.close();
   });
 
@@ -62,6 +66,11 @@ void main() {
           (_) => Stream.value(BluetoothConnectionState.connected),
         );
         when(mockDevice.disconnect()).thenAnswer((_) async {});
+        when(mockDevice.requestMtu(any, predelay: anyNamed('predelay'), timeout: anyNamed('timeout')))
+            .thenAnswer((_) async => 512);
+        when(mockDevice.requestMtu(any,
+                predelay: anyNamed('predelay'), timeout: anyNamed('timeout')))
+            .thenAnswer((_) async => 512);
 
         when(mockService.uuid)
             .thenReturn(Guid('0000180a-0000-1000-8000-00805f9b34fb'));
@@ -99,6 +108,8 @@ void main() {
           (_) => Stream.value(BluetoothConnectionState.connected),
         );
         when(mockDevice.disconnect()).thenAnswer((_) async {});
+        when(mockDevice.requestMtu(any, predelay: anyNamed('predelay'), timeout: anyNamed('timeout')))
+            .thenAnswer((_) async => 512);
 
         when(mockService.uuid)
             .thenReturn(Guid('0000180a-0000-1000-8000-00805f9b34fb'));
@@ -167,6 +178,8 @@ void main() {
           (_) => Stream.value(BluetoothConnectionState.connected),
         );
         when(mockDevice.disconnect()).thenAnswer((_) async {});
+        when(mockDevice.requestMtu(any, predelay: anyNamed('predelay'), timeout: anyNamed('timeout')))
+            .thenAnswer((_) async => 512);
 
         when(mockService.uuid)
             .thenReturn(Guid('43484100-444c-5020-4e49-52204e616e6f'));
@@ -266,6 +279,8 @@ void main() {
           (_) => Stream.value(BluetoothConnectionState.connected),
         );
         when(mockDevice.disconnect()).thenAnswer((_) async {});
+        when(mockDevice.requestMtu(any, predelay: anyNamed('predelay'), timeout: anyNamed('timeout')))
+            .thenAnswer((_) async => 512);
 
         when(mockService.uuid)
             .thenReturn(Guid('0000180a-0000-1000-8000-00805f9b34fb'));
@@ -302,6 +317,8 @@ void main() {
           (_) => Stream.value(BluetoothConnectionState.connected),
         );
         when(mockDevice.disconnect()).thenAnswer((_) async {});
+        when(mockDevice.requestMtu(any, predelay: anyNamed('predelay'), timeout: anyNamed('timeout')))
+            .thenAnswer((_) async => 512);
 
         when(mockService.uuid)
             .thenReturn(Guid('0000180a-0000-1000-8000-00805f9b34fb'));
@@ -360,6 +377,8 @@ void main() {
           (_) => Stream.value(BluetoothConnectionState.connected),
         );
         when(mockDevice.disconnect()).thenAnswer((_) async {});
+        when(mockDevice.requestMtu(any, predelay: anyNamed('predelay'), timeout: anyNamed('timeout')))
+            .thenAnswer((_) async => 512);
 
         // DIS Service UUID
         when(mockDisService.uuid)
@@ -455,6 +474,8 @@ void main() {
           (_) => Stream.value(BluetoothConnectionState.connected),
         );
         when(mockDevice.disconnect()).thenAnswer((_) async {});
+        when(mockDevice.requestMtu(any, predelay: anyNamed('predelay'), timeout: anyNamed('timeout')))
+            .thenAnswer((_) async => 512);
 
         // BAS Service UUID (0x180F)
         when(mockBasService.uuid)
@@ -536,6 +557,8 @@ void main() {
           (_) => Stream.value(BluetoothConnectionState.connected),
         );
         when(mockDevice.disconnect()).thenAnswer((_) async {});
+        when(mockDevice.requestMtu(any, predelay: anyNamed('predelay'), timeout: anyNamed('timeout')))
+            .thenAnswer((_) async => 512);
 
         when(mockBasService.uuid)
             .thenReturn(Guid('0000180f-0000-1000-8000-00805f9b34fb'));
@@ -607,6 +630,8 @@ void main() {
           (_) => Stream.value(BluetoothConnectionState.connected),
         );
         when(mockDevice.disconnect()).thenAnswer((_) async {});
+        when(mockDevice.requestMtu(any, predelay: anyNamed('predelay'), timeout: anyNamed('timeout')))
+            .thenAnswer((_) async => 512);
 
         when(mockBasService.uuid)
             .thenReturn(Guid('0000180f-0000-1000-8000-00805f9b34fb'));
@@ -676,6 +701,8 @@ void main() {
           (_) => Stream.value(BluetoothConnectionState.connected),
         );
         when(mockDevice.disconnect()).thenAnswer((_) async {});
+        when(mockDevice.requestMtu(any, predelay: anyNamed('predelay'), timeout: anyNamed('timeout')))
+            .thenAnswer((_) async => 512);
 
         // GCIS Service
         when(mockGcisService.uuid)
@@ -743,6 +770,8 @@ void main() {
           (_) => Stream.value(BluetoothConnectionState.connected),
         );
         when(mockDevice.disconnect()).thenAnswer((_) async {});
+        when(mockDevice.requestMtu(any, predelay: anyNamed('predelay'), timeout: anyNamed('timeout')))
+            .thenAnswer((_) async => 512);
 
         when(mockDisService.uuid)
             .thenReturn(Guid('0000180a-0000-1000-8000-00805f9b34fb'));
@@ -817,6 +846,8 @@ void main() {
           (_) => Stream.value(BluetoothConnectionState.connected),
         );
         when(mockDevice.disconnect()).thenAnswer((_) async {});
+        when(mockDevice.requestMtu(any, predelay: anyNamed('predelay'), timeout: anyNamed('timeout')))
+            .thenAnswer((_) async => 512);
 
         // GCIS Service
         when(mockGcisService.uuid)
@@ -942,6 +973,8 @@ void main() {
           (_) => Stream.value(BluetoothConnectionState.connected),
         );
         when(mockDevice.disconnect()).thenAnswer((_) async {});
+        when(mockDevice.requestMtu(any, predelay: anyNamed('predelay'), timeout: anyNamed('timeout')))
+            .thenAnswer((_) async => 512);
 
         // GDTS service for time sync
         when(mockGdtsService.uuid)
@@ -1004,6 +1037,8 @@ void main() {
           (_) => Stream.value(BluetoothConnectionState.connected),
         );
         when(mockDevice.disconnect()).thenAnswer((_) async {});
+        when(mockDevice.requestMtu(any, predelay: anyNamed('predelay'), timeout: anyNamed('timeout')))
+            .thenAnswer((_) async => 512);
 
         when(mockGsdisService.uuid)
             .thenReturn(Guid('53455206-444c-5020-4e49-52204e616e6f'));
@@ -1064,6 +1099,8 @@ void main() {
           (_) => Stream.value(BluetoothConnectionState.connected),
         );
         when(mockDevice.disconnect()).thenAnswer((_) async {});
+        when(mockDevice.requestMtu(any, predelay: anyNamed('predelay'), timeout: anyNamed('timeout')))
+            .thenAnswer((_) async => 512);
 
         when(mockGsdisService.uuid)
             .thenReturn(Guid('53455206-444c-5020-4e49-52204e616e6f'));
@@ -1121,6 +1158,8 @@ void main() {
           (_) => Stream.value(BluetoothConnectionState.connected),
         );
         when(mockDevice.disconnect()).thenAnswer((_) async {});
+        when(mockDevice.requestMtu(any, predelay: anyNamed('predelay'), timeout: anyNamed('timeout')))
+            .thenAnswer((_) async => 512);
 
         when(mockGsdisService.uuid)
             .thenReturn(Guid('53455206-444c-5020-4e49-52204e616e6f'));
@@ -1197,6 +1236,8 @@ void main() {
           (_) => Stream.value(BluetoothConnectionState.connected),
         );
         when(mockDevice.disconnect()).thenAnswer((_) async {});
+        when(mockDevice.requestMtu(any, predelay: anyNamed('predelay'), timeout: anyNamed('timeout')))
+            .thenAnswer((_) async => 512);
 
         when(mockGsdisService.uuid)
             .thenReturn(Guid('53455206-444c-5020-4e49-52204e616e6f'));
@@ -1391,6 +1432,8 @@ void main() {
           (_) => Stream.value(BluetoothConnectionState.connected),
         );
         when(mockDevice.disconnect()).thenAnswer((_) async {});
+        when(mockDevice.requestMtu(any, predelay: anyNamed('predelay'), timeout: anyNamed('timeout')))
+            .thenAnswer((_) async => 512);
 
         // GDTS Service
         when(mockGdtsService.uuid)
@@ -1452,32 +1495,44 @@ void main() {
 
         var coeffRequested = false;
 
-        when(mockDevice.remoteId).thenReturn(const DeviceIdentifier('AA:BB:CC:DD:EE:FF'));
+        when(mockDevice.remoteId)
+            .thenReturn(const DeviceIdentifier('AA:BB:CC:DD:EE:FF'));
         when(mockDevice.platformName).thenReturn('NIRScan Nano');
         when(mockDevice.connect(
           timeout: anyNamed('timeout'),
           autoConnect: anyNamed('autoConnect'),
         )).thenAnswer((_) async {});
-        when(mockDevice.discoverServices()).thenAnswer((_) async => [mockGcisService]);
+        when(mockDevice.discoverServices())
+            .thenAnswer((_) async => [mockGcisService]);
         when(mockDevice.connectionState).thenAnswer(
           (_) => Stream.value(BluetoothConnectionState.connected),
         );
         when(mockDevice.disconnect()).thenAnswer((_) async {});
+        when(mockDevice.requestMtu(any, predelay: anyNamed('predelay'), timeout: anyNamed('timeout')))
+            .thenAnswer((_) async => 512);
 
         // GCIS Service
-        when(mockGcisService.uuid).thenReturn(Guid('4348410e-444c-5020-4e49-52204e616e6f'));
-        when(mockGcisService.characteristics).thenReturn([mockReqCoeffChar, mockRetCoeffChar]);
+        when(mockGcisService.uuid)
+            .thenReturn(Guid('4348410e-444c-5020-4e49-52204e616e6f'));
+        when(mockGcisService.characteristics)
+            .thenReturn([mockReqCoeffChar, mockRetCoeffChar]);
 
         // Request characteristic
-        when(mockReqCoeffChar.uuid).thenReturn(Guid('4348410f-444c-5020-4e49-52204e616e6f'));
-        when(mockReqCoeffChar.write(any, withoutResponse: anyNamed('withoutResponse'))).thenAnswer((_) async {
+        when(mockReqCoeffChar.uuid)
+            .thenReturn(Guid('4348410f-444c-5020-4e49-52204e616e6f'));
+        when(mockReqCoeffChar.write(any,
+                withoutResponse: anyNamed('withoutResponse')))
+            .thenAnswer((_) async {
           coeffRequested = true;
         });
 
         // Return characteristic (notification)
-        when(mockRetCoeffChar.uuid).thenReturn(Guid('43484110-444c-5020-4e49-52204e616e6f'));
-        when(mockRetCoeffChar.setNotifyValue(true)).thenAnswer((_) async => true);
-        when(mockRetCoeffChar.onValueReceived).thenAnswer((_) => coeffNotifyController.stream);
+        when(mockRetCoeffChar.uuid)
+            .thenReturn(Guid('43484110-444c-5020-4e49-52204e616e6f'));
+        when(mockRetCoeffChar.setNotifyValue(true))
+            .thenAnswer((_) async => true);
+        when(mockRetCoeffChar.onValueReceived)
+            .thenAnswer((_) => coeffNotifyController.stream);
 
         when(mockAdapter.getDevice('AA:BB:CC:DD:EE:FF')).thenReturn(mockDevice);
 

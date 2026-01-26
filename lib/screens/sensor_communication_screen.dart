@@ -1,31 +1,25 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/device_info.dart';
 import '../models/device_status.dart';
 import '../models/scan_configuration.dart';
 import '../models/scan_data.dart';
+import '../providers/ble_providers.dart';
+import '../providers/log_provider.dart';
 import '../services/ble/nir_scan_service.dart';
-import '../services/logging/log_service.dart';
 import '../widgets/log_viewer_widget.dart';
 
-class SensorCommunicationScreen extends StatefulWidget {
-  final NirScanService bleService;
-  final LogService logService;
-
-  const SensorCommunicationScreen({
-    super.key,
-    required this.bleService,
-    required this.logService,
-  });
+class SensorCommunicationScreen extends ConsumerStatefulWidget {
+  const SensorCommunicationScreen({super.key});
 
   @override
-  State<SensorCommunicationScreen> createState() =>
+  ConsumerState<SensorCommunicationScreen> createState() =>
       _SensorCommunicationScreenState();
 }
 
-class _SensorCommunicationScreenState extends State<SensorCommunicationScreen> {
+class _SensorCommunicationScreenState
+    extends ConsumerState<SensorCommunicationScreen> {
   bool _logPanelExpanded = false;
   bool _isConnected = false;
   String? _loadingCommand;
@@ -34,23 +28,16 @@ class _SensorCommunicationScreenState extends State<SensorCommunicationScreen> {
   List<ScanConfiguration>? _configurations;
   int? _selectedConfigIndex;
 
-  StreamSubscription<NirConnectionState>? _connectionSubscription;
-
   @override
   void initState() {
     super.initState();
-    _connectionSubscription =
-        widget.bleService.connectionState.listen(_onConnectionStateChanged);
-    _isConnected = widget.bleService.connectedDevice != null;
-    if (_isConnected) {
-      _loadConfigurations();
-    }
-  }
-
-  @override
-  void dispose() {
-    _connectionSubscription?.cancel();
-    super.dispose();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final bleService = ref.read(nirScanServiceProvider);
+      _isConnected = bleService.connectedDevice != null;
+      if (_isConnected) {
+        _loadConfigurations();
+      }
+    });
   }
 
   void _onConnectionStateChanged(NirConnectionState state) {
@@ -70,32 +57,38 @@ class _SensorCommunicationScreenState extends State<SensorCommunicationScreen> {
 
   Future<void> _loadConfigurations() async {
     try {
-      final configs = await widget.bleService.getScanConfigurations();
+      final bleService = ref.read(nirScanServiceProvider);
+      final configs = await bleService.getScanConfigurations();
       if (mounted) {
         setState(() {
           _configurations = configs;
-          _selectedConfigIndex = configs.isNotEmpty ? configs.first.index : null;
+          _selectedConfigIndex =
+              configs.isNotEmpty ? configs.first.index : null;
         });
       }
     } catch (e) {
-      widget.logService.error('Failed to load configurations: $e', tag: 'UI');
+      final logService = ref.read(logServiceProvider);
+      logService.error('Failed to load configurations: $e', tag: 'UI');
     }
   }
 
   Future<void> _onConfigurationChanged(int? index) async {
     if (index == null || index == _selectedConfigIndex) return;
 
-    widget.logService.info('↑ CMD: setActiveScanConfiguration($index)', tag: 'UI');
+    final bleService = ref.read(nirScanServiceProvider);
+    final logService = ref.read(logServiceProvider);
+
+    logService.info('↑ CMD: setActiveScanConfiguration($index)', tag: 'UI');
     try {
-      await widget.bleService.setActiveScanConfiguration(index);
-      widget.logService.info('↓ RSP: OK', tag: 'UI');
+      await bleService.setActiveScanConfiguration(index);
+      logService.info('↓ RSP: OK', tag: 'UI');
       if (mounted) {
         setState(() {
           _selectedConfigIndex = index;
         });
       }
     } on NirScanException catch (e) {
-      widget.logService.error('↓ ERR: $e', tag: 'UI');
+      logService.error('↓ ERR: $e', tag: 'UI');
     }
   }
 
@@ -111,16 +104,18 @@ class _SensorCommunicationScreenState extends State<SensorCommunicationScreen> {
   ) async {
     if (!_isConnected) return;
 
+    final logService = ref.read(logServiceProvider);
+
     setState(() {
       _loadingCommand = commandName;
       _lastError = null;
     });
 
-    widget.logService.info('↑ CMD: $commandName', tag: 'UI');
+    logService.info('↑ CMD: $commandName', tag: 'UI');
 
     try {
       final result = await command();
-      widget.logService.info('↓ RSP: $result', tag: 'UI');
+      logService.info('↓ RSP: $result', tag: 'UI');
       if (mounted) {
         setState(() {
           _lastResponse = result;
@@ -128,7 +123,7 @@ class _SensorCommunicationScreenState extends State<SensorCommunicationScreen> {
         });
       }
     } on NirScanException catch (e) {
-      widget.logService.error('↓ ERR: $e', tag: 'UI');
+      logService.error('↓ ERR: $e', tag: 'UI');
       if (mounted) {
         setState(() {
           _lastError = e.message;
@@ -140,6 +135,15 @@ class _SensorCommunicationScreenState extends State<SensorCommunicationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    ref.listen<AsyncValue<NirConnectionState>>(
+      connectionStateProvider,
+      (previous, next) {
+        next.whenData((state) {
+          _onConnectionStateChanged(state);
+        });
+      },
+    );
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Sensor Communication'),
@@ -237,6 +241,8 @@ class _SensorCommunicationScreenState extends State<SensorCommunicationScreen> {
   }
 
   Widget _buildCommandSection() {
+    final bleService = ref.read(nirScanServiceProvider);
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -257,7 +263,7 @@ class _SensorCommunicationScreenState extends State<SensorCommunicationScreen> {
                   Icons.radar,
                   () => _executeCommand(
                     'performScan',
-                    () => widget.bleService.performScan(),
+                    () => bleService.performScan(),
                   ),
                 ),
                 _buildCommandButton(
@@ -265,7 +271,7 @@ class _SensorCommunicationScreenState extends State<SensorCommunicationScreen> {
                   Icons.info_outline,
                   () => _executeCommand(
                     'getDeviceInfo',
-                    () => widget.bleService.getDeviceInfo(),
+                    () => bleService.getDeviceInfo(),
                   ),
                 ),
                 _buildCommandButton(
@@ -273,7 +279,7 @@ class _SensorCommunicationScreenState extends State<SensorCommunicationScreen> {
                   Icons.monitor_heart_outlined,
                   () => _executeCommand(
                     'getDeviceStatus',
-                    () => widget.bleService.getDeviceStatus(),
+                    () => bleService.getDeviceStatus(),
                   ),
                 ),
                 _buildCommandButton(
@@ -282,7 +288,7 @@ class _SensorCommunicationScreenState extends State<SensorCommunicationScreen> {
                   () => _executeCommand(
                     'syncTime',
                     () async {
-                      await widget.bleService.syncTime();
+                      await bleService.syncTime();
                       return 'OK';
                     },
                   ),
@@ -292,7 +298,7 @@ class _SensorCommunicationScreenState extends State<SensorCommunicationScreen> {
                   Icons.settings,
                   () => _executeCommand(
                     'getScanConfigurations',
-                    () => widget.bleService.getScanConfigurations(),
+                    () => bleService.getScanConfigurations(),
                   ),
                 ),
               ],
@@ -398,7 +404,8 @@ class _SensorCommunicationScreenState extends State<SensorCommunicationScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildInfoRow('Battery', '${status.batteryLevel}%'),
-        _buildInfoRow('Temperature', '${status.temperature.toStringAsFixed(1)}°C'),
+        _buildInfoRow(
+            'Temperature', '${status.temperature.toStringAsFixed(1)}°C'),
         _buildInfoRow('Humidity', '${status.humidity.toStringAsFixed(1)}%'),
         if (status.hasErrors)
           _buildInfoRow('Errors', status.errorMessages.join(', ')),
@@ -453,9 +460,7 @@ class _SensorCommunicationScreenState extends State<SensorCommunicationScreen> {
         color: Colors.grey[100],
         border: Border(top: BorderSide(color: Colors.grey[300]!)),
       ),
-      child: LogViewerWidget(
-        logService: widget.logService,
-      ),
+      child: const LogViewerWidget(),
     );
   }
 }

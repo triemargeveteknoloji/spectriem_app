@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:spectriem_app/providers/ble_providers.dart';
+import 'package:spectriem_app/providers/log_provider.dart';
 import 'package:spectriem_app/screens/bluetooth_connection_screen.dart';
 import 'package:spectriem_app/services/ble/mock_nir_scan_service.dart';
 import 'package:spectriem_app/services/logging/log_service.dart';
@@ -17,17 +20,20 @@ void main() {
     logService = LogService();
   });
 
-  tearDown(() async {
+  tearDown() async {
     await bleService.stopDeviceScan();
     bleService.dispose();
     logService.dispose();
-  });
+  }
 
   Widget createTestWidget({MockNirScanService? customService}) {
-    return MaterialApp(
-      home: BluetoothConnectionScreen(
-        bleService: customService ?? bleService,
-        logService: logService,
+    return ProviderScope(
+      overrides: [
+        nirScanServiceProvider.overrideWithValue(customService ?? bleService),
+        logServiceProvider.overrideWithValue(logService),
+      ],
+      child: const MaterialApp(
+        home: BluetoothConnectionScreen(),
       ),
     );
   }
@@ -53,7 +59,8 @@ void main() {
         await tester.pumpWidget(createTestWidget());
 
         // Initial state: no devices
-        expect(find.text('No devices found.\nTap Scan to search.'), findsOneWidget);
+        expect(find.text('No devices found.\nTap Scan to search.'),
+            findsOneWidget);
 
         // Tap scan button and pump multiple times for async chain
         await tester.tap(find.text('Scan'));
@@ -71,7 +78,8 @@ void main() {
         expect(find.byType(ListTile), findsNWidgets(3));
       });
 
-      testWidgets('discovered devices persist after scan completes', (tester) async {
+      testWidgets('discovered devices persist after scan completes',
+          (tester) async {
         await tester.pumpWidget(createTestWidget());
 
         // Start scan - devices appear and scan completes immediately

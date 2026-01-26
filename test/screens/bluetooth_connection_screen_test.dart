@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:spectriem_app/providers/ble_providers.dart';
+import 'package:spectriem_app/providers/log_provider.dart';
 import 'package:spectriem_app/screens/bluetooth_connection_screen.dart';
 import 'package:spectriem_app/services/ble/mock_nir_scan_service.dart';
 import 'package:spectriem_app/services/logging/log_service.dart';
@@ -24,10 +27,14 @@ void main() {
   });
 
   Widget createTestWidget({MockNirScanService? customBleService}) {
-    return MaterialApp(
-      home: BluetoothConnectionScreen(
-        bleService: customBleService ?? bleService,
-        logService: logService,
+    return ProviderScope(
+      overrides: [
+        nirScanServiceProvider
+            .overrideWithValue(customBleService ?? bleService),
+        logServiceProvider.overrideWithValue(logService),
+      ],
+      child: const MaterialApp(
+        home: BluetoothConnectionScreen(),
       ),
     );
   }
@@ -98,7 +105,8 @@ void main() {
         expect(find.byIcon(Icons.search), findsOneWidget);
       });
 
-      testWidgets('disconnected state has bluetooth disabled icon', (tester) async {
+      testWidgets('disconnected state has bluetooth disabled icon',
+          (tester) async {
         await tester.pumpWidget(createTestWidget());
 
         expect(find.byIcon(Icons.bluetooth_disabled), findsOneWidget);

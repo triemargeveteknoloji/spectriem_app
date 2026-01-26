@@ -1,26 +1,26 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../providers/log_provider.dart';
 import '../services/logging/log_service.dart';
 
-class LogViewerWidget extends StatefulWidget {
-  final LogService logService;
+class LogViewerWidget extends ConsumerStatefulWidget {
   final LogLevel? filterLevel;
   final bool expanded;
 
   const LogViewerWidget({
     super.key,
-    required this.logService,
     this.filterLevel,
     this.expanded = true,
   });
 
   @override
-  State<LogViewerWidget> createState() => _LogViewerWidgetState();
+  ConsumerState<LogViewerWidget> createState() => _LogViewerWidgetState();
 }
 
-class _LogViewerWidgetState extends State<LogViewerWidget> {
+class _LogViewerWidgetState extends ConsumerState<LogViewerWidget> {
   final ScrollController _scrollController = ScrollController();
   final List<LogEntry> _entries = [];
   StreamSubscription<LogEntry>? _subscription;
@@ -28,15 +28,18 @@ class _LogViewerWidgetState extends State<LogViewerWidget> {
   @override
   void initState() {
     super.initState();
-    _entries.addAll(widget.logService.history);
-    _subscription = widget.logService.logStream.listen(_onLogEntry);
+    final logService = ref.read(logServiceProvider);
+    _entries.addAll(logService.history);
+    _subscription = logService.logStream.listen(_onLogEntry);
   }
 
   void _onLogEntry(LogEntry entry) {
-    setState(() {
-      _entries.add(entry);
-    });
-    _scrollToBottom();
+    if (mounted) {
+      setState(() {
+        _entries.add(entry);
+      });
+      _scrollToBottom();
+    }
   }
 
   void _scrollToBottom() {

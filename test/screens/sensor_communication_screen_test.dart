@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:spectriem_app/providers/ble_providers.dart';
+import 'package:spectriem_app/providers/log_provider.dart';
 import 'package:spectriem_app/screens/sensor_communication_screen.dart';
 import 'package:spectriem_app/services/ble/mock_nir_scan_service.dart';
 import 'package:spectriem_app/services/logging/log_service.dart';
@@ -24,10 +27,14 @@ void main() {
   });
 
   Widget createTestWidget({MockNirScanService? customBleService}) {
-    return MaterialApp(
-      home: SensorCommunicationScreen(
-        bleService: customBleService ?? bleService,
-        logService: logService,
+    return ProviderScope(
+      overrides: [
+        nirScanServiceProvider
+            .overrideWithValue(customBleService ?? bleService),
+        logServiceProvider.overrideWithValue(logService),
+      ],
+      child: const MaterialApp(
+        home: SensorCommunicationScreen(),
       ),
     );
   }
@@ -161,13 +168,15 @@ void main() {
     });
 
     group('disconnected state', () {
-      testWidgets('shows disconnected message when not connected', (tester) async {
+      testWidgets('shows disconnected message when not connected',
+          (tester) async {
         await tester.pumpWidget(createTestWidget());
 
         expect(find.textContaining('Not connected'), findsOneWidget);
       });
 
-      testWidgets('command buttons are not shown when disconnected', (tester) async {
+      testWidgets('command buttons are not shown when disconnected',
+          (tester) async {
         await tester.pumpWidget(createTestWidget());
 
         expect(find.text('Info'), findsNothing);
@@ -198,7 +207,8 @@ void main() {
         expect(find.text('Quick Scan'), findsOneWidget);
       });
 
-      testWidgets('selecting config calls setActiveScanConfiguration', (tester) async {
+      testWidgets('selecting config calls setActiveScanConfiguration',
+          (tester) async {
         await tester.pumpWidget(createTestWidget());
         await connectDevice(tester);
         await tester.pumpAndSettle();
@@ -210,7 +220,9 @@ void main() {
         await tester.pumpAndSettle();
 
         final logs = logService.history;
-        expect(logs.any((e) => e.message.contains('setActiveScanConfiguration')), isTrue);
+        expect(
+            logs.any((e) => e.message.contains('setActiveScanConfiguration')),
+            isTrue);
       });
     });
   });

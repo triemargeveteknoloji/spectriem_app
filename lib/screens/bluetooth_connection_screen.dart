@@ -1,11 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/device_info.dart';
 import '../models/device_status.dart';
+import '../providers/ble_providers.dart';
+import '../providers/log_provider.dart';
 import '../services/ble/nir_scan_service.dart';
-import '../services/logging/log_service.dart';
 import '../widgets/log_viewer_widget.dart';
 
 enum _ScreenState {
@@ -16,22 +18,16 @@ enum _ScreenState {
   error,
 }
 
-class BluetoothConnectionScreen extends StatefulWidget {
-  final NirScanService bleService;
-  final LogService logService;
-
-  const BluetoothConnectionScreen({
-    super.key,
-    required this.bleService,
-    required this.logService,
-  });
+class BluetoothConnectionScreen extends ConsumerStatefulWidget {
+  const BluetoothConnectionScreen({super.key});
 
   @override
-  State<BluetoothConnectionScreen> createState() =>
+  ConsumerState<BluetoothConnectionScreen> createState() =>
       _BluetoothConnectionScreenState();
 }
 
-class _BluetoothConnectionScreenState extends State<BluetoothConnectionScreen> {
+class _BluetoothConnectionScreenState
+    extends ConsumerState<BluetoothConnectionScreen> {
   _ScreenState _state = _ScreenState.idle;
   List<NirScanDevice> _discoveredDevices = [];
   DeviceInfo? _deviceInfo;
@@ -40,19 +36,10 @@ class _BluetoothConnectionScreenState extends State<BluetoothConnectionScreen> {
   bool _logPanelExpanded = false;
 
   StreamSubscription<NirScanDevice>? _deviceSubscription;
-  StreamSubscription<NirConnectionState>? _connectionSubscription;
-
-  @override
-  void initState() {
-    super.initState();
-    _connectionSubscription =
-        widget.bleService.connectionState.listen(_onConnectionStateChanged);
-  }
 
   @override
   void dispose() {
     _deviceSubscription?.cancel();
-    _connectionSubscription?.cancel();
     super.dispose();
   }
 
@@ -75,14 +62,17 @@ class _BluetoothConnectionScreenState extends State<BluetoothConnectionScreen> {
   }
 
   Future<void> _startScan() async {
-    widget.logService.info('Starting device scan...', tag: 'BLE');
+    final bleService = ref.read(nirScanServiceProvider);
+    final logService = ref.read(logServiceProvider);
+
+    logService.info('Starting device scan...', tag: 'BLE');
     setState(() {
       _state = _ScreenState.scanning;
       _discoveredDevices = [];
     });
 
-    _deviceSubscription = widget.bleService.discoveredDevices.listen((device) {
-      widget.logService.debug('Found device: ${device.name}', tag: 'BLE');
+    _deviceSubscription = bleService.discoveredDevices.listen((device) {
+      logService.debug('Found device: ${device.name}', tag: 'BLE');
       setState(() {
         if (!_discoveredDevices.any((d) => d.id == device.id)) {
           _discoveredDevices = [..._discoveredDevices, device];
@@ -91,16 +81,16 @@ class _BluetoothConnectionScreenState extends State<BluetoothConnectionScreen> {
     });
 
     try {
-      await widget.bleService.startDeviceScan(
+      await bleService.startDeviceScan(
         timeout: const Duration(seconds: 10),
       );
     } catch (e) {
-      widget.logService.error('Scan failed: $e', tag: 'BLE');
+      logService.error('Scan failed: $e', tag: 'BLE');
     }
 
     await _deviceSubscription?.cancel();
     if (mounted && _state == _ScreenState.scanning) {
-      widget.logService.info('Scan completed', tag: 'BLE');
+      logService.info('Scan completed', tag: 'BLE');
       setState(() {
         _state = _ScreenState.idle;
       });
@@ -108,8 +98,11 @@ class _BluetoothConnectionScreenState extends State<BluetoothConnectionScreen> {
   }
 
   Future<void> _stopScan() async {
-    widget.logService.info('Stopping scan', tag: 'BLE');
-    await widget.bleService.stopDeviceScan();
+    final bleService = ref.read(nirScanServiceProvider);
+    final logService = ref.read(logServiceProvider);
+
+    logService.info('Stopping scan', tag: 'BLE');
+    await bleService.stopDeviceScan();
     await _deviceSubscription?.cancel();
     setState(() {
       _state = _ScreenState.idle;
@@ -117,15 +110,18 @@ class _BluetoothConnectionScreenState extends State<BluetoothConnectionScreen> {
   }
 
   Future<void> _connectToDevice(NirScanDevice device) async {
-    widget.logService.info('Connecting to ${device.name}...', tag: 'BLE');
+    final bleService = ref.read(nirScanServiceProvider);
+    final logService = ref.read(logServiceProvider);
+
+    logService.info('Connecting to ${device.name}...', tag: 'BLE');
     setState(() {
       _state = _ScreenState.connecting;
     });
 
     try {
-      await widget.bleService.connect(device.id);
+      await bleService.connect(device.id);
     } catch (e) {
-      widget.logService.error('Connection failed: $e', tag: 'BLE');
+      logService.error('Connection failed: $e', tag: 'BLE');
       setState(() {
         _state = _ScreenState.error;
         _errorMessage = e.toString();
@@ -134,20 +130,26 @@ class _BluetoothConnectionScreenState extends State<BluetoothConnectionScreen> {
   }
 
   Future<void> _disconnect() async {
-    widget.logService.info('Disconnecting...', tag: 'BLE');
+    final bleService = ref.read(nirScanServiceProvider);
+    final logService = ref.read(logServiceProvider);
+
+    logService.info('Disconnecting...', tag: 'BLE');
     try {
-      await widget.bleService.disconnect();
+      await bleService.disconnect();
     } catch (e) {
-      widget.logService.error('Disconnect failed: $e', tag: 'BLE');
+      logService.error('Disconnect failed: $e', tag: 'BLE');
     }
   }
 
   Future<void> _loadDeviceInfo() async {
+    final bleService = ref.read(nirScanServiceProvider);
+    final logService = ref.read(logServiceProvider);
+
     try {
-      widget.logService.debug('Loading device info...', tag: 'BLE');
-      final info = await widget.bleService.getDeviceInfo();
-      final status = await widget.bleService.getDeviceStatus();
-      widget.logService.info(
+      logService.debug('Loading device info...', tag: 'BLE');
+      final info = await bleService.getDeviceInfo();
+      final status = await bleService.getDeviceStatus();
+      logService.info(
         'Device: ${info.manufacturerName} ${info.modelNumber}',
         tag: 'BLE',
       );
@@ -158,7 +160,7 @@ class _BluetoothConnectionScreenState extends State<BluetoothConnectionScreen> {
         });
       }
     } catch (e) {
-      widget.logService.error('Failed to load device info: $e', tag: 'BLE');
+      logService.error('Failed to load device info: $e', tag: 'BLE');
     }
   }
 
@@ -170,6 +172,15 @@ class _BluetoothConnectionScreenState extends State<BluetoothConnectionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    ref.listen<AsyncValue<NirConnectionState>>(
+      connectionStateProvider,
+      (previous, next) {
+        next.whenData((state) {
+          _onConnectionStateChanged(state);
+        });
+      },
+    );
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Bluetooth Connection'),
@@ -221,10 +232,26 @@ class _BluetoothConnectionScreenState extends State<BluetoothConnectionScreen> {
 
   Widget _buildConnectionStatus() {
     final (text, color, icon) = switch (_state) {
-      _ScreenState.idle => ('Disconnected', Colors.grey, Icons.bluetooth_disabled),
-      _ScreenState.scanning => ('Scanning...', Colors.blue, Icons.bluetooth_searching),
-      _ScreenState.connecting => ('Connecting...', Colors.orange, Icons.bluetooth_connected),
-      _ScreenState.connected => ('Connected', Colors.green, Icons.bluetooth_connected),
+      _ScreenState.idle => (
+          'Disconnected',
+          Colors.grey,
+          Icons.bluetooth_disabled
+        ),
+      _ScreenState.scanning => (
+          'Scanning...',
+          Colors.blue,
+          Icons.bluetooth_searching
+        ),
+      _ScreenState.connecting => (
+          'Connecting...',
+          Colors.orange,
+          Icons.bluetooth_connected
+        ),
+      _ScreenState.connected => (
+          'Connected',
+          Colors.green,
+          Icons.bluetooth_connected
+        ),
       _ScreenState.error => ('Error', Colors.red, Icons.error_outline),
     };
 
@@ -441,9 +468,7 @@ class _BluetoothConnectionScreenState extends State<BluetoothConnectionScreen> {
         color: Colors.grey[100],
         border: Border(top: BorderSide(color: Colors.grey[300]!)),
       ),
-      child: LogViewerWidget(
-        logService: widget.logService,
-      ),
+      child: const LogViewerWidget(),
     );
   }
 }
