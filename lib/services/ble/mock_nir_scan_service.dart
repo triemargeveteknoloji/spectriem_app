@@ -35,7 +35,7 @@ class MockNirScanService implements NirScanService {
   final bool simulateErrors;
 
   /// Error probability when simulateErrors is true (0.0 - 1.0)
-  final double errorProbability;
+  double errorProbability;
 
   final _random = Random();
 
@@ -58,7 +58,7 @@ class MockNirScanService implements NirScanService {
   @override
   NirScanDevice? get connectedDevice => _connectedDevice;
 
-  void _setState(NirConnectionState state) {
+  void _emitConnectionState(NirConnectionState state) {
     _state = state;
     _connectionStateController.add(state);
   }
@@ -103,7 +103,9 @@ class MockNirScanService implements NirScanService {
     }
 
     // Auto-stop after timeout (skip if testing mode with zero delays)
-    if (timeout != null && timeout > Duration.zero && operationDelay > Duration.zero) {
+    if (timeout != null &&
+        timeout > Duration.zero &&
+        operationDelay > Duration.zero) {
       Future.delayed(timeout, stopDeviceScan);
     }
   }
@@ -116,7 +118,7 @@ class MockNirScanService implements NirScanService {
 
   @override
   Future<void> connect(String deviceId) async {
-    _setState(NirConnectionState.connecting);
+    _emitConnectionState(NirConnectionState.connecting);
     if (operationDelay > Duration.zero) {
       await Future.delayed(operationDelay * 5);
     }
@@ -128,18 +130,18 @@ class MockNirScanService implements NirScanService {
       name: 'NIRScan Nano Mock',
       rssi: -65,
     );
-    _setState(NirConnectionState.connected);
+    _emitConnectionState(NirConnectionState.connected);
   }
 
   @override
   Future<void> disconnect() async {
-    _setState(NirConnectionState.disconnecting);
+    _emitConnectionState(NirConnectionState.disconnecting);
     if (operationDelay > Duration.zero) {
       await Future.delayed(operationDelay);
     }
 
     _connectedDevice = null;
-    _setState(NirConnectionState.disconnected);
+    _emitConnectionState(NirConnectionState.disconnected);
   }
 
   void _ensureConnected() {
@@ -358,6 +360,24 @@ class MockNirScanService implements NirScanService {
       coefficients: Uint8List(1024),
       matrix: Uint8List(2048),
     );
+  }
+
+  /// Test helper: Simulate a connection without going through connect() method.
+  /// Useful for testing scenarios where you need instant connection state changes.
+  void simulateConnection() {
+    _connectedDevice = const NirScanDevice(
+      id: 'mock-test-device',
+      name: 'NIRScan Nano Test',
+      rssi: -65,
+    );
+    _emitConnectionState(NirConnectionState.connected);
+  }
+
+  /// Test helper: Simulate a disconnection without going through disconnect() method.
+  /// Useful for testing scenarios where you need instant disconnection state changes.
+  void simulateDisconnection() {
+    _connectedDevice = null;
+    _emitConnectionState(NirConnectionState.disconnected);
   }
 
   @override
