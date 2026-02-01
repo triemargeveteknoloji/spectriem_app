@@ -1,111 +1,147 @@
-# Spectriem App
+# CLAUDE.md
 
-NIR (Near-Infrared) spektroskopi uygulaması. Texas Instruments DLPNIRNANOEVM sensörü ile Bluetooth Low Energy üzerinden haberleşir.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Proje Yapısı
+## Project Overview
 
-```
-lib/
-├── main.dart
-├── app.dart
-├── services/
-│   └── ble/
-│       ├── nir_scan_service.dart      # Abstract interface
-│       ├── real_nir_scan_service.dart # Gerçek BLE implementasyonu
-│       ├── mock_nir_scan_service.dart # Test için mock
-│       └── nano_gatt.dart             # GATT UUID sabitleri
-├── models/
-│   ├── device_info.dart
-│   ├── device_status.dart
-│   ├── scan_data.dart
-│   └── scan_configuration.dart
-├── providers/                         # State management
-├── screens/                           # UI screens
-└── widgets/                           # Reusable widgets
+NIR (Near-Infrared) spectroscopy Flutter application for Texas Instruments DLP NIRscan Nano EVM sensor via Bluetooth Low Energy.
 
-test/
-├── unit/
-├── widget/
-├── integration/
-└── mocks/
-    └── mock_ble_service.dart
-```
-
-## Teknoloji Stack
-
-- **Framework:** Flutter 3.x (Dart 3.x)
-- **BLE:** flutter_blue_plus
-- **State Management:** (TBD - riverpod önerilir)
-- **Test:** flutter_test, mockito
-
-## Sensör
-
-Texas Instruments DLPNIRNANOEVM (DLP NIRscan Nano EVM)
-
-- Bluetooth Low Energy 4.0
-- 900-1700nm NIR spektroskopi
-- GATT protokolü
-
-Detaylı dokümantasyon: `.claude/skills/dlpnirnanoevm-sensor`
-
-## Komutlar
+## Commands
 
 ```bash
-# Bağımlılıkları yükle
+# Install dependencies
 flutter pub get
 
-# Testleri çalıştır
+# Run tests
 flutter test
 
-# Uygulamayı çalıştır
+# Run single test file
+flutter test test/path/to/test_file.dart
+
+# Run tests with coverage
+flutter test --coverage
+
+# Code generation (after modifying @freezed or @riverpod classes)
+dart run build_runner build --delete-conflicting-outputs
+
+# Watch mode for code generation
+dart run build_runner watch --delete-conflicting-outputs
+
+# Run app
 flutter run
 
 # Build
 flutter build apk --release
 flutter build ios --release
+
+# Analyze code
+flutter analyze
 ```
 
-## Geliştirme Notları
+## Architecture
+
+### Layer Overview
+
+```
+UI Layer (screens/, widgets/)
+    ↓ WidgetRef
+State Layer (providers/) - Riverpod StateNotifiers + @freezed states
+    ↓ Dependencies
+Service Layer (services/ble/)
+    ↓ Abstraction
+BLE Layer (flutter_blue_plus via BleAdapter)
+```
+
+### State Management: Riverpod + Freezed
+
+- **Providers** (`lib/providers/`): Use `@riverpod` annotation for code generation
+- **State classes**: Use `@freezed` for immutable state with `copyWith()`
+- **Generated files**: `*.g.dart` (riverpod), `*.freezed.dart` (freezed)
+
+Key providers:
+
+- `nirScanServiceProvider` - Platform-aware BLE service (real on mobile, mock on desktop)
+- `bluetoothConnectionNotifierProvider` - Connection screen state machine
+- `sensorCommunicationNotifierProvider` - Sensor operations state
+- `logEntriesProvider` - Real-time log entries
+
+### BLE Service Architecture
+
+```
+NirScanService (abstract interface)
+├── BleNirScanService - Production implementation using flutter_blue_plus
+└── MockNirScanService - Development/test implementation
+
+BleAdapter (abstract)
+└── FlutterBluePlusAdapter - Wraps flutter_blue_plus for mockability
+```
+
+Service selection is automatic via `nirScanServiceProvider` based on platform.
+
+### GATT Protocol
+
+UUID definitions in `lib/services/ble/nano_gatt.dart`. Custom TI services follow pattern: `434841XX-444C-5020-4E49-52204E616E6F`
+
+Key services:
+
+- **GSDIS** - Scan data (start scan, retrieve results)
+- **GCIS** - Calibration data (coefficients, matrices)
+- **GSCIS** - Scan configurations
+- **GGIS** - Device status (temperature, humidity, errors)
+
+Detailed protocol docs: `.claude/skills/dlpnirnanoevm-sensor`
+
+### Multi-Packet Protocol
+
+Large BLE responses (calibration, scan data) use chunked transfer:
+
+- Header packet: `[0x00, sizeLow, sizeHigh]`
+- Data packets: `[packetIndex, ...data]`
+
+Handled by `MultiPacketReceiver` class.
+
+## Key Patterns
 
 ### Logging
 
-Uygulama UI'da gerçek zamanlı log görüntüleme özelliği var. Service'ler ve BLE işlemleri için:
+Use `LogService` for all logging - it feeds both console and UI log viewer:
 
 ```dart
-// ❌ YANLIŞ: print() kullanma
-print('Debug message');
-
-// ✅ DOĞRU: Logger provider kullan
-// TODO: Logger implementation'ı dokümante edilecek
+final log = ref.read(logServiceProvider);
+log.info('Message', tag: 'BLE');  // Tags: BLE, CAL, SCAN, UI
+log.debug('Details');
+log.error('Failed', tag: 'BLE');
 ```
 
-**Not:** Logging sistemi `lib/providers/` altında. BLE debug için kritik.
-
-### BLE Testi
-
-Gerçek sensör olmadan geliştirme için `MockNirScanService` kullanılır.
+### Testing
 
 ```dart
-// Development/Test
-final service = MockNirScanService();
-
-// Production
-final service = RealNirScanService();
+// Override service with mock in tests
+final container = ProviderContainer(overrides: [
+  nirScanServiceProvider.overrideWithValue(MockNirScanService()),
+]);
 ```
 
-### Platform İzinleri
+Mock implementations support configurable delays and error simulation.
 
-- Android: Bluetooth, Location izinleri
-- iOS: NSBluetoothAlwaysUsageDescription
+### State Updates in Notifiers
 
-## Kod Standartları
+Use `scheduleMicrotask()` when updating state from listeners to avoid build-phase conflicts:
 
-- Dart analysis: strict mode
-- Test coverage hedefi: %80+
-- TDD yaklaşımı tercih edilir
-- Commit mesajları: Conventional Commits
+```dart
+_subscription = stream.listen((data) {
+  scheduleMicrotask(() => state = state.copyWith(data: data));
+});
+```
 
-## İlgili Skill'ler
+## File Naming Conventions
 
-- `/nirscan-ble-flows` - BLE iletişim akışları (APK'dan çıkarılmış)
-- `/dlpnirnanoevm-sensor` - Sensör protokolü ve BLE iletişimi
+- Services: `*_service.dart`
+- Notifiers: `*_notifier.dart` (class) / `*_provider.dart` (file)
+- Models: Simple names (`device_info.dart`, `scan_data.dart`)
+- Generated: `*.g.dart`, `*.freezed.dart`
+
+## Related Skills
+
+- `/dlpnirnanoevm-sensor` - Sensor protocol and BLE communication
+- `.claude/research/nirscan-apk-analysis.md` - APK reverse engineering notes
