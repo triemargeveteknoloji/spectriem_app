@@ -5,144 +5,22 @@ import '../models/device_info.dart';
 import '../models/device_status.dart';
 import '../models/scan_configuration.dart';
 import '../models/scan_data.dart';
-import '../providers/ble_providers.dart';
-import '../providers/log_provider.dart';
+import '../providers/sensor_communication_notifier.dart';
 import '../services/ble/nir_scan_service.dart';
 import '../widgets/log_viewer_widget.dart';
 
-class SensorCommunicationScreen extends ConsumerStatefulWidget {
+class SensorCommunicationScreen extends ConsumerWidget {
   const SensorCommunicationScreen({super.key});
 
   @override
-  ConsumerState<SensorCommunicationScreen> createState() =>
-      _SensorCommunicationScreenState();
-}
-
-class _SensorCommunicationScreenState
-    extends ConsumerState<SensorCommunicationScreen> {
-  bool _logPanelExpanded = false;
-  bool _isConnected = false;
-  String? _loadingCommand;
-  Object? _lastResponse;
-  String? _lastError;
-  List<ScanConfiguration>? _configurations;
-  int? _selectedConfigIndex;
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final bleService = ref.read(nirScanServiceProvider);
-      _isConnected = bleService.connectedDevice != null;
-      if (_isConnected) {
-        _loadConfigurations();
-      }
-    });
-  }
-
-  void _onConnectionStateChanged(NirConnectionState state) {
-    final wasConnected = _isConnected;
-    setState(() {
-      _isConnected = state == NirConnectionState.connected;
-    });
-    if (_isConnected && !wasConnected) {
-      _loadConfigurations();
-    } else if (!_isConnected) {
-      setState(() {
-        _configurations = null;
-        _selectedConfigIndex = null;
-      });
-    }
-  }
-
-  Future<void> _loadConfigurations() async {
-    try {
-      final bleService = ref.read(nirScanServiceProvider);
-      final configs = await bleService.getScanConfigurations();
-      if (mounted) {
-        setState(() {
-          _configurations = configs;
-          _selectedConfigIndex =
-              configs.isNotEmpty ? configs.first.index : null;
-        });
-      }
-    } catch (e) {
-      final logService = ref.read(logServiceProvider);
-      logService.error('Failed to load configurations: $e', tag: 'UI');
-    }
-  }
-
-  Future<void> _onConfigurationChanged(int? index) async {
-    if (index == null || index == _selectedConfigIndex) return;
-
-    final bleService = ref.read(nirScanServiceProvider);
-    final logService = ref.read(logServiceProvider);
-
-    logService.info('↑ CMD: setActiveScanConfiguration($index)', tag: 'UI');
-    try {
-      await bleService.setActiveScanConfiguration(index);
-      logService.info('↓ RSP: OK', tag: 'UI');
-      if (mounted) {
-        setState(() {
-          _selectedConfigIndex = index;
-        });
-      }
-    } on NirScanException catch (e) {
-      logService.error('↓ ERR: $e', tag: 'UI');
-    }
-  }
-
-  void _toggleLogPanel() {
-    setState(() {
-      _logPanelExpanded = !_logPanelExpanded;
-    });
-  }
-
-  Future<void> _executeCommand(
-    String commandName,
-    Future<Object?> Function() command,
-  ) async {
-    if (!_isConnected) return;
-
-    final logService = ref.read(logServiceProvider);
-
-    setState(() {
-      _loadingCommand = commandName;
-      _lastError = null;
-    });
-
-    logService.info('↑ CMD: $commandName', tag: 'UI');
-
-    try {
-      final result = await command();
-      logService.info('↓ RSP: $result', tag: 'UI');
-      if (mounted) {
-        setState(() {
-          _lastResponse = result;
-          _loadingCommand = null;
-        });
-      }
-    } on NirScanException catch (e) {
-      logService.error('↓ ERR: $e', tag: 'UI');
-      if (mounted) {
-        setState(() {
-          _lastError = e.message;
-          _loadingCommand = null;
-        });
-      }
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    ref.listen<AsyncValue<NirConnectionState>>(
-      connectionStateProvider,
-      (previous, next) {
-        next.whenData((state) {
-          _onConnectionStateChanged(state);
-        });
-      },
-    );
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(sensorCommunicationProvider);
+    final notifier = ref.read(sensorCommunicationProvider.notifier);
+    final commandState = ref.watch(commandExecutionProvider);
+    final commandNotifier = ref.read(commandExecutionProvider.notifier);
+    final isConnected = state.isConnected;
+    final isLoading = commandState.isLoading;
+    final response = commandState.value;
 
     return Scaffold(
       appBar: AppBar(
@@ -151,25 +29,41 @@ class _SensorCommunicationScreenState
           IconButton(
             icon: Icon(
               Icons.terminal,
-              color: _logPanelExpanded ? Colors.blue : null,
+              color: state.logPanelExpanded ? Colors.blue : null,
             ),
-            onPressed: _toggleLogPanel,
+            onPressed: notifier.toggleLogPanel,
           ),
         ],
       ),
       body: Column(
         children: [
           Expanded(
-            child: _buildMainContent(),
+            child: _buildMainContent(
+              isConnected: isConnected,
+              isLoading: isLoading,
+              response: response,
+              commandState: commandState,
+              state: state,
+              notifier: notifier,
+              commandNotifier: commandNotifier,
+            ),
           ),
-          if (_logPanelExpanded) _buildLogPanel(),
+          if (state.logPanelExpanded) _buildLogPanel(),
         ],
       ),
     );
   }
 
-  Widget _buildMainContent() {
-    if (!_isConnected) {
+  Widget _buildMainContent({
+    required bool isConnected,
+    required bool isLoading,
+    required Object? response,
+    required AsyncValue<Object?> commandState,
+    required SensorCommunicationState state,
+    required SensorCommunication notifier,
+    required CommandExecution commandNotifier,
+  }) {
+    if (!isConnected) {
       return _buildDisconnectedState();
     }
 
@@ -178,18 +72,24 @@ class _SensorCommunicationScreenState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _buildCommandSection(),
+          _buildCommandSection(
+            isConnected: isConnected,
+            isLoading: isLoading,
+            commandNotifier: commandNotifier,
+          ),
           const SizedBox(height: 16),
-          _buildConfigDropdown(),
+          _buildConfigDropdown(state, notifier),
           const SizedBox(height: 16),
-          if (_lastError != null) _buildErrorCard(),
-          if (_lastResponse != null && _lastError == null) _buildResponseCard(),
+          _buildCommandResult(commandState, response),
         ],
       ),
     );
   }
 
-  Widget _buildConfigDropdown() {
+  Widget _buildConfigDropdown(
+    SensorCommunicationState state,
+    SensorCommunication notifier,
+  ) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -202,16 +102,16 @@ class _SensorCommunicationScreenState
             ),
             const SizedBox(height: 12),
             DropdownButton<int>(
-              value: _selectedConfigIndex,
+              value: state.selectedConfigIndex,
               isExpanded: true,
               hint: const Text('Loading configurations...'),
-              items: _configurations?.map((config) {
+              items: state.configurations?.map((config) {
                 return DropdownMenuItem<int>(
                   value: config.index,
                   child: Text(config.name),
                 );
               }).toList(),
-              onChanged: _onConfigurationChanged,
+              onChanged: notifier.selectConfig,
             ),
           ],
         ),
@@ -240,9 +140,11 @@ class _SensorCommunicationScreenState
     );
   }
 
-  Widget _buildCommandSection() {
-    final bleService = ref.read(nirScanServiceProvider);
-
+  Widget _buildCommandSection({
+    required bool isConnected,
+    required bool isLoading,
+    required CommandExecution commandNotifier,
+  }) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -261,45 +163,37 @@ class _SensorCommunicationScreenState
                 _buildCommandButton(
                   'Scan',
                   Icons.radar,
-                  () => _executeCommand(
-                    'performScan',
-                    () => bleService.performScan(),
-                  ),
+                  isConnected,
+                  isLoading,
+                  () => commandNotifier.executeCommand('performScan'),
                 ),
                 _buildCommandButton(
                   'Info',
                   Icons.info_outline,
-                  () => _executeCommand(
-                    'getDeviceInfo',
-                    () => bleService.getDeviceInfo(),
-                  ),
+                  isConnected,
+                  isLoading,
+                  () => commandNotifier.executeCommand('getDeviceInfo'),
                 ),
                 _buildCommandButton(
                   'Status',
                   Icons.monitor_heart_outlined,
-                  () => _executeCommand(
-                    'getDeviceStatus',
-                    () => bleService.getDeviceStatus(),
-                  ),
+                  isConnected,
+                  isLoading,
+                  () => commandNotifier.executeCommand('getDeviceStatus'),
                 ),
                 _buildCommandButton(
                   'Sync Time',
                   Icons.schedule,
-                  () => _executeCommand(
-                    'syncTime',
-                    () async {
-                      await bleService.syncTime();
-                      return 'OK';
-                    },
-                  ),
+                  isConnected,
+                  isLoading,
+                  () => commandNotifier.executeCommand('syncTime'),
                 ),
                 _buildCommandButton(
                   'Config',
                   Icons.settings,
-                  () => _executeCommand(
-                    'getScanConfigurations',
-                    () => bleService.getScanConfigurations(),
-                  ),
+                  isConnected,
+                  isLoading,
+                  () => commandNotifier.executeCommand('getScanConfigurations'),
                 ),
               ],
             ),
@@ -312,14 +206,13 @@ class _SensorCommunicationScreenState
   Widget _buildCommandButton(
     String label,
     IconData icon,
+    bool isConnected,
+    bool isLoading,
     VoidCallback onPressed,
   ) {
-    final isLoading = _loadingCommand != null;
-    final isThisLoading = _loadingCommand == label;
-
     return ElevatedButton.icon(
-      onPressed: _isConnected && !isLoading ? onPressed : null,
-      icon: isThisLoading
+      onPressed: isConnected && !isLoading ? onPressed : null,
+      icon: isLoading
           ? const SizedBox(
               width: 16,
               height: 16,
@@ -330,7 +223,29 @@ class _SensorCommunicationScreenState
     );
   }
 
-  Widget _buildErrorCard() {
+  Widget _buildCommandResult(
+    AsyncValue<Object?> commandState,
+    Object? response,
+  ) {
+    if (commandState.isLoading) {
+      return const SizedBox.shrink();
+    }
+
+    if (commandState.hasError) {
+      return _buildErrorCard(commandState.error);
+    }
+
+    if (response == null) {
+      return const SizedBox.shrink();
+    }
+
+    return _buildResponseCard(response);
+  }
+
+  Widget _buildErrorCard(Object? error) {
+    final message =
+        error is NirScanException ? error.message : error.toString();
+
     return Card(
       color: Colors.red[50],
       child: Padding(
@@ -341,7 +256,7 @@ class _SensorCommunicationScreenState
             const SizedBox(width: 12),
             Expanded(
               child: Text(
-                _lastError!,
+                message,
                 style: const TextStyle(color: Colors.red),
               ),
             ),
@@ -351,7 +266,7 @@ class _SensorCommunicationScreenState
     );
   }
 
-  Widget _buildResponseCard() {
+  Widget _buildResponseCard(Object response) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -363,16 +278,14 @@ class _SensorCommunicationScreenState
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
-            _buildResponseContent(),
+            _buildResponseContent(response),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildResponseContent() {
-    final response = _lastResponse;
-
+  Widget _buildResponseContent(Object response) {
     if (response is DeviceInfo) {
       return _buildDeviceInfoResponse(response);
     } else if (response is DeviceStatus) {

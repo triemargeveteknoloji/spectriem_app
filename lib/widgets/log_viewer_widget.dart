@@ -1,12 +1,10 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../providers/log_provider.dart';
+import '../providers/log_entries_provider.dart';
 import '../services/logging/log_service.dart';
 
-class LogViewerWidget extends ConsumerStatefulWidget {
+class LogViewerWidget extends ConsumerWidget {
   final LogLevel? filterLevel;
   final bool expanded;
 
@@ -17,64 +15,17 @@ class LogViewerWidget extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<LogViewerWidget> createState() => _LogViewerWidgetState();
-}
-
-class _LogViewerWidgetState extends ConsumerState<LogViewerWidget> {
-  final ScrollController _scrollController = ScrollController();
-  final List<LogEntry> _entries = [];
-  StreamSubscription<LogEntry>? _subscription;
-
-  @override
-  void initState() {
-    super.initState();
-    final logService = ref.read(logServiceProvider);
-    _entries.addAll(logService.history);
-    _subscription = logService.logStream.listen(_onLogEntry);
-  }
-
-  void _onLogEntry(LogEntry entry) {
-    if (mounted) {
-      setState(() {
-        _entries.add(entry);
-      });
-      _scrollToBottom();
-    }
-  }
-
-  void _scrollToBottom() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_scrollController.hasClients) {
-        _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 50),
-          curve: Curves.easeOut,
-        );
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _subscription?.cancel();
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  List<LogEntry> get _filteredEntries {
-    if (widget.filterLevel == null) return _entries;
-    return _entries
-        .where((e) => e.level.index >= widget.filterLevel!.index)
-        .toList();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (!widget.expanded) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    if (!expanded) {
       return const SizedBox.shrink();
     }
 
-    final entries = _filteredEntries;
+    final allEntries = ref.watch(logEntriesProvider);
+
+    // Apply filter
+    final entries = filterLevel == null
+        ? allEntries
+        : allEntries.where((e) => e.level.index >= filterLevel!.index).toList();
 
     if (entries.isEmpty) {
       return const Center(
@@ -86,7 +37,6 @@ class _LogViewerWidgetState extends ConsumerState<LogViewerWidget> {
     }
 
     return ListView.builder(
-      controller: _scrollController,
       itemCount: entries.length,
       itemBuilder: (context, index) {
         final entry = entries[index];

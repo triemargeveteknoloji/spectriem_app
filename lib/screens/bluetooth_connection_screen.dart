@@ -1,185 +1,18 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/device_info.dart';
 import '../models/device_status.dart';
-import '../providers/ble_providers.dart';
-import '../providers/log_provider.dart';
-import '../services/ble/nir_scan_service.dart';
+import '../providers/bluetooth_connection_notifier.dart';
 import '../widgets/log_viewer_widget.dart';
 
-enum _ScreenState {
-  idle,
-  scanning,
-  connecting,
-  connected,
-  error,
-}
-
-class BluetoothConnectionScreen extends ConsumerStatefulWidget {
+class BluetoothConnectionScreen extends ConsumerWidget {
   const BluetoothConnectionScreen({super.key});
 
   @override
-  ConsumerState<BluetoothConnectionScreen> createState() =>
-      _BluetoothConnectionScreenState();
-}
-
-class _BluetoothConnectionScreenState
-    extends ConsumerState<BluetoothConnectionScreen> {
-  _ScreenState _state = _ScreenState.idle;
-  List<NirScanDevice> _discoveredDevices = [];
-  DeviceInfo? _deviceInfo;
-  DeviceStatus? _deviceStatus;
-  String? _errorMessage;
-  bool _logPanelExpanded = false;
-
-  StreamSubscription<NirScanDevice>? _deviceSubscription;
-
-  @override
-  void dispose() {
-    _deviceSubscription?.cancel();
-    super.dispose();
-  }
-
-  void _onConnectionStateChanged(NirConnectionState state) {
-    setState(() {
-      switch (state) {
-        case NirConnectionState.disconnected:
-          _state = _ScreenState.idle;
-          _deviceInfo = null;
-          _deviceStatus = null;
-        case NirConnectionState.connecting:
-          _state = _ScreenState.connecting;
-        case NirConnectionState.connected:
-          _state = _ScreenState.connected;
-          _loadDeviceInfo();
-        case NirConnectionState.disconnecting:
-          break;
-      }
-    });
-  }
-
-  Future<void> _startScan() async {
-    final bleService = ref.read(nirScanServiceProvider);
-    final logService = ref.read(logServiceProvider);
-
-    logService.info('Starting device scan...', tag: 'BLE');
-    setState(() {
-      _state = _ScreenState.scanning;
-      _discoveredDevices = [];
-    });
-
-    _deviceSubscription = bleService.discoveredDevices.listen((device) {
-      logService.debug('Found device: ${device.name}', tag: 'BLE');
-      setState(() {
-        if (!_discoveredDevices.any((d) => d.id == device.id)) {
-          _discoveredDevices = [..._discoveredDevices, device];
-        }
-      });
-    });
-
-    try {
-      await bleService.startDeviceScan(
-        timeout: const Duration(seconds: 10),
-      );
-    } catch (e) {
-      logService.error('Scan failed: $e', tag: 'BLE');
-    }
-
-    await _deviceSubscription?.cancel();
-    if (mounted && _state == _ScreenState.scanning) {
-      logService.info('Scan completed', tag: 'BLE');
-      setState(() {
-        _state = _ScreenState.idle;
-      });
-    }
-  }
-
-  Future<void> _stopScan() async {
-    final bleService = ref.read(nirScanServiceProvider);
-    final logService = ref.read(logServiceProvider);
-
-    logService.info('Stopping scan', tag: 'BLE');
-    await bleService.stopDeviceScan();
-    await _deviceSubscription?.cancel();
-    setState(() {
-      _state = _ScreenState.idle;
-    });
-  }
-
-  Future<void> _connectToDevice(NirScanDevice device) async {
-    final bleService = ref.read(nirScanServiceProvider);
-    final logService = ref.read(logServiceProvider);
-
-    logService.info('Connecting to ${device.name}...', tag: 'BLE');
-    setState(() {
-      _state = _ScreenState.connecting;
-    });
-
-    try {
-      await bleService.connect(device.id);
-    } catch (e) {
-      logService.error('Connection failed: $e', tag: 'BLE');
-      setState(() {
-        _state = _ScreenState.error;
-        _errorMessage = e.toString();
-      });
-    }
-  }
-
-  Future<void> _disconnect() async {
-    final bleService = ref.read(nirScanServiceProvider);
-    final logService = ref.read(logServiceProvider);
-
-    logService.info('Disconnecting...', tag: 'BLE');
-    try {
-      await bleService.disconnect();
-    } catch (e) {
-      logService.error('Disconnect failed: $e', tag: 'BLE');
-    }
-  }
-
-  Future<void> _loadDeviceInfo() async {
-    final bleService = ref.read(nirScanServiceProvider);
-    final logService = ref.read(logServiceProvider);
-
-    try {
-      logService.debug('Loading device info...', tag: 'BLE');
-      final info = await bleService.getDeviceInfo();
-      final status = await bleService.getDeviceStatus();
-      logService.info(
-        'Device: ${info.manufacturerName} ${info.modelNumber}',
-        tag: 'BLE',
-      );
-      if (mounted) {
-        setState(() {
-          _deviceInfo = info;
-          _deviceStatus = status;
-        });
-      }
-    } catch (e) {
-      logService.error('Failed to load device info: $e', tag: 'BLE');
-    }
-  }
-
-  void _toggleLogPanel() {
-    setState(() {
-      _logPanelExpanded = !_logPanelExpanded;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    ref.listen<AsyncValue<NirConnectionState>>(
-      connectionStateProvider,
-      (previous, next) {
-        next.whenData((state) {
-          _onConnectionStateChanged(state);
-        });
-      },
-    );
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(bluetoothConnectionProvider);
+    final notifier = ref.read(bluetoothConnectionProvider.notifier);
 
     return Scaffold(
       appBar: AppBar(
@@ -188,71 +21,77 @@ class _BluetoothConnectionScreenState
           IconButton(
             icon: Icon(
               Icons.terminal,
-              color: _logPanelExpanded ? Colors.blue : null,
+              color: state.logPanelExpanded ? Colors.blue : null,
             ),
-            onPressed: _toggleLogPanel,
+            onPressed: () => notifier.toggleLogPanel(),
           ),
         ],
       ),
       body: Column(
         children: [
           Expanded(
-            child: _buildMainContent(),
+            child: _buildMainContent(state, notifier),
           ),
-          if (_logPanelExpanded) _buildLogPanel(),
+          if (state.logPanelExpanded) _buildLogPanel(),
         ],
       ),
     );
   }
 
-  Widget _buildMainContent() {
+  Widget _buildMainContent(
+    BluetoothConnectionState state,
+    BluetoothConnection notifier,
+  ) {
     return Column(
       children: [
-        _buildStatusHeader(),
+        _buildStatusHeader(state, notifier),
         const Divider(height: 1),
         Expanded(
-          child: _buildDeviceSection(),
+          child: _buildDeviceSection(state, notifier),
         ),
       ],
     );
   }
 
-  Widget _buildStatusHeader() {
+  Widget _buildStatusHeader(
+    BluetoothConnectionState state,
+    BluetoothConnection notifier,
+  ) {
     return Container(
       padding: const EdgeInsets.all(16),
       child: Row(
         children: [
-          _buildConnectionStatus(),
+          _buildConnectionStatus(state),
           const Spacer(),
-          _buildScanButton(),
+          _buildScanButton(state, notifier),
         ],
       ),
     );
   }
 
-  Widget _buildConnectionStatus() {
-    final (text, color, icon) = switch (_state) {
-      _ScreenState.idle => (
+  Widget _buildConnectionStatus(BluetoothConnectionState state) {
+    final (text, color, icon) = switch (state.screenState) {
+      ScreenState.idle => (
           'Disconnected',
           Colors.grey,
           Icons.bluetooth_disabled
         ),
-      _ScreenState.scanning => (
+      ScreenState.scanning => (
           'Scanning...',
           Colors.blue,
           Icons.bluetooth_searching
         ),
-      _ScreenState.connecting => (
+      ScreenState.connecting => (
           'Connecting...',
           Colors.orange,
           Icons.bluetooth_connected
         ),
-      _ScreenState.connected => (
+      ScreenState.connected => (
           'Connected',
           Colors.green,
           Icons.bluetooth_connected
         ),
-      _ScreenState.error => ('Error', Colors.red, Icons.error_outline),
+      ScreenState.error => ('Error', Colors.red, Icons.error_outline),
     };
 
     return Row(
@@ -270,8 +109,11 @@ class _BluetoothConnectionScreenState
     );
   }
 
-  Widget _buildScanButton() {
-    if (_state == _ScreenState.scanning) {
+  Widget _buildScanButton(
+    BluetoothConnectionState state,
+    BluetoothConnection notifier,
+  ) {
+    if (state.screenState == ScreenState.scanning) {
       return Row(
         children: [
           const SizedBox(
@@ -281,7 +123,7 @@ class _BluetoothConnectionScreenState
           ),
           const SizedBox(width: 8),
           TextButton.icon(
-            onPressed: _stopScan,
+            onPressed: () => notifier.stopScanning(),
             icon: const Icon(Icons.stop),
             label: const Text('Stop'),
           ),
@@ -289,9 +131,9 @@ class _BluetoothConnectionScreenState
       );
     }
 
-    if (_state == _ScreenState.connected) {
+    if (state.screenState == ScreenState.connected) {
       return TextButton.icon(
-        onPressed: _disconnect,
+        onPressed: () => notifier.disconnect(),
         icon: const Icon(Icons.link_off),
         label: const Text('Disconnect'),
         style: TextButton.styleFrom(foregroundColor: Colors.red),
@@ -299,26 +141,35 @@ class _BluetoothConnectionScreenState
     }
 
     return TextButton.icon(
-      onPressed: _state == _ScreenState.connecting ? null : _startScan,
+      onPressed: state.screenState == ScreenState.connecting
+          ? null
+          : () => notifier.startScanning(),
       icon: const Icon(Icons.search),
       label: const Text('Scan'),
     );
   }
 
-  Widget _buildDeviceSection() {
-    if (_state == _ScreenState.connected && _deviceInfo != null) {
-      return _buildConnectedDeviceInfo();
+  Widget _buildDeviceSection(
+    BluetoothConnectionState state,
+    BluetoothConnection notifier,
+  ) {
+    if (state.screenState == ScreenState.connected &&
+        state.deviceInfo != null) {
+      return _buildConnectedDeviceInfo(state.deviceInfo!, state.deviceStatus);
     }
 
-    if (_state == _ScreenState.error) {
-      return _buildErrorState();
+    if (state.screenState == ScreenState.error) {
+      return _buildErrorState(state, notifier);
     }
 
-    return _buildDeviceList();
+    return _buildDeviceList(state, notifier);
   }
 
-  Widget _buildDeviceList() {
-    if (_discoveredDevices.isEmpty) {
+  Widget _buildDeviceList(
+    BluetoothConnectionState state,
+    BluetoothConnection notifier,
+  ) {
+    if (state.discoveredDevices.isEmpty) {
       return const Center(
         child: Text(
           'No devices found.\nTap Scan to search.',
@@ -329,21 +180,22 @@ class _BluetoothConnectionScreenState
     }
 
     return ListView.builder(
-      itemCount: _discoveredDevices.length,
+      itemCount: state.discoveredDevices.length,
       itemBuilder: (context, index) {
-        final device = _discoveredDevices[index];
+        final device = state.discoveredDevices[index];
         return ListTile(
           leading: const Icon(Icons.bluetooth),
           title: Text(device.name),
           subtitle: Text(device.id),
           trailing: const Icon(Icons.chevron_right),
-          onTap: () => _connectToDevice(device),
+          onTap: () => notifier.connectToDevice(device),
         );
       },
     );
   }
 
-  Widget _buildConnectedDeviceInfo() {
+  Widget _buildConnectedDeviceInfo(
+      DeviceInfo deviceInfo, DeviceStatus? deviceStatus) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -352,31 +204,31 @@ class _BluetoothConnectionScreenState
           _buildInfoCard(
             'Device Information',
             [
-              _buildInfoRow('Manufacturer', _deviceInfo!.manufacturerName),
-              _buildInfoRow('Model', _deviceInfo!.modelNumber),
-              _buildInfoRow('Serial', _deviceInfo!.serialNumber),
-              _buildInfoRow('Firmware', _deviceInfo!.tivaFirmwareRevision),
+              _buildInfoRow('Manufacturer', deviceInfo.manufacturerName),
+              _buildInfoRow('Model', deviceInfo.modelNumber),
+              _buildInfoRow('Serial', deviceInfo.serialNumber),
+              _buildInfoRow('Firmware', deviceInfo.tivaFirmwareRevision),
             ],
           ),
           const SizedBox(height: 16),
-          if (_deviceStatus != null)
+          if (deviceStatus != null)
             _buildInfoCard(
               'Device Status',
               [
                 _buildStatusRow(
                   Icons.battery_full,
                   'Battery',
-                  '${_deviceStatus!.batteryLevel}%',
+                  '${deviceStatus.batteryLevel}%',
                 ),
                 _buildStatusRow(
                   Icons.thermostat,
                   'Temperature',
-                  '${_deviceStatus!.temperature.toStringAsFixed(1)}°C',
+                  '${deviceStatus.temperature.toStringAsFixed(1)}°C',
                 ),
                 _buildStatusRow(
                   Icons.water_drop,
                   'Humidity',
-                  '${_deviceStatus!.humidity.toStringAsFixed(1)}%',
+                  '${deviceStatus.humidity.toStringAsFixed(1)}%',
                 ),
               ],
             ),
@@ -435,7 +287,10 @@ class _BluetoothConnectionScreenState
     );
   }
 
-  Widget _buildErrorState() {
+  Widget _buildErrorState(
+    BluetoothConnectionState state,
+    BluetoothConnection notifier,
+  ) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -443,17 +298,17 @@ class _BluetoothConnectionScreenState
           const Icon(Icons.error_outline, size: 48, color: Colors.red),
           const SizedBox(height: 16),
           const Text('Connection Error'),
-          if (_errorMessage != null)
+          if (state.errorMessage != null)
             Padding(
               padding: const EdgeInsets.all(16),
               child: Text(
-                _errorMessage!,
+                state.errorMessage!,
                 textAlign: TextAlign.center,
                 style: const TextStyle(color: Colors.grey),
               ),
             ),
           TextButton(
-            onPressed: _startScan,
+            onPressed: () => notifier.startScanning(),
             child: const Text('Try Again'),
           ),
         ],

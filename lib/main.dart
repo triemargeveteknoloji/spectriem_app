@@ -3,8 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'screens/bluetooth_connection_screen.dart';
 import 'screens/sensor_communication_screen.dart';
-import 'services/ble/nir_scan_service.dart';
-import 'services/logging/log_service.dart';
+import 'providers/navigation_provider.dart';
 
 void main() {
   runApp(
@@ -14,18 +13,14 @@ void main() {
   );
 }
 
-class SpecTriemApp extends StatefulWidget {
+class SpecTriemApp extends ConsumerWidget {
   const SpecTriemApp({super.key});
 
   @override
-  State<SpecTriemApp> createState() => _SpecTriemAppState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currentIndex = ref.watch(navigationIndexProvider);
+    final navigation = ref.read(navigationIndexProvider.notifier);
 
-class _SpecTriemAppState extends State<SpecTriemApp> {
-  int _currentIndex = 0;
-
-  @override
-  Widget build(BuildContext context) {
     return MaterialApp(
       title: 'SpecTriem',
       theme: ThemeData(
@@ -34,18 +29,16 @@ class _SpecTriemAppState extends State<SpecTriemApp> {
       ),
       home: Scaffold(
         body: IndexedStack(
-          index: _currentIndex,
+          index: currentIndex,
           children: const [
             BluetoothConnectionScreen(),
             SensorCommunicationScreen(),
           ],
         ),
         bottomNavigationBar: NavigationBar(
-          selectedIndex: _currentIndex,
+          selectedIndex: currentIndex,
           onDestinationSelected: (index) {
-            setState(() {
-              _currentIndex = index;
-            });
+            navigation.state = index;
           },
           destinations: const [
             NavigationDestination(
