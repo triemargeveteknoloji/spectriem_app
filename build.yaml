@@ -1,0 +1,15 @@
+# Build configuration for code generation
+targets:
+  $default:
+    builders:
+      riverpod_generator:
+        options:
+          # Generate .g.dart files for riverpod
+          riverpod_generator:riverpod_generator:
+            enabled: true
+
+      freezed:
+        options:
+          # Generate .freezed.dart files
+          freezed:freezed:
+            enabled: true
