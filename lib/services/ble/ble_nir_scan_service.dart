@@ -7,6 +7,7 @@ import '../../models/device_info.dart';
 import '../../models/device_status.dart';
 import '../../models/scan_configuration.dart';
 import '../../models/scan_data.dart';
+import '../../utils/hex_format.dart';
 import '../logging/log_service.dart';
 import 'ble_adapter.dart';
 import 'multi_packet_receiver.dart';
@@ -187,6 +188,54 @@ class BleNirScanService implements NirScanService {
     return null;
   }
 
+  /// Find characteristic with Notify property (for subscription).
+  /// Some sensors define separate Write and Notify characteristics with same UUID.
+  /// This ensures we get the one that supports notifications.
+  BluetoothCharacteristic? _findNotifyCharacteristic(Guid uuid) {
+    if (_services == null) return null;
+
+    for (final service in _services!) {
+      for (final char in service.characteristics) {
+        if (char.uuid == uuid && char.properties.notify) {
+          return char;
+        }
+      }
+    }
+    // Fallback: try indicate property (some devices use indicate instead of notify)
+    for (final service in _services!) {
+      for (final char in service.characteristics) {
+        if (char.uuid == uuid && char.properties.indicate) {
+          return char;
+        }
+      }
+    }
+    return null;
+  }
+
+  /// Find characteristic with Write property (for sending commands).
+  /// Some sensors define separate Write and Notify characteristics with same UUID.
+  /// This ensures we get the one that supports writing.
+  BluetoothCharacteristic? _findWriteCharacteristic(Guid uuid) {
+    if (_services == null) return null;
+
+    for (final service in _services!) {
+      for (final char in service.characteristics) {
+        if (char.uuid == uuid && char.properties.write) {
+          return char;
+        }
+      }
+    }
+    // Fallback: try writeWithoutResponse
+    for (final service in _services!) {
+      for (final char in service.characteristics) {
+        if (char.uuid == uuid && char.properties.writeWithoutResponse) {
+          return char;
+        }
+      }
+    }
+    return null;
+  }
+
   @override
   Future<DeviceInfo> getDeviceInfo() async {
     _ensureConnected();
@@ -288,11 +337,43 @@ class BleNirScanService implements NirScanService {
     }
 
     for (final uuid in NanoGatt.notificationCharacteristics) {
-      final char = _findCharacteristic(uuid);
-      if (char != null) {
-        await char.setNotifyValue(true);
-        await Future.delayed(delayBetween);
+      // FIX: Use _findNotifyCharacteristic to get the correct characteristic
+      // Some sensors (like TI NIRscan Nano) define separate Write and Notify
+      // characteristics with the same UUID - we need the one with Notify property
+      final char = _findNotifyCharacteristic(uuid);
+      final uuidShort = uuid.str.substring(4, 8).toUpperCase();
+
+      if (char == null) {
+        _logger.warning('[DIAG] No notify characteristic found for $uuidShort',
+            tag: 'BLE');
+        continue;
       }
+
+      // Enable CCCD with confirmation logging
+      try {
+        await char.setNotifyValue(true);
+        _logger.debug(
+            '[DIAG] CCCD OK | Char: $uuidShort | isNotifying: ${char.isNotifying}',
+            tag: 'BLE');
+      } catch (e) {
+        _logger.error('[DIAG] CCCD FAIL | Char: $uuidShort | Error: $e',
+            tag: 'BLE');
+        continue;
+      }
+
+      // DIAGNOSTIC: Global listener to catch ALL notifications
+      // This helps identify if notifications arrive but aren't routed to performScan()
+      char.onValueReceived.listen((data) {
+        final firstByte = data.isNotEmpty
+            ? '0x${data[0].toRadixString(16).padLeft(2, '0').toUpperCase()}'
+            : 'empty';
+        _logger.info(
+          '[DIAG] Notify | Char: $uuidShort | Size: ${data.length}B | First: $firstByte',
+          tag: 'BLE',
+        );
+      });
+
+      await Future.delayed(delayBetween);
     }
   }
 
@@ -347,68 +428,228 @@ class BleNirScanService implements NirScanService {
     await _ensureActiveScanConfig();
     _logger.info('[SCAN] Active scan configuration confirmed', tag: 'BLE');
 
-    // 1. Subscribe to start scan notifications and trigger scan
-    _logger.info('[SCAN] Finding start scan characteristic...', tag: 'BLE');
-    final startScanChar = _findCharacteristic(NanoGatt.gsdisStartScan);
-    if (startScanChar == null) {
-      _logger.info('[SCAN] Start scan characteristic not found!', tag: 'BLE');
-      throw NirScanException('Start scan characteristic not found');
+    // DIAGNOSTIC: Read error status before scan to check sensor state
+    _logger.info('[SCAN] Reading pre-scan error status...', tag: 'BLE');
+    try {
+      final errStatusChar = _findCharacteristic(NanoGatt.ggisErrStatus);
+      if (errStatusChar != null) {
+        final errStatus = await errStatusChar.read();
+        final errValue = errStatus.length >= 2
+            ? (errStatus[1] << 8) | (errStatus[0] & 0xFF)
+            : (errStatus.isNotEmpty ? errStatus[0] : 0);
+        _logger.info(
+            '[SCAN] Pre-scan error status: 0x${errValue.toRadixString(16).toUpperCase().padLeft(4, '0')} (raw: ${errStatus.map((b) => '0x${b.toRadixString(16).padLeft(2, '0')}').join(' ')})',
+            tag: 'BLE');
+        if (errValue != 0) {
+          _logger.warning(
+              '[SCAN] Sensor has error flags set: 0x${errValue.toRadixString(16).toUpperCase()}',
+              tag: 'BLE');
+        }
+      }
+    } catch (e) {
+      _logger.warning('[SCAN] Could not read error status: $e', tag: 'BLE');
     }
-    _logger.info('[SCAN] Start scan characteristic found', tag: 'BLE');
 
-    // NOTE: We already subscribed to this characteristic during connection setup
-    // No need to call setNotifyValue again
-    _logger.info('[SCAN] Already subscribed to notifications during connection',
+    // DIAGNOSTIC: Read device status before scan
+    _logger.info('[SCAN] Reading pre-scan device status...', tag: 'BLE');
+    try {
+      final devStatusChar = _findCharacteristic(NanoGatt.ggisDevStatus);
+      if (devStatusChar != null) {
+        final devStatus = await devStatusChar.read();
+        final devValue = devStatus.length >= 2
+            ? (devStatus[1] << 8) | (devStatus[0] & 0xFF)
+            : (devStatus.isNotEmpty ? devStatus[0] : 0);
+        _logger.info(
+            '[SCAN] Pre-scan device status: 0x${devValue.toRadixString(16).toUpperCase().padLeft(4, '0')} (raw: ${devStatus.map((b) => '0x${b.toRadixString(16).padLeft(2, '0')}').join(' ')})',
+            tag: 'BLE');
+      }
+    } catch (e) {
+      _logger.warning('[SCAN] Could not read device status: $e', tag: 'BLE');
+    }
+
+    // 1. Subscribe to start scan notifications and trigger scan
+    // FIX: TI NIRscan Nano defines GSDIS_START_SCAN as TWO separate characteristics:
+    //   - handle=0x0068: Write only (prop=0x08) - for sending scan command
+    //   - handle=0x006a: Notify only (prop=0x10) - for receiving scan complete notification
+    // flutter_blue_plus's default _findCharacteristic returns the first one (Write),
+    // which has no CCCD descriptor, causing notification subscription to fail silently.
+    _logger.info(
+        '[SCAN] Finding start scan characteristics (write + notify)...',
+        tag: 'BLE');
+
+    final notifyChar = _findNotifyCharacteristic(NanoGatt.gsdisStartScan);
+    final writeChar = _findWriteCharacteristic(NanoGatt.gsdisStartScan);
+
+    if (notifyChar == null) {
+      _logger.error(
+          '[SCAN] Notify characteristic not found for GSDIS_START_SCAN!',
+          tag: 'BLE');
+      throw NirScanException('Start scan notify characteristic not found');
+    }
+    if (writeChar == null) {
+      _logger.error(
+          '[SCAN] Write characteristic not found for GSDIS_START_SCAN!',
+          tag: 'BLE');
+      throw NirScanException('Start scan write characteristic not found');
+    }
+
+    // DIAGNOSTIC: Log both characteristics
+    _logger.info(
+        '[SCAN] Notify char: notify=${notifyChar.properties.notify}, indicate=${notifyChar.properties.indicate}, handle=${notifyChar.characteristicUuid}',
+        tag: 'BLE');
+    _logger.info(
+        '[SCAN] Write char: write=${writeChar.properties.write}, writeNoResp=${writeChar.properties.writeWithoutResponse}',
+        tag: 'BLE');
+    _logger.info('[SCAN] Notify char isNotifying: ${notifyChar.isNotifying}',
+        tag: 'BLE');
+
+    // Subscribe to the CORRECT characteristic (the one with Notify property)
+    _logger.info('[SCAN] Subscribing to notify characteristic...', tag: 'BLE');
+    await notifyChar.setNotifyValue(false);
+    await Future.delayed(const Duration(milliseconds: 100));
+    await notifyChar.setNotifyValue(true);
+    _logger.info(
+        '[SCAN] Subscription complete, isNotifying: ${notifyChar.isNotifying}',
         tag: 'BLE');
 
     // Create completer to wait for scan complete notification
     final scanCompleter = Completer<List<int>>();
     late StreamSubscription<List<int>> startScanSubscription;
 
-    startScanSubscription = startScanChar.onValueReceived.listen((data) {
+    // DIAGNOSTIC: Timing tracker for scan flow
+    final stopwatch = Stopwatch()..start();
+
+    // FIX: Track when write is complete to ignore stale/cached notifications
+    // This prevents lastValueStream cache issues where old 0xFF from previous scan
+    // gets mistakenly interpreted as current scan success
+    bool writeComplete = false;
+
+    // FIX: Use ONLY onValueReceived - NOT lastValueStream!
+    // lastValueStream emits cached values which causes stale data issues:
+    // - Previous scan's 0xFF stays in cache
+    // - Next scan reads old 0xFF at T+0ms and thinks it succeeded
+    // - No actual scan is performed!
+    startScanSubscription = notifyChar.onValueReceived.listen((data) {
       final firstByte = data.isNotEmpty
           ? '0x${data[0].toRadixString(16).toUpperCase().padLeft(2, '0')}'
           : 'empty';
       _logger.info(
-          '[SCAN] Notification | Size: ${data.length}B | First: $firstByte',
+          '[SCAN] Notification at T+${stopwatch.elapsedMilliseconds}ms | Size: ${data.length}B | First: $firstByte | WriteComplete: $writeComplete',
           tag: 'BLE');
-      if (!scanCompleter.isCompleted && data.isNotEmpty) {
+
+      // FIX: Ignore notifications that arrive BEFORE write is complete
+      // These are stale/cached values from previous operations
+      if (!writeComplete) {
+        _logger.debug('[SCAN] Ignoring pre-write notification: $firstByte',
+            tag: 'BLE');
+        return;
+      }
+
+      // Ignore empty notifications
+      if (data.isEmpty) {
+        _logger.debug('[SCAN] Ignoring empty notification', tag: 'BLE');
+        return;
+      }
+
+      // Ignore write command echoes (0x00 = scan without save, 0x01 = scan with save)
+      if (data.length == 1 && (data[0] == 0x00 || data[0] == 0x01)) {
+        _logger.debug('[SCAN] Ignoring write echo: $firstByte', tag: 'BLE');
+        return;
+      }
+
+      // This is an actual scan response
+      if (!scanCompleter.isCompleted) {
         if (data[0] == 0xFF) {
-          _logger.info('[SCAN] SUCCESS (0xFF)', tag: 'BLE');
+          _logger.info('[SCAN] SUCCESS (0xFF) | Index bytes: ${data.length - 1}',
+              tag: 'BLE');
         } else {
-          _logger.warning('[SCAN] Unexpected: $firstByte', tag: 'BLE');
+          _logger.warning('[SCAN] Device returned error: $firstByte', tag: 'BLE');
         }
         scanCompleter.complete(data);
-        startScanSubscription.cancel();
       }
     });
 
-    // CRITICAL: Small delay to ensure listener is fully registered before write
-    // flutter_blue_plus needs time to set up the stream listener at the native layer
-    await Future.delayed(const Duration(milliseconds: 200));
-    _logger.info('[SCAN] Listener ready, triggering scan...', tag: 'BLE');
+    _logger.info(
+        '[SCAN] Listener created at T+${stopwatch.elapsedMilliseconds}ms',
+        tag: 'BLE');
 
-    // Write save flag to start scan
+    // Brief delay for listener registration at native layer
+    await Future.delayed(const Duration(milliseconds: 200));
+    _logger.info(
+        '[SCAN] Delay done at T+${stopwatch.elapsedMilliseconds}ms, triggering scan...',
+        tag: 'BLE');
+
+    // Write save flag to start scan (use the WRITE characteristic)
     final scanCmd = saveToSd ? 0x01 : 0x00;
     _logger.info(
-        '[SCAN] Trigger | Cmd: 0x${scanCmd.toRadixString(16).toUpperCase()}',
+        '[SCAN] Trigger | Cmd: 0x${scanCmd.toRadixString(16).toUpperCase()} | Using write characteristic',
         tag: 'BLE');
-    await startScanChar.write([scanCmd]);
-    _logger.info('[SCAN] Command sent, awaiting device (timeout: 60s)...',
+    await writeChar.write([scanCmd], withoutResponse: false);
+
+    // FIX: Mark write as complete - only NOW should we accept notifications
+    writeComplete = true;
+    _logger.info(
+        '[SCAN] Write done at T+${stopwatch.elapsedMilliseconds}ms, awaiting device (timeout: 30s)...',
         tag: 'BLE');
 
-    // 2. Wait for scan complete notification
-    final scanResult = await scanCompleter.future;
+    // 2. Wait for scan complete notification with timeout
+    // Note: READ is not supported on this characteristic, so polling fallback won't work
+    // The sensor should notify with 0xFF when scan is complete (~3-5 seconds)
+    List<int> scanResult;
+    try {
+      scanResult = await scanCompleter.future.timeout(
+        const Duration(seconds: 30),
+        onTimeout: () {
+          _logger.error('[SCAN] TIMEOUT after 30s - no notification received!',
+              tag: 'BLE');
+          throw TimeoutException('Scan notification timeout after 30 seconds');
+        },
+      );
+    } on TimeoutException {
+      // DIAGNOSTIC: Read error status after timeout to check sensor state
+      _logger.info('[SCAN] Reading post-timeout error status...', tag: 'BLE');
+      try {
+        final errStatusChar = _findCharacteristic(NanoGatt.ggisErrStatus);
+        if (errStatusChar != null) {
+          final errStatus = await errStatusChar.read();
+          final errValue = errStatus.length >= 2
+              ? (errStatus[1] << 8) | (errStatus[0] & 0xFF)
+              : (errStatus.isNotEmpty ? errStatus[0] : 0);
+          _logger.info(
+              '[SCAN] Post-timeout error status: 0x${errValue.toRadixString(16).toUpperCase().padLeft(4, '0')}',
+              tag: 'BLE');
+        }
+        final devStatusChar = _findCharacteristic(NanoGatt.ggisDevStatus);
+        if (devStatusChar != null) {
+          final devStatus = await devStatusChar.read();
+          final devValue = devStatus.length >= 2
+              ? (devStatus[1] << 8) | (devStatus[0] & 0xFF)
+              : (devStatus.isNotEmpty ? devStatus[0] : 0);
+          _logger.info(
+              '[SCAN] Post-timeout device status: 0x${devValue.toRadixString(16).toUpperCase().padLeft(4, '0')}',
+              tag: 'BLE');
+        }
+      } catch (e) {
+        _logger.warning('[SCAN] Could not read post-timeout status: $e',
+            tag: 'BLE');
+      }
+      await startScanSubscription.cancel();
+      rethrow;
+    }
+    await startScanSubscription.cancel();
     _logger.info('[SCAN] Hardware complete | Result: ${scanResult.length}B',
         tag: 'BLE');
 
     if (scanResult.isEmpty || scanResult[0] != 0xFF) {
-      final errCode = scanResult.isNotEmpty
-          ? '0x${scanResult[0].toRadixString(16).toUpperCase()}'
+      final errCode = scanResult.isNotEmpty ? scanResult[0] : -1;
+      final errCodeHex = errCode >= 0
+          ? '0x${errCode.toRadixString(16).toUpperCase().padLeft(2, '0')}'
           : 'empty';
-      _logger.error('[SCAN] FAILED | Error: $errCode', tag: 'BLE');
+      final errDescription = _getScanErrorDescription(errCode);
+      _logger.error('[SCAN] FAILED | Error: $errCodeHex ($errDescription)',
+          tag: 'BLE');
       throw ScanFailedException(
-        'Scan failed with error code: $errCode',
+        'Scan failed: $errDescription (code: $errCodeHex)',
       );
     }
 
@@ -508,6 +749,10 @@ class BleNirScanService implements NirScanService {
     _logger.info('[SCAN] =========================================',
         tag: 'BLE');
     _logger.info('', tag: 'BLE');
+
+    // Log raw scan data in hex format for debugging
+    final truncatedBytes = HexFormat.truncate(scanData.rawData, 64);
+    _logger.info('Raw data (first 64 bytes): ${HexFormat.toHexString(truncatedBytes)}', tag: 'SCAN');
 
     return scanData;
   }
@@ -803,41 +1048,187 @@ class BleNirScanService implements NirScanService {
   }
 
   /// Ensures active scan configuration is set on device.
-  /// Reads current active config, and if not set (0xFFFF), writes default (index 0).
+  /// Fetches config list from device and uses the first available config index.
+  /// This follows TI SDK approach: config indices are stored IN the config list data,
+  /// not as sequential 0, 1, 2... values.
   Future<void> _ensureActiveScanConfig() async {
-    final char = _findCharacteristic(NanoGatt.gscisActiveScanConf);
-    if (char == null) {
-      _logger.warning('[SCAN] Active scan config characteristic not found!',
+    // Step 1: Read total number of stored configs
+    int numConfigs = 0;
+    final numConfigsChar = _findCharacteristic(NanoGatt.gscisNumStoredConf);
+    if (numConfigsChar != null) {
+      try {
+        final numConfigsBytes = await numConfigsChar.read();
+        numConfigs = numConfigsBytes.length >= 2
+            ? (numConfigsBytes[1] << 8) | (numConfigsBytes[0] & 0xFF)
+            : (numConfigsBytes.isNotEmpty ? numConfigsBytes[0] : 0);
+        _logger.info('[SCAN] Total stored configs on device: $numConfigs',
+            tag: 'BLE');
+      } catch (e) {
+        _logger.warning('[SCAN] Could not read config count: $e', tag: 'BLE');
+      }
+    }
+
+    if (numConfigs == 0) {
+      _logger.warning('[SCAN] No configs stored on device!', tag: 'BLE');
+      throw NirScanException('No scan configurations stored on device');
+    }
+
+    // Step 2: Fetch config list to get actual config indices
+    // TI SDK shows config index is at bytes [1] and [2] of each config list entry
+    _logger.info('[SCAN] Fetching config list to get valid indices...',
+        tag: 'BLE');
+    final validConfigIndices = await _fetchConfigIndices();
+
+    if (validConfigIndices.isEmpty) {
+      _logger.warning('[SCAN] Could not fetch config indices, using fallback',
           tag: 'BLE');
+      // Fallback: try index 0
+      validConfigIndices.add(0);
+    }
+
+    _logger.info('[SCAN] Valid config indices from device: $validConfigIndices',
+        tag: 'BLE');
+
+    // Step 3: Read current active config
+    // DIAGNOSTIC: Check if there are multiple characteristics with same UUID (like GSDIS_START_SCAN)
+    final activeConfigChar = _findCharacteristic(NanoGatt.gscisActiveScanConf);
+    final activeConfigWriteChar =
+        _findWriteCharacteristic(NanoGatt.gscisActiveScanConf);
+
+    if (activeConfigChar == null) {
       throw NirScanException('Active scan config characteristic not found');
     }
 
-    // Read current active config
-    _logger.info('[SCAN] Reading current active config...', tag: 'BLE');
-    final configBytes = await char.read();
-    if (configBytes.length < 2) {
-      _logger.warning('[SCAN] Invalid config data: ${configBytes.length} bytes',
+    _logger.info(
+        '[SCAN] Active config char properties: read=${activeConfigChar.properties.read}, write=${activeConfigChar.properties.write}',
+        tag: 'BLE');
+    if (activeConfigWriteChar != null &&
+        activeConfigWriteChar != activeConfigChar) {
+      _logger.info(
+          '[SCAN] Found separate write char for active config! write=${activeConfigWriteChar.properties.write}',
           tag: 'BLE');
+    }
+
+    _logger.info('[SCAN] Reading current active config...', tag: 'BLE');
+    final configBytes = await activeConfigChar.read();
+    if (configBytes.length < 2) {
       throw NirScanException('Invalid active config data');
     }
 
-    // Parse as little-endian uint16
     final currentConfig = (configBytes[1] << 8) | (configBytes[0] & 0xFF);
     _logger.info(
-        '[SCAN] Current active config: 0x${currentConfig.toRadixString(16).toUpperCase().padLeft(4, '0')}',
+        '[SCAN] Current active config: 0x${currentConfig.toRadixString(16).toUpperCase().padLeft(4, '0')} (index: $currentConfig)',
         tag: 'BLE');
 
-    // If not set (0xFFFF), write default config (index 0)
-    if (currentConfig == 0xFFFF) {
-      _logger.info('[SCAN] No active config set, writing default (index 0)...',
+    // Step 4: Check if current config is in valid list
+    if (validConfigIndices.contains(currentConfig)) {
+      _logger.info('[SCAN] Active config $currentConfig is valid, using as-is',
           tag: 'BLE');
-      final defaultConfigBytes = [0x00, 0x00]; // Index 0, little-endian
-      await char.write(defaultConfigBytes);
-      _logger.info('[SCAN] Default config (0) written successfully',
+      return;
+    }
+
+    // Step 5: Current config invalid, try to set first valid config
+    final targetConfig = validConfigIndices.first;
+    _logger.info(
+        '[SCAN] Switching from invalid config $currentConfig to valid config $targetConfig...',
+        tag: 'BLE');
+
+    // Write new config index (little-endian uint16)
+    // Use separate write characteristic if available (like GSDIS_START_SCAN pattern)
+    final charToWrite = activeConfigWriteChar ?? activeConfigChar;
+    final newConfigBytes = [targetConfig & 0xFF, (targetConfig >> 8) & 0xFF];
+    _logger.info(
+        '[SCAN] Writing config to char with write=${charToWrite.properties.write}',
+        tag: 'BLE');
+    await charToWrite.write(newConfigBytes, withoutResponse: false);
+    _logger.info('[SCAN] Write complete, verifying...', tag: 'BLE');
+
+    // Wait and verify
+    await Future.delayed(const Duration(milliseconds: 300));
+    final verifyBytes = await activeConfigChar.read();
+    final verifiedConfig = verifyBytes.length >= 2
+        ? (verifyBytes[1] << 8) | (verifyBytes[0] & 0xFF)
+        : -1;
+    _logger.info(
+        '[SCAN] Config after write: $verifiedConfig (raw: ${verifyBytes.map((b) => '0x${b.toRadixString(16).padLeft(2, '0')}').join(' ')})',
+        tag: 'BLE');
+
+    if (verifiedConfig != targetConfig) {
+      _logger.warning(
+          '[SCAN] Config write may have failed (expected $targetConfig, got $verifiedConfig)',
           tag: 'BLE');
-    } else {
-      _logger.info('[SCAN] Active config already set (index: $currentConfig)',
+    }
+  }
+
+  /// Fetches the list of valid scan configuration indices from the device.
+  /// Uses GSCIS_REQ_STORED_CONF_LIST / GSCIS_RET_STORED_CONF_LIST protocol.
+  /// Returns list of config indices (from bytes [1] and [2] of each entry).
+  Future<List<int>> _fetchConfigIndices() async {
+    final requestChar = _findCharacteristic(NanoGatt.gscisReqStoredConfList);
+    final responseChar =
+        _findNotifyCharacteristic(NanoGatt.gscisRetStoredConfList);
+
+    if (requestChar == null || responseChar == null) {
+      _logger.warning('[SCAN] Config list characteristics not found',
           tag: 'BLE');
+      return [];
+    }
+
+    final configIndices = <int>[];
+    late StreamSubscription<List<int>> subscription;
+
+    // Set up listener for config list responses
+    subscription = responseChar.onValueReceived.listen((data) {
+      if (data.isEmpty) return;
+
+      _logger.debug(
+          '[SCAN] Config list packet: ${data.map((b) => '0x${b.toRadixString(16).padLeft(2, '0')}').join(' ')}',
+          tag: 'BLE');
+
+      // TI SDK format: byte[0] = packet index, byte[1-2] = config index (little-endian)
+      if (data.length >= 3) {
+        final configIndex = (data[2] << 8) | (data[1] & 0xFF);
+        configIndices.add(configIndex);
+        _logger.info('[SCAN] Found config index: $configIndex', tag: 'BLE');
+      }
+    });
+
+    try {
+      // Ensure subscription is active
+      await responseChar.setNotifyValue(true);
+      await Future.delayed(const Duration(milliseconds: 100));
+
+      // Request config list
+      await requestChar.write([0x00], withoutResponse: false);
+
+      // Wait for responses (multi-packet)
+      await Future.delayed(const Duration(milliseconds: 1000));
+
+      subscription.cancel();
+      return configIndices;
+    } catch (e) {
+      _logger.error('[SCAN] Failed to fetch config indices: $e', tag: 'BLE');
+      subscription.cancel();
+      return [];
+    }
+  }
+
+  /// Maps scan error codes to human-readable descriptions.
+  /// Reference: DLPU030G User's Guide, NNOStatusDefs.h
+  String _getScanErrorDescription(int errorCode) {
+    switch (errorCode) {
+      case 0x01:
+        return 'Lamp power failure';
+      case 0x02:
+        return 'ADC overflow/saturation';
+      case 0x03:
+        return 'Pattern stream error';
+      case 0x04:
+        return 'DLP subsystem failure';
+      case -1:
+        return 'Empty response';
+      default:
+        return 'Unknown error';
     }
   }
 
