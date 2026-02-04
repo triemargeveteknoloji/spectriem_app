@@ -415,18 +415,25 @@ class BleNirScanService implements NirScanService {
     await syncTime();
     _logger.info('[SCAN] Time synced successfully', tag: 'BLE');
 
-    // Ensure calibration data is cached (as per protocol Flow 4A)
-    final calCached = _cachedRefCalCoeff != null && _cachedRefCalMatrix != null;
-    _logger.info('[SCAN] Calibration check | Cached: $calCached', tag: 'BLE');
-    await _ensureCalibrationData();
+    // Check calibration data is available (required before scan)
+    final hasCalibration =
+        _cachedRefCalCoeff != null && _cachedRefCalMatrix != null;
+    if (!hasCalibration) {
+      _logger.warning(
+          '[SCAN] Calibration required! Call getCalibrationData() first.',
+          tag: 'BLE');
+      throw const CalibrationRequiredException();
+    }
     _logger.info(
-        '[SCAN] Calibration ready | Coeff: ${_cachedRefCalCoeff?.length ?? 0}B | Matrix: ${_cachedRefCalMatrix?.length ?? 0}B',
+        '[SCAN] Calibration verified | Coeff: ${_cachedRefCalCoeff!.length}B | Matrix: ${_cachedRefCalMatrix!.length}B',
         tag: 'BLE');
 
     // Ensure active scan configuration is set (as per protocol Flow 8)
-    _logger.info('[SCAN] Checking active scan configuration...', tag: 'BLE');
-    await _ensureActiveScanConfig();
-    _logger.info('[SCAN] Active scan configuration confirmed', tag: 'BLE');
+    if (!_skipScanConfigCheck) {
+      _logger.info('[SCAN] Checking active scan configuration...', tag: 'BLE');
+      await _ensureActiveScanConfig();
+      _logger.info('[SCAN] Active scan configuration confirmed', tag: 'BLE');
+    }
 
     // DIAGNOSTIC: Read error status before scan to check sensor state
     _logger.info('[SCAN] Reading pre-scan error status...', tag: 'BLE');
@@ -887,6 +894,18 @@ class BleNirScanService implements NirScanService {
   List<int>? _cachedRefCalCoeff;
   List<int>? _cachedRefCalMatrix;
 
+  /// Sets calibration data directly (for testing only)
+  void setCalibrationDataForTesting(List<int> coefficients, List<int> matrix) {
+    _cachedRefCalCoeff = coefficients;
+    _cachedRefCalMatrix = matrix;
+  }
+
+  /// Skip scan config check (for testing only)
+  bool _skipScanConfigCheck = false;
+  void skipScanConfigCheckForTesting() {
+    _skipScanConfigCheck = true;
+  }
+
   /// Ensures calibration data is available (fetches if not cached)
   Future<void> _ensureCalibrationData() async {
     if (_cachedRefCalCoeff != null && _cachedRefCalMatrix != null) {
@@ -927,12 +946,12 @@ class BleNirScanService implements NirScanService {
 
     final subscription = retChar.onValueReceived.listen((data) {
       packetCount++;
-      _logger.info(
+      _logger.debug(
           '[CAL] Received coeff packet #$packetCount (${data.length} bytes)',
           tag: 'BLE');
       receiver.onPacketReceived(data);
       if (receiver.isComplete) {
-        _logger.info(
+        _logger.debug(
             '[CAL] Coefficient data complete (${receiver.data.length} bytes)',
             tag: 'BLE');
         completer.complete(receiver.data);
@@ -986,12 +1005,12 @@ class BleNirScanService implements NirScanService {
 
     final subscription = retChar.onValueReceived.listen((data) {
       packetCount++;
-      _logger.info(
+      _logger.debug(
           '[CAL] Received matrix packet #$packetCount (${data.length} bytes)',
           tag: 'BLE');
       receiver.onPacketReceived(data);
       if (receiver.isComplete) {
-        _logger.info(
+        _logger.debug(
             '[CAL] Matrix data complete (${receiver.data.length} bytes)',
             tag: 'BLE');
         completer.complete(receiver.data);
@@ -1044,7 +1063,11 @@ class BleNirScanService implements NirScanService {
   @override
   Future<CalibrationData> getCalibrationData() async {
     _ensureConnected();
-    throw UnsupportedError('getCalibrationData not implemented yet');
+    await _ensureCalibrationData();
+    return CalibrationData(
+      coefficients: Uint8List.fromList(_cachedRefCalCoeff!),
+      matrix: Uint8List.fromList(_cachedRefCalMatrix!),
+    );
   }
 
   /// Ensures active scan configuration is set on device.

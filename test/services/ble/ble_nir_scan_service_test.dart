@@ -11,8 +11,69 @@ import 'package:spectriem_app/services/logging/log_service.dart';
 
 import 'ble_nir_scan_service_test.mocks.dart';
 
-@GenerateMocks(
-    [BluetoothDevice, BluetoothService, BluetoothCharacteristic, BleAdapter])
+@GenerateNiceMocks([
+  MockSpec<BluetoothDevice>(),
+  MockSpec<BluetoothService>(),
+  MockSpec<BluetoothCharacteristic>(),
+  MockSpec<BleAdapter>(),
+])
+
+/// Helper to create a mock characteristic with properties stubbed.
+/// This is needed because _findNotifyCharacteristic checks properties.notify.
+MockBluetoothCharacteristic createMockCharacteristic({
+  required Guid uuid,
+  bool notify = true, // Default true - most test chars need notification
+  bool write = true, // Default true - most test chars need write
+  bool writeWithoutResponse = false,
+  bool indicate = false,
+  bool read = true, // Default true - most test chars need read
+}) {
+  final char = MockBluetoothCharacteristic();
+  when(char.uuid).thenReturn(uuid);
+
+  // Create real CharacteristicProperties since it's a simple value class
+  final properties = CharacteristicProperties(
+    notify: notify,
+    write: write,
+    writeWithoutResponse: writeWithoutResponse,
+    indicate: indicate,
+    read: read,
+    broadcast: false,
+    authenticatedSignedWrites: false,
+    extendedProperties: false,
+    notifyEncryptionRequired: false,
+    indicateEncryptionRequired: false,
+  );
+  when(char.properties).thenReturn(properties);
+
+  return char;
+}
+
+/// Helper to add default properties to an existing mock characteristic.
+/// Use this for mocks that were already created with MockBluetoothCharacteristic().
+void stubCharacteristicProperties(
+  MockBluetoothCharacteristic char, {
+  bool notify = true,
+  bool write = true,
+  bool read = true,
+  bool indicate = false,
+  bool writeWithoutResponse = false,
+}) {
+  final properties = CharacteristicProperties(
+    notify: notify,
+    write: write,
+    writeWithoutResponse: writeWithoutResponse,
+    indicate: indicate,
+    read: read,
+    broadcast: false,
+    authenticatedSignedWrites: false,
+    extendedProperties: false,
+    notifyEncryptionRequired: false,
+    indicateEncryptionRequired: false,
+  );
+  when(char.properties).thenReturn(properties);
+}
+
 void main() {
   late BleNirScanService service;
   late MockBleAdapter mockAdapter;
@@ -136,10 +197,10 @@ void main() {
       test('subscribes to all notifications after connection', () async {
         final mockDevice = MockBluetoothDevice();
         final mockService = MockBluetoothService();
-        final mockCharacteristic = MockBluetoothCharacteristic();
         final notificationCharacteristics = <MockBluetoothCharacteristic>[];
 
         // Create mock characteristics for all notification UUIDs
+        // All notification characteristics need notify: true for _findNotifyCharacteristic
         final notificationUuids = [
           '43484110-444c-5020-4e49-52204e616e6f', // gcisRetRefCalCoeff
           '43484112-444c-5020-4e49-52204e616e6f', // gcisRetRefCalMatrix
@@ -157,10 +218,15 @@ void main() {
         ];
 
         for (final uuidStr in notificationUuids) {
-          final char = MockBluetoothCharacteristic();
-          when(char.uuid).thenReturn(Guid(uuidStr));
+          final char = createMockCharacteristic(
+            uuid: Guid(uuidStr),
+            notify: true, // Required for _findNotifyCharacteristic to find it
+          );
           when(char.setNotifyValue(true)).thenAnswer((_) async => true);
+          when(char.setNotifyValue(false)).thenAnswer((_) async => true);
           when(char.lastValueStream).thenAnswer((_) => Stream.value([]));
+          when(char.onValueReceived).thenAnswer((_) => Stream.empty());
+          when(char.isNotifying).thenReturn(true);
           notificationCharacteristics.add(char);
         }
 
@@ -713,10 +779,14 @@ void main() {
         // Notification characteristic
         when(mockRetSpecCalCoeffChar.uuid)
             .thenReturn(Guid('4348410e-444c-5020-4e49-52204e616e6f'));
+        stubCharacteristicProperties(mockRetSpecCalCoeffChar, notify: true);
         when(mockRetSpecCalCoeffChar.setNotifyValue(true))
+            .thenAnswer((_) async => true);
+        when(mockRetSpecCalCoeffChar.setNotifyValue(false))
             .thenAnswer((_) async => true);
         when(mockRetSpecCalCoeffChar.onValueReceived)
             .thenAnswer((_) => notificationController.stream);
+        when(mockRetSpecCalCoeffChar.isNotifying).thenReturn(true);
 
         when(mockAdapter.getDevice('AA:BB:CC:DD:EE:FF')).thenReturn(mockDevice);
 
@@ -727,8 +797,8 @@ void main() {
           Guid('4348410e-444c-5020-4e49-52204e616e6f'),
         );
 
-        // Verify setNotifyValue was called
-        verify(mockRetSpecCalCoeffChar.setNotifyValue(true)).called(1);
+        // Verify setNotifyValue was called during connect
+        verify(mockRetSpecCalCoeffChar.setNotifyValue(true)).called(greaterThanOrEqualTo(1));
 
         // Test that notifications come through
         final receivedData = <List<int>>[];
@@ -904,9 +974,12 @@ void main() {
             .thenReturn(Guid('43484117-444c-5020-4e49-52204e616e6f'));
 
         for (final char in mockChars) {
+          stubCharacteristicProperties(char, notify: true);
           when(char.setNotifyValue(true)).thenAnswer((_) async => true);
+          when(char.setNotifyValue(false)).thenAnswer((_) async => true);
           when(char.onValueReceived)
               .thenAnswer((_) => notificationController.stream);
+          when(char.isNotifying).thenReturn(true);
         }
 
         when(mockAdapter.getDevice('AA:BB:CC:DD:EE:FF')).thenReturn(mockDevice);
@@ -917,19 +990,20 @@ void main() {
         await service.subscribeToAllNotifications();
 
         // Verify setNotifyValue was called on all notification characteristics
-        verify(gcisRetSpecCalCoeff.setNotifyValue(true)).called(1);
-        verify(gcisRetRefCalCoeff.setNotifyValue(true)).called(1);
-        verify(gcisRetRefCalMatrix.setNotifyValue(true)).called(1);
-        verify(gsdisStartScan.setNotifyValue(true)).called(1);
-        verify(gsdisRetScanName.setNotifyValue(true)).called(1);
-        verify(gsdisRetScanType.setNotifyValue(true)).called(1);
-        verify(gsdisRetScanDate.setNotifyValue(true)).called(1);
-        verify(gsdisRetPktFmtVer.setNotifyValue(true)).called(1);
-        verify(gsdisRetSerScanDataStruct.setNotifyValue(true)).called(1);
-        verify(gsdisSdStoredScanIndListData.setNotifyValue(true)).called(1);
-        verify(gsdisClearScan.setNotifyValue(true)).called(1);
-        verify(gscisRetStoredConfList.setNotifyValue(true)).called(1);
-        verify(gscisRetScanConfData.setNotifyValue(true)).called(1);
+        // (2x: once during connect, once during explicit subscribeToAllNotifications call)
+        verify(gcisRetSpecCalCoeff.setNotifyValue(true)).called(2);
+        verify(gcisRetRefCalCoeff.setNotifyValue(true)).called(2);
+        verify(gcisRetRefCalMatrix.setNotifyValue(true)).called(2);
+        verify(gsdisStartScan.setNotifyValue(true)).called(2);
+        verify(gsdisRetScanName.setNotifyValue(true)).called(2);
+        verify(gsdisRetScanType.setNotifyValue(true)).called(2);
+        verify(gsdisRetScanDate.setNotifyValue(true)).called(2);
+        verify(gsdisRetPktFmtVer.setNotifyValue(true)).called(2);
+        verify(gsdisRetSerScanDataStruct.setNotifyValue(true)).called(2);
+        verify(gsdisSdStoredScanIndListData.setNotifyValue(true)).called(2);
+        verify(gsdisClearScan.setNotifyValue(true)).called(2);
+        verify(gscisRetStoredConfList.setNotifyValue(true)).called(2);
+        verify(gscisRetScanConfData.setNotifyValue(true)).called(2);
 
         await notificationController.close();
       });
@@ -947,6 +1021,51 @@ void main() {
         expect(
           () => service.performScan(),
           throwsA(isA<NotConnectedException>()),
+        );
+      });
+
+      test('throws CalibrationRequiredException when calibration not cached',
+          () async {
+        final mockDevice = MockBluetoothDevice();
+        final mockService = MockBluetoothService();
+
+        when(mockDevice.remoteId)
+            .thenReturn(const DeviceIdentifier('AA:BB:CC:DD:EE:FF'));
+        when(mockDevice.platformName).thenReturn('NIRScan Nano');
+        when(mockDevice.connect(
+          timeout: anyNamed('timeout'),
+          autoConnect: anyNamed('autoConnect'),
+        )).thenAnswer((_) async {});
+        when(mockDevice.discoverServices())
+            .thenAnswer((_) async => [mockService]);
+        when(mockDevice.connectionState).thenAnswer(
+          (_) => Stream.value(BluetoothConnectionState.connected),
+        );
+        when(mockDevice.disconnect()).thenAnswer((_) async {});
+        when(mockDevice.requestMtu(any,
+                predelay: anyNamed('predelay'), timeout: anyNamed('timeout')))
+            .thenAnswer((_) async => 512);
+
+        // Minimal service setup - GDTS for time sync only
+        when(mockService.uuid)
+            .thenReturn(Guid('53455203-444c-5020-4e49-52204e616e6f'));
+        final mockTimeChar = MockBluetoothCharacteristic();
+        when(mockService.characteristics).thenReturn([mockTimeChar]);
+        when(mockTimeChar.uuid)
+            .thenReturn(Guid('4348410c-444c-5020-4e49-52204e616e6f'));
+        when(mockTimeChar.write(any,
+                withoutResponse: anyNamed('withoutResponse')))
+            .thenAnswer((_) async {});
+
+        when(mockAdapter.getDevice('AA:BB:CC:DD:EE:FF')).thenReturn(mockDevice);
+
+        await service.connect('AA:BB:CC:DD:EE:FF');
+        await Future.delayed(const Duration(milliseconds: 50));
+
+        // Attempt scan without calibration
+        expect(
+          () => service.performScan(),
+          throwsA(isA<CalibrationRequiredException>()),
         );
       });
 
@@ -982,6 +1101,7 @@ void main() {
         when(mockGdtsService.characteristics).thenReturn([mockTimeChar]);
         when(mockTimeChar.uuid)
             .thenReturn(Guid('4348410c-444c-5020-4e49-52204e616e6f'));
+        stubCharacteristicProperties(mockTimeChar, write: true, notify: false);
         when(mockTimeChar.write(any,
                 withoutResponse: anyNamed('withoutResponse')))
             .thenAnswer((_) async {
@@ -994,17 +1114,27 @@ void main() {
         when(mockGsdisService.characteristics).thenReturn([mockStartScanChar]);
         when(mockStartScanChar.uuid)
             .thenReturn(Guid('4348411d-444c-5020-4e49-52204e616e6f'));
+        stubCharacteristicProperties(mockStartScanChar, notify: true, write: true);
         when(mockStartScanChar.write(any,
                 withoutResponse: anyNamed('withoutResponse')))
             .thenAnswer((_) async {});
         when(mockStartScanChar.setNotifyValue(true))
             .thenAnswer((_) async => true);
+        when(mockStartScanChar.setNotifyValue(false))
+            .thenAnswer((_) async => true);
+        when(mockStartScanChar.isNotifying).thenReturn(true);
         when(mockStartScanChar.onValueReceived)
+            .thenAnswer((_) => startScanNotifyController.stream);
+        when(mockStartScanChar.lastValueStream)
             .thenAnswer((_) => startScanNotifyController.stream);
 
         when(mockAdapter.getDevice('AA:BB:CC:DD:EE:FF')).thenReturn(mockDevice);
 
         await service.connect('AA:BB:CC:DD:EE:FF');
+
+        // Set calibration data for testing (required before scan)
+        service.setCalibrationDataForTesting([0x01], [0x02]);
+        service.skipScanConfigCheckForTesting();
 
         // Start scan - will timeout waiting for notification, but we only care about time sync
         final scanFuture = service.performScan();
@@ -1017,9 +1147,12 @@ void main() {
         startScanNotifyController.close();
       });
 
+      // TODO: Fix timing issues with mock notification streams
       test('writes save flag 0x00 to start scan characteristic', () async {
         final mockDevice = MockBluetoothDevice();
+        final mockGdtsService = MockBluetoothService();
         final mockGsdisService = MockBluetoothService();
+        final mockTimeChar = MockBluetoothCharacteristic();
         final mockStartScanChar = MockBluetoothCharacteristic();
         final startScanNotifyController =
             StreamController<List<int>>.broadcast();
@@ -1032,7 +1165,7 @@ void main() {
           autoConnect: anyNamed('autoConnect'),
         )).thenAnswer((_) async {});
         when(mockDevice.discoverServices())
-            .thenAnswer((_) async => [mockGsdisService]);
+            .thenAnswer((_) async => [mockGdtsService, mockGsdisService]);
         when(mockDevice.connectionState).thenAnswer(
           (_) => Stream.value(BluetoothConnectionState.connected),
         );
@@ -1040,25 +1173,46 @@ void main() {
         when(mockDevice.requestMtu(any, predelay: anyNamed('predelay'), timeout: anyNamed('timeout')))
             .thenAnswer((_) async => 512);
 
+        // GDTS service for time sync
+        when(mockGdtsService.uuid)
+            .thenReturn(Guid('53455203-444c-5020-4e49-52204e616e6f'));
+        when(mockGdtsService.characteristics).thenReturn([mockTimeChar]);
+        when(mockTimeChar.uuid)
+            .thenReturn(Guid('4348410c-444c-5020-4e49-52204e616e6f'));
+        stubCharacteristicProperties(mockTimeChar, write: true, notify: false);
+        when(mockTimeChar.write(any, withoutResponse: anyNamed('withoutResponse')))
+            .thenAnswer((_) async {});
+
         when(mockGsdisService.uuid)
             .thenReturn(Guid('53455206-444c-5020-4e49-52204e616e6f'));
         when(mockGsdisService.characteristics).thenReturn([mockStartScanChar]);
 
-        // GSDIS_START_SCAN characteristic
+        // GSDIS_START_SCAN characteristic - needs both notify and write properties
+        // Real sensor has separate chars, but for test we use one with both
         when(mockStartScanChar.uuid)
             .thenReturn(Guid('4348411d-444c-5020-4e49-52204e616e6f'));
+        stubCharacteristicProperties(mockStartScanChar, notify: true, write: true);
         when(mockStartScanChar.write(any,
                 withoutResponse: anyNamed('withoutResponse')))
             .thenAnswer((_) async {});
         when(mockStartScanChar.setNotifyValue(true))
             .thenAnswer((_) async => true);
+        when(mockStartScanChar.setNotifyValue(false))
+            .thenAnswer((_) async => true);
         when(mockStartScanChar.onValueReceived)
             .thenAnswer((_) => startScanNotifyController.stream);
+        when(mockStartScanChar.lastValueStream)
+            .thenAnswer((_) => startScanNotifyController.stream);
+        when(mockStartScanChar.isNotifying).thenReturn(true);
 
         when(mockAdapter.getDevice('AA:BB:CC:DD:EE:FF')).thenReturn(mockDevice);
 
         await service.connect('AA:BB:CC:DD:EE:FF');
         await Future.delayed(const Duration(milliseconds: 50));
+
+        // Set calibration data for testing (required before scan)
+        service.setCalibrationDataForTesting([0x01], [0x02]);
+        service.skipScanConfigCheckForTesting();
 
         // Start scan in background, will wait for notification
         final scanFuture = service.performScan(saveToSd: false);
@@ -1070,8 +1224,8 @@ void main() {
                 .write([0x00], withoutResponse: anyNamed('withoutResponse')))
             .called(1);
 
-        // Emit scan failed to complete the future
-        startScanNotifyController.add([0x01]); // Non-0xFF = error
+        // Emit scan failed - use multi-byte error (single-byte 0x00/0x01 are filtered as write echoes)
+        startScanNotifyController.add([0x02, 0x00, 0x00, 0x00, 0x00]); // Non-0xFF = error
 
         // Expect ScanFailedException
         await expectLater(scanFuture, throwsA(isA<ScanFailedException>()));
@@ -1081,7 +1235,9 @@ void main() {
 
       test('writes save flag 0x01 when saveToSd is true', () async {
         final mockDevice = MockBluetoothDevice();
+        final mockGdtsService = MockBluetoothService();
         final mockGsdisService = MockBluetoothService();
+        final mockTimeChar = MockBluetoothCharacteristic();
         final mockStartScanChar = MockBluetoothCharacteristic();
         final startScanNotifyController =
             StreamController<List<int>>.broadcast();
@@ -1094,7 +1250,7 @@ void main() {
           autoConnect: anyNamed('autoConnect'),
         )).thenAnswer((_) async {});
         when(mockDevice.discoverServices())
-            .thenAnswer((_) async => [mockGsdisService]);
+            .thenAnswer((_) async => [mockGdtsService, mockGsdisService]);
         when(mockDevice.connectionState).thenAnswer(
           (_) => Stream.value(BluetoothConnectionState.connected),
         );
@@ -1102,24 +1258,44 @@ void main() {
         when(mockDevice.requestMtu(any, predelay: anyNamed('predelay'), timeout: anyNamed('timeout')))
             .thenAnswer((_) async => 512);
 
+        // GDTS service for time sync
+        when(mockGdtsService.uuid)
+            .thenReturn(Guid('53455203-444c-5020-4e49-52204e616e6f'));
+        when(mockGdtsService.characteristics).thenReturn([mockTimeChar]);
+        when(mockTimeChar.uuid)
+            .thenReturn(Guid('4348410c-444c-5020-4e49-52204e616e6f'));
+        stubCharacteristicProperties(mockTimeChar, write: true, notify: false);
+        when(mockTimeChar.write(any, withoutResponse: anyNamed('withoutResponse')))
+            .thenAnswer((_) async {});
+
         when(mockGsdisService.uuid)
             .thenReturn(Guid('53455206-444c-5020-4e49-52204e616e6f'));
         when(mockGsdisService.characteristics).thenReturn([mockStartScanChar]);
 
         when(mockStartScanChar.uuid)
             .thenReturn(Guid('4348411d-444c-5020-4e49-52204e616e6f'));
+        stubCharacteristicProperties(mockStartScanChar, notify: true, write: true);
         when(mockStartScanChar.write(any,
                 withoutResponse: anyNamed('withoutResponse')))
             .thenAnswer((_) async {});
         when(mockStartScanChar.setNotifyValue(true))
             .thenAnswer((_) async => true);
+        when(mockStartScanChar.setNotifyValue(false))
+            .thenAnswer((_) async => true);
         when(mockStartScanChar.onValueReceived)
             .thenAnswer((_) => startScanNotifyController.stream);
+        when(mockStartScanChar.lastValueStream)
+            .thenAnswer((_) => startScanNotifyController.stream);
+        when(mockStartScanChar.isNotifying).thenReturn(true);
 
         when(mockAdapter.getDevice('AA:BB:CC:DD:EE:FF')).thenReturn(mockDevice);
 
         await service.connect('AA:BB:CC:DD:EE:FF');
         await Future.delayed(const Duration(milliseconds: 50));
+
+        // Set calibration data for testing (required before scan)
+        service.setCalibrationDataForTesting([0x01], [0x02]);
+        service.skipScanConfigCheckForTesting();
 
         final scanFuture = service.performScan(saveToSd: true);
 
@@ -1130,7 +1306,8 @@ void main() {
                 .write([0x01], withoutResponse: anyNamed('withoutResponse')))
             .called(1);
 
-        startScanNotifyController.add([0x01]);
+        // Emit scan failed - use multi-byte error (single-byte 0x00/0x01 are filtered as write echoes)
+        startScanNotifyController.add([0x02, 0x00, 0x00, 0x00, 0x00]); // Non-0xFF = error
 
         await expectLater(scanFuture, throwsA(isA<ScanFailedException>()));
 
@@ -1140,7 +1317,9 @@ void main() {
       test('throws ScanFailedException when scan notification is not 0xFF',
           () async {
         final mockDevice = MockBluetoothDevice();
+        final mockGdtsService = MockBluetoothService();
         final mockGsdisService = MockBluetoothService();
+        final mockTimeChar = MockBluetoothCharacteristic();
         final mockStartScanChar = MockBluetoothCharacteristic();
         final startScanNotifyController =
             StreamController<List<int>>.broadcast();
@@ -1153,7 +1332,7 @@ void main() {
           autoConnect: anyNamed('autoConnect'),
         )).thenAnswer((_) async {});
         when(mockDevice.discoverServices())
-            .thenAnswer((_) async => [mockGsdisService]);
+            .thenAnswer((_) async => [mockGdtsService, mockGsdisService]);
         when(mockDevice.connectionState).thenAnswer(
           (_) => Stream.value(BluetoothConnectionState.connected),
         );
@@ -1161,24 +1340,44 @@ void main() {
         when(mockDevice.requestMtu(any, predelay: anyNamed('predelay'), timeout: anyNamed('timeout')))
             .thenAnswer((_) async => 512);
 
+        // GDTS service for time sync
+        when(mockGdtsService.uuid)
+            .thenReturn(Guid('53455203-444c-5020-4e49-52204e616e6f'));
+        when(mockGdtsService.characteristics).thenReturn([mockTimeChar]);
+        when(mockTimeChar.uuid)
+            .thenReturn(Guid('4348410c-444c-5020-4e49-52204e616e6f'));
+        stubCharacteristicProperties(mockTimeChar, write: true, notify: false);
+        when(mockTimeChar.write(any, withoutResponse: anyNamed('withoutResponse')))
+            .thenAnswer((_) async {});
+
         when(mockGsdisService.uuid)
             .thenReturn(Guid('53455206-444c-5020-4e49-52204e616e6f'));
         when(mockGsdisService.characteristics).thenReturn([mockStartScanChar]);
 
         when(mockStartScanChar.uuid)
             .thenReturn(Guid('4348411d-444c-5020-4e49-52204e616e6f'));
+        stubCharacteristicProperties(mockStartScanChar, notify: true, write: true);
         when(mockStartScanChar.write(any,
                 withoutResponse: anyNamed('withoutResponse')))
             .thenAnswer((_) async {});
         when(mockStartScanChar.setNotifyValue(true))
             .thenAnswer((_) async => true);
+        when(mockStartScanChar.setNotifyValue(false))
+            .thenAnswer((_) async => true);
         when(mockStartScanChar.onValueReceived)
             .thenAnswer((_) => startScanNotifyController.stream);
+        when(mockStartScanChar.lastValueStream)
+            .thenAnswer((_) => startScanNotifyController.stream);
+        when(mockStartScanChar.isNotifying).thenReturn(true);
 
         when(mockAdapter.getDevice('AA:BB:CC:DD:EE:FF')).thenReturn(mockDevice);
 
         await service.connect('AA:BB:CC:DD:EE:FF');
         await Future.delayed(const Duration(milliseconds: 50));
+
+        // Set calibration data for testing (required before scan)
+        service.setCalibrationDataForTesting([0x01], [0x02]);
+        service.skipScanConfigCheckForTesting();
 
         final scanFuture = service.performScan();
 
@@ -1194,7 +1393,9 @@ void main() {
 
       test('returns ScanData on successful scan', () async {
         final mockDevice = MockBluetoothDevice();
+        final mockGdtsService = MockBluetoothService();
         final mockGsdisService = MockBluetoothService();
+        final mockTimeChar = MockBluetoothCharacteristic();
 
         // Characteristics
         final mockStartScanChar = MockBluetoothCharacteristic();
@@ -1231,13 +1432,23 @@ void main() {
           autoConnect: anyNamed('autoConnect'),
         )).thenAnswer((_) async {});
         when(mockDevice.discoverServices())
-            .thenAnswer((_) async => [mockGsdisService]);
+            .thenAnswer((_) async => [mockGdtsService, mockGsdisService]);
         when(mockDevice.connectionState).thenAnswer(
           (_) => Stream.value(BluetoothConnectionState.connected),
         );
         when(mockDevice.disconnect()).thenAnswer((_) async {});
         when(mockDevice.requestMtu(any, predelay: anyNamed('predelay'), timeout: anyNamed('timeout')))
             .thenAnswer((_) async => 512);
+
+        // GDTS service for time sync
+        when(mockGdtsService.uuid)
+            .thenReturn(Guid('53455203-444c-5020-4e49-52204e616e6f'));
+        when(mockGdtsService.characteristics).thenReturn([mockTimeChar]);
+        when(mockTimeChar.uuid)
+            .thenReturn(Guid('4348410c-444c-5020-4e49-52204e616e6f'));
+        stubCharacteristicProperties(mockTimeChar, write: true, notify: false);
+        when(mockTimeChar.write(any, withoutResponse: anyNamed('withoutResponse')))
+            .thenAnswer((_) async {});
 
         when(mockGsdisService.uuid)
             .thenReturn(Guid('53455206-444c-5020-4e49-52204e616e6f'));
@@ -1255,106 +1466,142 @@ void main() {
           mockRetSerScanDataChar,
         ]);
 
-        // GSDIS_START_SCAN
+        // GSDIS_START_SCAN - needs both notify and write
         when(mockStartScanChar.uuid)
             .thenReturn(Guid('4348411d-444c-5020-4e49-52204e616e6f'));
+        stubCharacteristicProperties(mockStartScanChar, notify: true, write: true);
         when(mockStartScanChar.write(any,
                 withoutResponse: anyNamed('withoutResponse')))
             .thenAnswer((_) async {});
         when(mockStartScanChar.setNotifyValue(true))
             .thenAnswer((_) async => true);
+        when(mockStartScanChar.setNotifyValue(false))
+            .thenAnswer((_) async => true);
         when(mockStartScanChar.onValueReceived)
             .thenAnswer((_) => startScanNotifyController.stream);
+        when(mockStartScanChar.lastValueStream)
+            .thenAnswer((_) => startScanNotifyController.stream);
+        when(mockStartScanChar.isNotifying).thenReturn(true);
 
-        // GSDIS_REQ_SCAN_NAME
+        // GSDIS_REQ_SCAN_NAME (write only)
         when(mockReqScanNameChar.uuid)
             .thenReturn(Guid('4348411f-444c-5020-4e49-52204e616e6f'));
+        stubCharacteristicProperties(mockReqScanNameChar, write: true, notify: false);
         when(mockReqScanNameChar.write(any,
                 withoutResponse: anyNamed('withoutResponse')))
             .thenAnswer((_) async {});
 
-        // GSDIS_RET_SCAN_NAME (notify)
+        // GSDIS_RET_SCAN_NAME (notify only)
         when(mockRetScanNameChar.uuid)
             .thenReturn(Guid('43484120-444c-5020-4e49-52204e616e6f'));
+        stubCharacteristicProperties(mockRetScanNameChar, notify: true, write: false);
         when(mockRetScanNameChar.setNotifyValue(true))
+            .thenAnswer((_) async => true);
+        when(mockRetScanNameChar.setNotifyValue(false))
             .thenAnswer((_) async => true);
         when(mockRetScanNameChar.onValueReceived)
             .thenAnswer((_) => retScanNameNotifyController.stream);
+        when(mockRetScanNameChar.isNotifying).thenReturn(true);
 
-        // GSDIS_REQ_SCAN_TYPE
+        // GSDIS_REQ_SCAN_TYPE (write only)
         when(mockReqScanTypeChar.uuid)
             .thenReturn(Guid('43484121-444c-5020-4e49-52204e616e6f'));
+        stubCharacteristicProperties(mockReqScanTypeChar, write: true, notify: false);
         when(mockReqScanTypeChar.write(any,
                 withoutResponse: anyNamed('withoutResponse')))
             .thenAnswer((_) async {});
 
-        // GSDIS_RET_SCAN_TYPE (notify)
+        // GSDIS_RET_SCAN_TYPE (notify only)
         when(mockRetScanTypeChar.uuid)
             .thenReturn(Guid('43484122-444c-5020-4e49-52204e616e6f'));
+        stubCharacteristicProperties(mockRetScanTypeChar, notify: true, write: false);
         when(mockRetScanTypeChar.setNotifyValue(true))
             .thenAnswer((_) async => true);
+        when(mockRetScanTypeChar.setNotifyValue(false))
+            .thenAnswer((_) async => true);
+        when(mockRetScanTypeChar.isNotifying).thenReturn(true);
         when(mockRetScanTypeChar.onValueReceived)
             .thenAnswer((_) => retScanTypeNotifyController.stream);
 
-        // GSDIS_REQ_SCAN_DATE
+        // GSDIS_REQ_SCAN_DATE (write only)
         when(mockReqScanDateChar.uuid)
             .thenReturn(Guid('43484123-444c-5020-4e49-52204e616e6f'));
+        stubCharacteristicProperties(mockReqScanDateChar, write: true, notify: false);
         when(mockReqScanDateChar.write(any,
                 withoutResponse: anyNamed('withoutResponse')))
             .thenAnswer((_) async {});
 
-        // GSDIS_RET_SCAN_DATE (notify)
+        // GSDIS_RET_SCAN_DATE (notify only)
         when(mockRetScanDateChar.uuid)
             .thenReturn(Guid('43484124-444c-5020-4e49-52204e616e6f'));
+        stubCharacteristicProperties(mockRetScanDateChar, notify: true, write: false);
         when(mockRetScanDateChar.setNotifyValue(true))
+            .thenAnswer((_) async => true);
+        when(mockRetScanDateChar.setNotifyValue(false))
             .thenAnswer((_) async => true);
         when(mockRetScanDateChar.onValueReceived)
             .thenAnswer((_) => retScanDateNotifyController.stream);
+        when(mockRetScanDateChar.isNotifying).thenReturn(true);
 
-        // GSDIS_REQ_PKT_FMT_VER
+        // GSDIS_REQ_PKT_FMT_VER (write only)
         when(mockReqPktFmtVerChar.uuid)
             .thenReturn(Guid('43484125-444c-5020-4e49-52204e616e6f'));
+        stubCharacteristicProperties(mockReqPktFmtVerChar, write: true, notify: false);
         when(mockReqPktFmtVerChar.write(any,
                 withoutResponse: anyNamed('withoutResponse')))
             .thenAnswer((_) async {});
 
-        // GSDIS_RET_PKT_FMT_VER (notify)
+        // GSDIS_RET_PKT_FMT_VER (notify only)
         when(mockRetPktFmtVerChar.uuid)
             .thenReturn(Guid('43484126-444c-5020-4e49-52204e616e6f'));
+        stubCharacteristicProperties(mockRetPktFmtVerChar, notify: true, write: false);
         when(mockRetPktFmtVerChar.setNotifyValue(true))
+            .thenAnswer((_) async => true);
+        when(mockRetPktFmtVerChar.setNotifyValue(false))
             .thenAnswer((_) async => true);
         when(mockRetPktFmtVerChar.onValueReceived)
             .thenAnswer((_) => retPktFmtVerNotifyController.stream);
+        when(mockRetPktFmtVerChar.isNotifying).thenReturn(true);
 
-        // GSDIS_REQ_SER_SCAN_DATA_STRUCT
+        // GSDIS_REQ_SER_SCAN_DATA_STRUCT (write only)
         when(mockReqSerScanDataChar.uuid)
             .thenReturn(Guid('43484127-444c-5020-4e49-52204e616e6f'));
+        stubCharacteristicProperties(mockReqSerScanDataChar, write: true, notify: false);
         when(mockReqSerScanDataChar.write(any,
                 withoutResponse: anyNamed('withoutResponse')))
             .thenAnswer((_) async {});
 
-        // GSDIS_RET_SER_SCAN_DATA_STRUCT (notify - multi-packet)
+        // GSDIS_RET_SER_SCAN_DATA_STRUCT (notify only - multi-packet)
         when(mockRetSerScanDataChar.uuid)
             .thenReturn(Guid('43484128-444c-5020-4e49-52204e616e6f'));
+        stubCharacteristicProperties(mockRetSerScanDataChar, notify: true, write: false);
         when(mockRetSerScanDataChar.setNotifyValue(true))
+            .thenAnswer((_) async => true);
+        when(mockRetSerScanDataChar.setNotifyValue(false))
             .thenAnswer((_) async => true);
         when(mockRetSerScanDataChar.onValueReceived)
             .thenAnswer((_) => retSerScanDataNotifyController.stream);
+        when(mockRetSerScanDataChar.isNotifying).thenReturn(true);
 
         when(mockAdapter.getDevice('AA:BB:CC:DD:EE:FF')).thenReturn(mockDevice);
 
         await service.connect('AA:BB:CC:DD:EE:FF');
         await Future.delayed(const Duration(milliseconds: 50));
 
+        // Set calibration data for testing (required before scan)
+        service.setCalibrationDataForTesting([0x01], [0x02]);
+        service.skipScanConfigCheckForTesting();
+
         final scanFuture = service.performScan();
 
-        await Future.delayed(const Duration(milliseconds: 50));
+        // Wait for performScan to finish its 200ms delay and start listening
+        await Future.delayed(const Duration(milliseconds: 300));
 
         // Simulate scan complete notification: 0xFF + 4-byte scan index
         // Scan index = 0x00000001 (little-endian)
         startScanNotifyController.add([0xFF, 0x01, 0x00, 0x00, 0x00]);
 
-        await Future.delayed(const Duration(milliseconds: 50));
+        await Future.delayed(const Duration(milliseconds: 100));
 
         // Return scan name: "TestScan"
         retScanNameNotifyController.add('TestScan'.codeUnits);
@@ -1486,14 +1733,27 @@ void main() {
     });
 
     group('calibration', () {
-      test('fetches reference calibration data on first scan', () async {
+      test('getCalibrationData throws NotConnectedException when not connected',
+          () {
+        expect(
+          () => service.getCalibrationData(),
+          throwsA(isA<NotConnectedException>()),
+        );
+      });
+
+      test('getCalibrationData returns coefficients and matrix', () async {
         final mockDevice = MockBluetoothDevice();
         final mockGcisService = MockBluetoothService();
+
+        // Coefficient characteristics
         final mockReqCoeffChar = MockBluetoothCharacteristic();
         final mockRetCoeffChar = MockBluetoothCharacteristic();
         final coeffNotifyController = StreamController<List<int>>.broadcast();
 
-        var coeffRequested = false;
+        // Matrix characteristics
+        final mockReqMatrixChar = MockBluetoothCharacteristic();
+        final mockRetMatrixChar = MockBluetoothCharacteristic();
+        final matrixNotifyController = StreamController<List<int>>.broadcast();
 
         when(mockDevice.remoteId)
             .thenReturn(const DeviceIdentifier('AA:BB:CC:DD:EE:FF'));
@@ -1508,43 +1768,229 @@ void main() {
           (_) => Stream.value(BluetoothConnectionState.connected),
         );
         when(mockDevice.disconnect()).thenAnswer((_) async {});
-        when(mockDevice.requestMtu(any, predelay: anyNamed('predelay'), timeout: anyNamed('timeout')))
+        when(mockDevice.requestMtu(any,
+                predelay: anyNamed('predelay'), timeout: anyNamed('timeout')))
             .thenAnswer((_) async => 512);
 
         // GCIS Service
         when(mockGcisService.uuid)
-            .thenReturn(Guid('4348410e-444c-5020-4e49-52204e616e6f'));
-        when(mockGcisService.characteristics)
-            .thenReturn([mockReqCoeffChar, mockRetCoeffChar]);
+            .thenReturn(Guid('53455204-444c-5020-4e49-52204e616e6f'));
+        when(mockGcisService.characteristics).thenReturn([
+          mockReqCoeffChar,
+          mockRetCoeffChar,
+          mockReqMatrixChar,
+          mockRetMatrixChar,
+        ]);
 
-        // Request characteristic
+        // Request coeff characteristic (write only)
         when(mockReqCoeffChar.uuid)
             .thenReturn(Guid('4348410f-444c-5020-4e49-52204e616e6f'));
+        stubCharacteristicProperties(mockReqCoeffChar,
+            write: true, notify: false);
         when(mockReqCoeffChar.write(any,
                 withoutResponse: anyNamed('withoutResponse')))
-            .thenAnswer((_) async {
-          coeffRequested = true;
-        });
+            .thenAnswer((_) async {});
 
-        // Return characteristic (notification)
+        // Return coeff characteristic (notification only)
         when(mockRetCoeffChar.uuid)
             .thenReturn(Guid('43484110-444c-5020-4e49-52204e616e6f'));
+        stubCharacteristicProperties(mockRetCoeffChar,
+            notify: true, write: false);
         when(mockRetCoeffChar.setNotifyValue(true))
+            .thenAnswer((_) async => true);
+        when(mockRetCoeffChar.setNotifyValue(false))
             .thenAnswer((_) async => true);
         when(mockRetCoeffChar.onValueReceived)
             .thenAnswer((_) => coeffNotifyController.stream);
+        when(mockRetCoeffChar.isNotifying).thenReturn(true);
+
+        // Request matrix characteristic (write only)
+        when(mockReqMatrixChar.uuid)
+            .thenReturn(Guid('43484111-444c-5020-4e49-52204e616e6f'));
+        stubCharacteristicProperties(mockReqMatrixChar,
+            write: true, notify: false);
+        when(mockReqMatrixChar.write(any,
+                withoutResponse: anyNamed('withoutResponse')))
+            .thenAnswer((_) async {});
+
+        // Return matrix characteristic (notification only)
+        when(mockRetMatrixChar.uuid)
+            .thenReturn(Guid('43484112-444c-5020-4e49-52204e616e6f'));
+        stubCharacteristicProperties(mockRetMatrixChar,
+            notify: true, write: false);
+        when(mockRetMatrixChar.setNotifyValue(true))
+            .thenAnswer((_) async => true);
+        when(mockRetMatrixChar.setNotifyValue(false))
+            .thenAnswer((_) async => true);
+        when(mockRetMatrixChar.onValueReceived)
+            .thenAnswer((_) => matrixNotifyController.stream);
+        when(mockRetMatrixChar.isNotifying).thenReturn(true);
 
         when(mockAdapter.getDevice('AA:BB:CC:DD:EE:FF')).thenReturn(mockDevice);
 
         await service.connect('AA:BB:CC:DD:EE:FF');
+        await Future.delayed(const Duration(milliseconds: 50));
 
-        // Simulate request for calibration (would be called internally)
-        // For now, just verify the characteristic exists
-        expect(coeffRequested, isFalse); // Not yet called
+        // Start getCalibrationData
+        final calibrationFuture = service.getCalibrationData();
 
-        // TODO: When ensureCalibration() is implemented, verify it gets called
+        await Future.delayed(const Duration(milliseconds: 50));
 
-        coeffNotifyController.close();
+        // Multi-packet coeff response:
+        // Header: [0x00, 0x04, 0x00] = size 4 bytes
+        coeffNotifyController.add([0x00, 0x04, 0x00]);
+        await Future.delayed(const Duration(milliseconds: 20));
+        // Data packet: [0x01, 0xAA, 0xBB, 0xCC, 0xDD]
+        coeffNotifyController.add([0x01, 0xAA, 0xBB, 0xCC, 0xDD]);
+
+        await Future.delayed(const Duration(milliseconds: 50));
+
+        // Multi-packet matrix response:
+        // Header: [0x00, 0x03, 0x00] = size 3 bytes
+        matrixNotifyController.add([0x00, 0x03, 0x00]);
+        await Future.delayed(const Duration(milliseconds: 20));
+        // Data packet: [0x01, 0x11, 0x22, 0x33]
+        matrixNotifyController.add([0x01, 0x11, 0x22, 0x33]);
+
+        final calData = await calibrationFuture;
+
+        expect(calData.coefficients.length, equals(4));
+        expect(calData.coefficients, equals([0xAA, 0xBB, 0xCC, 0xDD]));
+        expect(calData.matrix.length, equals(3));
+        expect(calData.matrix, equals([0x11, 0x22, 0x33]));
+
+        // Cleanup
+        await coeffNotifyController.close();
+        await matrixNotifyController.close();
+      });
+
+      test('getCalibrationData uses cached data on second call', () async {
+        final mockDevice = MockBluetoothDevice();
+        final mockGcisService = MockBluetoothService();
+
+        // Coefficient characteristics
+        final mockReqCoeffChar = MockBluetoothCharacteristic();
+        final mockRetCoeffChar = MockBluetoothCharacteristic();
+        final coeffNotifyController = StreamController<List<int>>.broadcast();
+
+        // Matrix characteristics
+        final mockReqMatrixChar = MockBluetoothCharacteristic();
+        final mockRetMatrixChar = MockBluetoothCharacteristic();
+        final matrixNotifyController = StreamController<List<int>>.broadcast();
+
+        var coeffWriteCount = 0;
+        var matrixWriteCount = 0;
+
+        when(mockDevice.remoteId)
+            .thenReturn(const DeviceIdentifier('AA:BB:CC:DD:EE:FF'));
+        when(mockDevice.platformName).thenReturn('NIRScan Nano');
+        when(mockDevice.connect(
+          timeout: anyNamed('timeout'),
+          autoConnect: anyNamed('autoConnect'),
+        )).thenAnswer((_) async {});
+        when(mockDevice.discoverServices())
+            .thenAnswer((_) async => [mockGcisService]);
+        when(mockDevice.connectionState).thenAnswer(
+          (_) => Stream.value(BluetoothConnectionState.connected),
+        );
+        when(mockDevice.disconnect()).thenAnswer((_) async {});
+        when(mockDevice.requestMtu(any,
+                predelay: anyNamed('predelay'), timeout: anyNamed('timeout')))
+            .thenAnswer((_) async => 512);
+
+        // GCIS Service
+        when(mockGcisService.uuid)
+            .thenReturn(Guid('53455204-444c-5020-4e49-52204e616e6f'));
+        when(mockGcisService.characteristics).thenReturn([
+          mockReqCoeffChar,
+          mockRetCoeffChar,
+          mockReqMatrixChar,
+          mockRetMatrixChar,
+        ]);
+
+        // Request coeff characteristic
+        when(mockReqCoeffChar.uuid)
+            .thenReturn(Guid('4348410f-444c-5020-4e49-52204e616e6f'));
+        stubCharacteristicProperties(mockReqCoeffChar,
+            write: true, notify: false);
+        when(mockReqCoeffChar.write(any,
+                withoutResponse: anyNamed('withoutResponse')))
+            .thenAnswer((_) async {
+          coeffWriteCount++;
+        });
+
+        // Return coeff characteristic
+        when(mockRetCoeffChar.uuid)
+            .thenReturn(Guid('43484110-444c-5020-4e49-52204e616e6f'));
+        stubCharacteristicProperties(mockRetCoeffChar,
+            notify: true, write: false);
+        when(mockRetCoeffChar.setNotifyValue(any))
+            .thenAnswer((_) async => true);
+        when(mockRetCoeffChar.onValueReceived)
+            .thenAnswer((_) => coeffNotifyController.stream);
+        when(mockRetCoeffChar.isNotifying).thenReturn(true);
+
+        // Request matrix characteristic
+        when(mockReqMatrixChar.uuid)
+            .thenReturn(Guid('43484111-444c-5020-4e49-52204e616e6f'));
+        stubCharacteristicProperties(mockReqMatrixChar,
+            write: true, notify: false);
+        when(mockReqMatrixChar.write(any,
+                withoutResponse: anyNamed('withoutResponse')))
+            .thenAnswer((_) async {
+          matrixWriteCount++;
+        });
+
+        // Return matrix characteristic
+        when(mockRetMatrixChar.uuid)
+            .thenReturn(Guid('43484112-444c-5020-4e49-52204e616e6f'));
+        stubCharacteristicProperties(mockRetMatrixChar,
+            notify: true, write: false);
+        when(mockRetMatrixChar.setNotifyValue(any))
+            .thenAnswer((_) async => true);
+        when(mockRetMatrixChar.onValueReceived)
+            .thenAnswer((_) => matrixNotifyController.stream);
+        when(mockRetMatrixChar.isNotifying).thenReturn(true);
+
+        when(mockAdapter.getDevice('AA:BB:CC:DD:EE:FF')).thenReturn(mockDevice);
+
+        await service.connect('AA:BB:CC:DD:EE:FF');
+        await Future.delayed(const Duration(milliseconds: 50));
+
+        // First call
+        final calibrationFuture1 = service.getCalibrationData();
+        await Future.delayed(const Duration(milliseconds: 50));
+
+        // Emit coefficient data
+        coeffNotifyController.add([0x00, 0x02, 0x00]); // Header: 2 bytes
+        await Future.delayed(const Duration(milliseconds: 20));
+        coeffNotifyController.add([0x01, 0xAA, 0xBB]); // Data
+
+        await Future.delayed(const Duration(milliseconds: 50));
+
+        // Emit matrix data
+        matrixNotifyController.add([0x00, 0x02, 0x00]); // Header: 2 bytes
+        await Future.delayed(const Duration(milliseconds: 20));
+        matrixNotifyController.add([0x01, 0x11, 0x22]); // Data
+
+        await calibrationFuture1;
+
+        expect(coeffWriteCount, equals(1));
+        expect(matrixWriteCount, equals(1));
+
+        // Second call - should use cache
+        final calData2 = await service.getCalibrationData();
+
+        // Verify no additional writes were made
+        expect(coeffWriteCount, equals(1));
+        expect(matrixWriteCount, equals(1));
+
+        expect(calData2.coefficients, equals([0xAA, 0xBB]));
+        expect(calData2.matrix, equals([0x11, 0x22]));
+
+        // Cleanup
+        await coeffNotifyController.close();
+        await matrixNotifyController.close();
       });
     });
   });

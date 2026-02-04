@@ -145,3 +145,9 @@ class BleTimeoutException extends NirScanException {
 class ScanFailedException extends NirScanException {
   const ScanFailedException(String reason) : super('Scan failed: $reason');
 }
+
+/// Exception thrown when calibration is required before scan
+class CalibrationRequiredException extends NirScanException {
+  const CalibrationRequiredException()
+      : super('Calibration required before scan. Call getCalibrationData() first.');
+}

@@ -140,6 +140,13 @@ class CommandExecution extends _$CommandExecution {
           logService.info('↓ RSP: ${result.length} configs', tag: 'UI');
           return result;
 
+        case 'getCalibrationData':
+          final result = await bleService.getCalibrationData();
+          logService.info(
+              '↓ RSP: Coeff ${result.coefficients.length}B, Matrix ${result.matrix.length}B',
+              tag: 'UI');
+          return result;
+
         default:
           throw Exception('Unknown command: $command');
       }

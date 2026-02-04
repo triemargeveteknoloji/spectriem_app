@@ -34,6 +34,12 @@ class TestContext {
   /// Calibration matrix (raw bytes)
   Uint8List? calibrationMatrix;
 
+  /// Sets calibration data from CalibrationData object
+  set calibrationData(CalibrationData data) {
+    calibrationCoefficients = data.coefficients;
+    calibrationMatrix = data.matrix;
+  }
+
   /// Timing metrics for each test step
   final Map<String, Duration> stepDurations = {};
 

@@ -7,6 +7,7 @@ import '../models/scan_configuration.dart';
 import '../models/scan_data.dart';
 import '../providers/sensor_communication_notifier.dart';
 import '../services/ble/nir_scan_service.dart';
+import '../widgets/hex_dump_widget.dart';
 import '../widgets/log_viewer_widget.dart';
 
 class SensorCommunicationScreen extends ConsumerWidget {
@@ -160,6 +161,13 @@ class SensorCommunicationScreen extends ConsumerWidget {
               spacing: 8,
               runSpacing: 8,
               children: [
+                _buildCommandButton(
+                  'Calibrate',
+                  Icons.tune,
+                  isConnected,
+                  isLoading,
+                  () => commandNotifier.executeCommand('getCalibrationData'),
+                ),
                 _buildCommandButton(
                   'Scan',
                   Icons.radar,
@@ -334,6 +342,13 @@ class SensorCommunicationScreen extends ConsumerWidget {
         _buildInfoRow('Type', scan.type),
         _buildInfoRow('Date', scan.dateTime?.toString() ?? scan.date),
         _buildInfoRow('Data Size', '${scan.rawData.length} bytes'),
+        const SizedBox(height: 12),
+        const Text(
+          'Raw Data',
+          style: TextStyle(fontWeight: FontWeight.w500),
+        ),
+        const SizedBox(height: 8),
+        HexDumpWidget(data: scan.rawData),
       ],
     );
   }

@@ -18,8 +18,8 @@ import '../steps/disconnect_step.dart';
 /// 2. Connect to selected device
 /// 3. Read device info
 /// 4. Read device status
-/// 5. Perform spectral scan
-/// 6. Verify calibration
+/// 5. Fetch calibration data (REQUIRED before scan)
+/// 6. Perform spectral scan
 /// 7. Disconnect
 ///
 /// Each step stores its results in [context] for final assertions.
@@ -31,8 +31,8 @@ const List<String> stepNames = [
   'Connect to device',
   'Read device info',
   'Read device status',
+  'Fetch calibration',
   'Perform spectral scan',
-  'Verify calibration',
   'Disconnect',
 ];
 
@@ -83,16 +83,16 @@ Future<void> executeFullSensorFlow(
   context.recordStepDuration('status', stopwatch.elapsed);
   stopwatch.reset();
 
-  // Step 5: Perform spectral scan
-  stopwatch.start();
-  await executePerformScanStep(context, executor, logger);
-  context.recordStepDuration('performScan', stopwatch.elapsed);
-  stopwatch.reset();
-
-  // Step 6: Verify calibration
+  // Step 5: Fetch calibration data (REQUIRED before scan)
   stopwatch.start();
   await executeCalibrationStep(context, executor, logger);
   context.recordStepDuration('calibration', stopwatch.elapsed);
+  stopwatch.reset();
+
+  // Step 6: Perform spectral scan
+  stopwatch.start();
+  await executePerformScanStep(context, executor, logger);
+  context.recordStepDuration('performScan', stopwatch.elapsed);
   stopwatch.reset();
 
   // Step 7: Disconnect

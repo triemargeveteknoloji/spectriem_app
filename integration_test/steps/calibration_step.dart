@@ -3,36 +3,32 @@ import '../core/step_executor.dart';
 import '../core/test_context.dart';
 import '../observability/integration_logger.dart';
 
-/// Verifies that calibration data was fetched successfully.
+/// Fetches calibration data from the device.
 ///
-/// The [BleNirScanService] caches calibration data internally during
-/// [performScan()]. The calibration fetch methods are private, so we verify
-/// calibration success implicitly by checking that a scan completed.
+/// This step must run BEFORE [executePerformScanStep] because
+/// [performScan()] requires calibration data to be cached.
 ///
-/// This step requires [executePerformScanStep] to have run first.
+/// The calibration data (coefficients and matrix) is fetched via BLE
+/// and cached in the service for subsequent scan operations.
 ///
-/// Throws [StateError] if scan data is missing (calibration cannot be verified).
+/// Throws [CalibrationRequiredException] if calibration is not available.
 Future<void> executeCalibrationStep(
   TestContext context,
   StepExecutor executor,
   IntegrationLogger logger,
 ) async {
   await executor.execute(
-    'CALIBRATION: Verifying calibration data was fetched',
+    'CALIBRATION: Fetching calibration data',
     () async {
-      if (context.scanData == null) {
-        // Scan failed but calibration was still fetched during connection
-        // We can verify this from the logs (Calibration ready | Coeff: XXX | Matrix: XXX)
-        logger.ble('Scan failed but calibration was fetched during connection');
-        logger.data('Note', 'Calibration fetch happens before scan trigger');
-        logger.pass('Calibration step skipped (scan failed, but calibration is independent)');
-        return;
-      }
+      logger.ble('Requesting calibration data (coefficients + matrix)...');
 
-      logger.ble('Calibration data was fetched successfully during scan');
-      logger.data('Verification', 'Scan completed with ${context.scanData!.rawData.length} bytes');
+      final calData = await context.service.getCalibrationData();
+      context.calibrationData = calData;
 
-      logger.pass('Calibration verified (implicit via successful scan)');
+      logger.ble(
+          'Calibration fetched: ${calData.coefficients.length}B coefficients, ${calData.matrix.length}B matrix');
+      logger.pass(
+          'Calibration complete (${calData.coefficients.length + calData.matrix.length}B total)');
     },
     timeout: TestConfig.calibrationTimeout,
   );
