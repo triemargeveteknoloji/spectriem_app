@@ -455,45 +455,126 @@ class PhotodetectorReading {
 
 ## 9. Scan Configuration Formatı
 
-Scan configuration DLP Spectrum Library tarafından serialize/deserialize edilir.
+Scan configuration, TI'nin **tpl** (Troy's Packing Library) kullanarak serialize edilir.
 
-### Temel Yapı
+> **Kaynaklar:**
+> - [tpl GitHub](https://github.com/troydhanson/tpl)
+> - [tpl User Guide](https://troydhanson.github.io/tpl/userguide.html)
+> - [TI E2E Forum](https://e2e.ti.com/support/dlp-products-group/dlp/f/dlp-products-forum/846128)
+
+### TPL (Troy's Packing Library)
+
+tpl, C struct'larını binary formata serialize eden hafif bir kütüphanedir. Format string'leri kullanır:
+
+| Karakter | Tip | Boyut | Açıklama |
+|----------|-----|-------|----------|
+| `c` | char | 1 byte | Karakter/byte |
+| `v` | uint16_t | 2 bytes | 16-bit unsigned (LE) |
+| `i` | int32_t | 4 bytes | 32-bit signed (LE) |
+| `u` | uint32_t | 4 bytes | 32-bit unsigned (LE) |
+| `s` | string | variable | Null-terminated string |
+| `c#` | char[] | variable | Fixed-length char array (length prefix follows) |
+| `S(...)` | struct | variable | Struct wrapper |
+| `A(...)` | array | variable | Variable-length array |
+
+### TPL Image Yapısı
+
+```
+┌─────────────────────────────────────────────────────────┐
+│ TPL Header                                               │
+├──────────────┬──────────────┬───────────────────────────┤
+│ Magic (4B)   │ Size (4B)    │ Format String (null-term) │
+│ "tpl\0"      │ LE uint32    │ e.g. "S(cvc#c#vc)\0"      │
+├──────────────┴──────────────┴───────────────────────────┤
+│ Length Prefixes (for c# arrays)                          │
+│ 4 bytes each, LE uint32                                  │
+├─────────────────────────────────────────────────────────┤
+│ Struct Data                                              │
+│ Fields in format string order                            │
+└─────────────────────────────────────────────────────────┘
+```
+
+### Scan Config TPL Format: `S(cvc#c#vc)`
+
+GSCIS_RET_SCAN_CONF_DATA karakteristiğinden dönen veri:
+
+```
+Offset  Size  Field              Açıklama
+──────────────────────────────────────────────────────────
+TPL HEADER
+0-3     4     magic              "tpl\0"
+4-7     4     size               Toplam TPL block boyutu (LE)
+8-19    12    format             "S(cvc#c#vc)\0"
+
+LENGTH PREFIXES
+20-23   4     serial_len         Serial number uzunluğu (8)
+24-27   4     name_len           Config name uzunluğu (40)
+
+STRUCT DATA
+28      1     scan_type          0=Column, 1=Hadamard
+29-30   2     config_index       Config index (LE uint16)
+31-38   8     serial_number      Cihaz seri numarası
+39-78   40    config_name        Config adı (null-padded)
+79+     var   section_data       Section parametreleri
+```
+
+### Örnek Raw Data
+
+```
+74 70 6c 00  -- "tpl\0" magic
+52 00 00 00  -- size = 82 bytes
+53 28 63 76 63 23 63 23 76 63 29 00  -- "S(cvc#c#vc)\0"
+08 00 00 00  -- serial_len = 8
+28 00 00 00  -- name_len = 40
+02           -- scan_type = 2 (?)
+06 00        -- config_index = 6
+43 33 37 30 31 34 35 00  -- "C370145\0"
+43 6f 6c 75 6d 6e 20 31 00 00...  -- "Column 1" + padding
+```
+
+### Önemli Not: Concatenated Configs
+
+`getScanConfigurations()` response'u **TÜM config'leri** tek pakette döndürebilir.
+Her config kendi TPL header'ıyla başlar:
+
+```
+[TPL Block 1: Column 1 config]
+[TPL Block 2: Hadamard 1 config]
+...
+```
+
+Parsing yaparken tüm TPL bloklarını iterate etmek gerekir.
+
+### Temel Yapı (Dart)
 
 ```dart
 class ScanConfiguration {
+  final int index;
   final String name;
-  final int scansToAverage;
+  final int scanType;        // 0=Column, 1=Hadamard
   final int numSections;
   final List<ScanSection> sections;
+  final Uint8List rawData;   // Original TPL data
 
-  // DLP Spectrum Library serialization
-  static ScanConfiguration fromSerialized(List<int> data) {
-    // dlpspec_scan_read_configuration() equivalent
-    // Implementation depends on DLP Spectrum Library format
-    throw UnimplementedError('Requires DLP Spectrum Library');
-  }
-
-  List<int> toSerialized() {
-    // dlpspec_scan_write_configuration() equivalent
-    throw UnimplementedError('Requires DLP Spectrum Library');
+  factory ScanConfiguration.fromTplData(int index, List<int> data) {
+    // TPL parsing implementation
+    // See: lib/services/ble/ble_nir_scan_service.dart:_parseConfigData()
   }
 }
 
 class ScanSection {
-  final ScanMethod method;
-  final int startWavelength; // nm
-  final int endWavelength;   // nm
-  final int widthNm;
-  final int digitalResolution;
-  final double exposureTime; // ms
-
-  // ...
+  final int startWavelength; // nm (900-1700)
+  final int endWavelength;   // nm (900-1700)
+  final int numPatterns;     // 2-624
+  final int width;           // Digital resolution (2-60)
+  final int numRepeat;       // Scans to average (1-50)
+  final int exposure;        // Exposure time
 }
 
 enum ScanMethod {
   column,    // 0
   hadamard,  // 1
-  slew,      // 2
+  slew,      // 2 (rare)
 }
 ```
 

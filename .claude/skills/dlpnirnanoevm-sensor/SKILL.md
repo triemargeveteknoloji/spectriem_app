@@ -336,6 +336,13 @@ class MockSpectrumGenerator {
 - [Android SDK - GitHub](https://github.com/kstechnologies/NIRScanNano_Android)
 - [iOS SDK - GitHub](https://github.com/kstechnologies/NIRScanNano_iOS)
 
+### Serialization Library
+- [tpl (Troy's Packing Library)](https://github.com/troydhanson/tpl) - TI'nin config/scan data serialization için kullandığı C library
+- [tpl User Guide](https://troydhanson.github.io/tpl/userguide.html) - Format string referansı
+
+### TI Community
+- [TI E2E Forum - DLP Products](https://e2e.ti.com/support/dlp-products-group/dlp/f/dlp-products-forum)
+
 ### Not
 DLP Spectrum Library kaynak kodu için Texas Instruments ile NDA gereklidir.
 

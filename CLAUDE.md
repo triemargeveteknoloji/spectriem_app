@@ -124,6 +124,28 @@ final container = ProviderContainer(overrides: [
 
 Mock implementations support configurable delays and error simulation.
 
+### Integration Testing
+
+Real device tests in `integration_test/`. Uses actual `BleNirScanService` (not mocks).
+
+```bash
+# List connected devices
+flutter devices
+
+# Run integration test on physical device
+flutter test integration_test/integration_test.dart -d <device_id>
+
+# Filter BLE diagnostic logs
+flutter test integration_test/integration_test.dart -d <device_id> 2>&1 | grep -E "\[DIAG\]|\[SCAN\]|\[BLE\]"
+```
+
+**Test flow:** Scan → Connect → Device Info → Status → Perform Scan → Calibration → Disconnect
+
+**Log tags:**
+- `[DIAG]` - Diagnostic (CCCD status, all incoming notifications)
+- `[SCAN]` - Scan operation timing and results
+- `[BLE]` - General BLE operations
+
 ### State Updates in Notifiers
 
 Use `scheduleMicrotask()` when updating state from listeners to avoid build-phase conflicts:
