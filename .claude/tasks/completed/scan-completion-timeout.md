@@ -1,7 +1,8 @@
 # scan-completion-timeout
 
 **Created:** 2026-02-02
-**Status:** 🚧 In Progress
+**Status:** ✅ Completed
+**Completed:** 2026-02-04
 
 ---
 
@@ -60,7 +61,9 @@ Scan trigger başarıyla gönderiliyor, sensör fiziksel olarak tarama yapıyor 
 - [x] **Stale data fix** (`lastValueStream` → `onValueReceived` + `writeComplete` flag)
 - [x] Integration test'e ikinci scan ekle
 - [x] Integration test pass ✅
-- [ ] Lamp error root cause (ayrı task: config/donanım)
+
+### Deferred (Out of Scope)
+- [ ] Lamp error root cause → See separate task for config/hardware investigation
 
 ---
 
@@ -98,3 +101,9 @@ SCAN 2: T+725ms  → 0x01 ← Fresh notification! (eski 0xFF'i okumadı)
 **Sonuç:** Integration test PASS ✅ Stale data fix doğrulandı.
 
 **Remaining:** Lamp error (0x01) ayrı donanım/config sorunu - bu task'ın scope'u dışında.
+
+---
+
+## Commits
+
+- `cf48fe6` (2026-02-04): fix(ble): resolve stale notification data in scan flow

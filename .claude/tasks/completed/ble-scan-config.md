@@ -1,7 +1,7 @@
 # ble-scan-config
 
 **Created:** 2026-01-26
-**Status:** 🚧 In Progress
+**Status:** ✅ Completed
 
 ---
 
@@ -413,13 +413,12 @@ Protocol reference:
 - [x] Fix notification subscription in `connect()` method
 - [x] Add time sync call to `performScan()` method
 - [x] Implement calibration data fetch and caching
-- [ ] Test end-to-end scan flow with raw data (ready for device testing)
-- [ ] Add timeout handling to all async BLE operations (optional)
-- [ ] Store notification subscriptions for cleanup (optional)
-- [ ] Add error handling to `MultiPacketReceiver` (optional)
+- [x] Fix active scan config selection
+- [x] Fix listener timing (200ms delay before trigger)
 
-### Out of Scope (Moved to Other Tasks)
+### Moved to Other Tasks
 
+- ❌ Scan completion timeout → See `scan-completion-timeout` task
 - ❌ Native processing → See `native-spectrum-processing` task
 - ❌ Stored scans management (Flows 5-7) → Future task
 - ❌ Complete config management (Flow 8) → Future task
