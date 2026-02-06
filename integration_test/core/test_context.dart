@@ -4,6 +4,7 @@ import 'package:spectriem_app/services/ble/nir_scan_service.dart';
 import 'package:spectriem_app/models/device_info.dart';
 import 'package:spectriem_app/models/device_status.dart';
 import 'package:spectriem_app/models/scan_data.dart';
+import 'package:spectriem_app/models/scan_configuration.dart';
 
 /// Shared state container for NIR sensor integration tests.
 ///
@@ -34,6 +35,12 @@ class TestContext {
   /// Calibration matrix (raw bytes)
   Uint8List? calibrationMatrix;
 
+  /// Available scan configurations from device
+  List<ScanConfiguration>? scanConfigurations;
+
+  /// Currently active scan configuration
+  ScanConfiguration? activeScanConfiguration;
+
   /// Sets calibration data from CalibrationData object
   set calibrationData(CalibrationData data) {
     calibrationCoefficients = data.coefficients;
@@ -60,6 +67,8 @@ class TestContext {
     scanData = null;
     calibrationCoefficients = null;
     calibrationMatrix = null;
+    scanConfigurations = null;
+    activeScanConfiguration = null;
     stepDurations.clear();
     testStartTime = null;
   }
@@ -84,6 +93,12 @@ class TestContext {
     );
     buffer.writeln(
       'Calibration: ${calibrationCoefficients != null ? "OK" : "MISSING"}',
+    );
+    buffer.writeln(
+      'Scan configs: ${scanConfigurations != null ? "${scanConfigurations!.length} configs" : "MISSING"}',
+    );
+    buffer.writeln(
+      'Active config: ${activeScanConfiguration?.name ?? "MISSING"}',
     );
     buffer.writeln('Step durations:');
     for (final entry in stepDurations.entries) {

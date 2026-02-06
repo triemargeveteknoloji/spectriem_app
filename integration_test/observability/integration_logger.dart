@@ -10,6 +10,7 @@ enum LogCategory {
   scan,
   pass,
   fail,
+  warn,
   data,
 }
 
@@ -35,6 +36,7 @@ class IntegrationLogger {
       LogCategory.scan => AnsiColors.yellow,
       LogCategory.pass => '${AnsiColors.bold}${AnsiColors.green}',
       LogCategory.fail => '${AnsiColors.bold}${AnsiColors.red}',
+      LogCategory.warn => '${AnsiColors.bold}${AnsiColors.yellow}',
       LogCategory.data => AnsiColors.white,
     };
   }
@@ -73,6 +75,10 @@ class IntegrationLogger {
 
   void fail(String message) {
     log(LogCategory.fail, '\u2717 $message');
+  }
+
+  void warning(String message) {
+    log(LogCategory.warn, '\u26a0 $message');
   }
 
   void data(String label, dynamic value) {

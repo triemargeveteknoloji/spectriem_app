@@ -26,6 +26,7 @@ class TestConfig {
   static const Duration calibrationTimeout = Duration(seconds: 30);
   static const Duration multiPacketTimeout = Duration(seconds: 10);
   static const Duration statusTimeout = Duration(seconds: 5);
+  static const Duration configTimeout = Duration(seconds: 30);
   static const Duration disconnectTimeout = Duration(seconds: 5);
 
   const TestConfig({

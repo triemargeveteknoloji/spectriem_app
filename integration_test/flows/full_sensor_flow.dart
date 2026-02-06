@@ -7,6 +7,7 @@ import '../steps/scan_step.dart';
 import '../steps/connect_step.dart';
 import '../steps/device_info_step.dart';
 import '../steps/status_step.dart';
+import '../steps/config_step.dart';
 import '../steps/perform_scan_step.dart';
 import '../steps/calibration_step.dart';
 import '../steps/disconnect_step.dart';
@@ -18,9 +19,10 @@ import '../steps/disconnect_step.dart';
 /// 2. Connect to selected device
 /// 3. Read device info
 /// 4. Read device status
-/// 5. Fetch calibration data (REQUIRED before scan)
-/// 6. Perform spectral scan
-/// 7. Disconnect
+/// 5. Fetch scan configurations
+/// 6. Fetch calibration data (REQUIRED before scan)
+/// 7. Perform spectral scan
+/// 8. Disconnect
 ///
 /// Each step stores its results in [context] for final assertions.
 /// The flow uses [executor] for timing and optional user confirmation in
@@ -31,6 +33,7 @@ const List<String> stepNames = [
   'Connect to device',
   'Read device info',
   'Read device status',
+  'Fetch scan configs',
   'Fetch calibration',
   'Perform spectral scan',
   'Disconnect',
@@ -83,19 +86,25 @@ Future<void> executeFullSensorFlow(
   context.recordStepDuration('status', stopwatch.elapsed);
   stopwatch.reset();
 
-  // Step 5: Fetch calibration data (REQUIRED before scan)
+  // Step 5: Fetch scan configurations
+  stopwatch.start();
+  await executeConfigStep(context, executor, logger);
+  context.recordStepDuration('config', stopwatch.elapsed);
+  stopwatch.reset();
+
+  // Step 6: Fetch calibration data (REQUIRED before scan)
   stopwatch.start();
   await executeCalibrationStep(context, executor, logger);
   context.recordStepDuration('calibration', stopwatch.elapsed);
   stopwatch.reset();
 
-  // Step 6: Perform spectral scan
+  // Step 7: Perform spectral scan
   stopwatch.start();
   await executePerformScanStep(context, executor, logger);
   context.recordStepDuration('performScan', stopwatch.elapsed);
   stopwatch.reset();
 
-  // Step 7: Disconnect
+  // Step 8: Disconnect
   stopwatch.start();
   await executeDisconnectStep(context, executor, logger);
   context.recordStepDuration('disconnect', stopwatch.elapsed);
