@@ -32,12 +32,42 @@ class BleNirScanService implements NirScanService {
   StreamSubscription<BluetoothConnectionState>? _connectionSubscription;
   final List<StreamSubscription> _notificationSubscriptions = [];
 
+  /// BLE operation queue - ensures sequential execution of BLE operations.
+  /// NIRScan Nano doesn't handle concurrent BLE operations well.
+  Completer<void>? _bleOperationLock;
+
   BleNirScanService({
     BleAdapter? adapter,
     required LogService logger,
   })  : _adapter = adapter ?? FlutterBluePlusAdapter(),
         _logger = logger {
     _connectionStateController.add(_currentState);
+  }
+
+  /// Executes a BLE operation with mutual exclusion.
+  /// Ensures only one operation runs at a time to prevent BLE stack conflicts.
+  Future<T> _withBleLock<T>(
+    String operationName,
+    Future<T> Function() operation,
+  ) async {
+    // Wait for any previous operation to complete
+    while (_bleOperationLock != null && !_bleOperationLock!.isCompleted) {
+      _logger.debug('[BLE] Waiting for lock: $operationName', tag: 'BLE');
+      await _bleOperationLock!.future;
+    }
+
+    // Acquire lock
+    _bleOperationLock = Completer<void>();
+    _logger.debug('[BLE] Lock acquired: $operationName', tag: 'BLE');
+
+    try {
+      final result = await operation();
+      return result;
+    } finally {
+      // Release lock
+      _bleOperationLock!.complete();
+      _logger.debug('[BLE] Lock released: $operationName', tag: 'BLE');
+    }
   }
 
   @override
@@ -239,27 +269,40 @@ class BleNirScanService implements NirScanService {
   @override
   Future<DeviceInfo> getDeviceInfo() async {
     _ensureConnected();
+    return _withBleLock('getDeviceInfo', () async {
+      final manufacturerName =
+          await _readStringCharacteristic(NanoGatt.disManufName);
+      final modelNumber =
+          await _readStringCharacteristic(NanoGatt.disModelNumber);
+      final serialNumber =
+          await _readStringCharacteristic(NanoGatt.disSerialNumber);
+      final hardwareRevision =
+          await _readStringCharacteristic(NanoGatt.disHwRev);
+      final tivaFirmwareRevision =
+          await _readStringCharacteristic(NanoGatt.disTivaFwRev);
+      final spectrumLibraryRevision =
+          await _readUint16Characteristic(NanoGatt.disSpeccRev);
 
-    final manufacturerName =
-        await _readStringCharacteristic(NanoGatt.disManufName);
-    final modelNumber =
-        await _readStringCharacteristic(NanoGatt.disModelNumber);
-    final serialNumber =
-        await _readStringCharacteristic(NanoGatt.disSerialNumber);
-    final hardwareRevision = await _readStringCharacteristic(NanoGatt.disHwRev);
-    final tivaFirmwareRevision =
-        await _readStringCharacteristic(NanoGatt.disTivaFwRev);
-    final spectrumLibraryRevision =
-        await _readUint16Characteristic(NanoGatt.disSpeccRev);
+      final deviceInfo = DeviceInfo(
+        manufacturerName: manufacturerName,
+        modelNumber: modelNumber,
+        serialNumber: serialNumber,
+        hardwareRevision: hardwareRevision,
+        tivaFirmwareRevision: tivaFirmwareRevision,
+        spectrumLibraryRevision: spectrumLibraryRevision.toString(),
+      );
 
-    return DeviceInfo(
-      manufacturerName: manufacturerName,
-      modelNumber: modelNumber,
-      serialNumber: serialNumber,
-      hardwareRevision: hardwareRevision,
-      tivaFirmwareRevision: tivaFirmwareRevision,
-      spectrumLibraryRevision: spectrumLibraryRevision.toString(),
-    );
+      _logger.info(
+        '[DEVICE] Firmware: $tivaFirmwareRevision | HW: $hardwareRevision | Spectrum Lib: $spectrumLibraryRevision',
+        tag: 'BLE',
+      );
+      _logger.info(
+        '[DEVICE] Model: $modelNumber | Serial: $serialNumber',
+        tag: 'BLE',
+      );
+
+      return deviceInfo;
+    });
   }
 
   Future<String> _readStringCharacteristic(Guid uuid) async {
@@ -380,24 +423,25 @@ class BleNirScanService implements NirScanService {
   @override
   Future<DeviceStatus> getDeviceStatus() async {
     _ensureConnected();
+    return _withBleLock('getDeviceStatus', () async {
+      final batteryLevel = await _readUint8Characteristic(NanoGatt.basBattLvl);
+      final tempRaw =
+          await _readInt16Characteristic(NanoGatt.ggisTempMeasurement);
+      final humidRaw =
+          await _readUint16Characteristic(NanoGatt.ggisHumidMeasurement);
+      final devStatusRaw =
+          await _readUint16Characteristic(NanoGatt.ggisDevStatus);
+      final errStatusRaw =
+          await _readUint16Characteristic(NanoGatt.ggisErrStatus);
 
-    final batteryLevel = await _readUint8Characteristic(NanoGatt.basBattLvl);
-    final tempRaw =
-        await _readInt16Characteristic(NanoGatt.ggisTempMeasurement);
-    final humidRaw =
-        await _readUint16Characteristic(NanoGatt.ggisHumidMeasurement);
-    final devStatusRaw =
-        await _readUint16Characteristic(NanoGatt.ggisDevStatus);
-    final errStatusRaw =
-        await _readUint16Characteristic(NanoGatt.ggisErrStatus);
-
-    return DeviceStatus(
-      batteryLevel: batteryLevel,
-      temperature: tempRaw / 100.0,
-      humidity: humidRaw / 100.0,
-      deviceStatus: devStatusRaw.toRadixString(16).padLeft(2, '0'),
-      errorStatus: errStatusRaw.toRadixString(16).padLeft(2, '0'),
-    );
+      return DeviceStatus(
+        batteryLevel: batteryLevel,
+        temperature: tempRaw / 100.0,
+        humidity: humidRaw / 100.0,
+        deviceStatus: devStatusRaw.toRadixString(16).padLeft(2, '0'),
+        errorStatus: errStatusRaw.toRadixString(16).padLeft(2, '0'),
+      );
+    });
   }
 
   @override
@@ -834,19 +878,406 @@ class BleNirScanService implements NirScanService {
   @override
   Future<List<ScanConfiguration>> getScanConfigurations() async {
     _ensureConnected();
-    throw UnsupportedError('getScanConfigurations not implemented yet');
+    return _withBleLock('getScanConfigurations', () async {
+      _logger.info('[CONFIG] Fetching scan configurations...', tag: 'BLE');
+
+      // Step 1: Get number of stored configs
+      final numConfigsChar = _findCharacteristic(NanoGatt.gscisNumStoredConf);
+      if (numConfigsChar == null) {
+        throw NirScanException('NUM_STORED_CONF characteristic not found');
+      }
+
+      final numConfigsBytes = await numConfigsChar.read();
+      final numConfigs = numConfigsBytes.length >= 2
+          ? (numConfigsBytes[1] << 8) | (numConfigsBytes[0] & 0xFF)
+          : (numConfigsBytes.isNotEmpty ? numConfigsBytes[0] : 0);
+      _logger.info('[CONFIG] Number of stored configs: $numConfigs',
+          tag: 'BLE');
+
+      if (numConfigs == 0) {
+        return [];
+      }
+
+      // Step 2: Fetch config indices (pass expected count for early completion)
+      final configIndices =
+          await _fetchConfigIndices(expectedCount: numConfigs);
+      _logger.info('[CONFIG] Config indices: $configIndices', tag: 'BLE');
+
+      if (configIndices.isEmpty) {
+        return [];
+      }
+
+      // Step 3: Fetch config data for each index
+      // TI firmware may return single config or all configs per request
+      // Some indices don't respond, so try each and merge results
+      final configMap = <int, ScanConfiguration>{};
+      for (final index in configIndices) {
+        final fetchedConfigs = await _fetchAllConfigsData(index);
+        for (final config in fetchedConfigs) {
+          // Use map to deduplicate by index
+          configMap[config.index] = config;
+        }
+        if (fetchedConfigs.isEmpty) {
+          _logger.debug('[CONFIG] Index $index returned empty, trying next...',
+              tag: 'BLE');
+        }
+      }
+
+      final configs = configMap.values.toList();
+      _logger.info('[CONFIG] Fetched ${configs.length} configurations',
+          tag: 'BLE');
+      return configs;
+    });
   }
 
   @override
   Future<ScanConfiguration> getActiveScanConfiguration() async {
     _ensureConnected();
-    throw UnsupportedError('getActiveScanConfiguration not implemented yet');
+    _logger.info('[CONFIG] Getting active scan configuration...', tag: 'BLE');
+
+    final activeConfChar = _findCharacteristic(NanoGatt.gscisActiveScanConf);
+    if (activeConfChar == null) {
+      throw NirScanException('ACTIVE_SCAN_CONF characteristic not found');
+    }
+
+    final activeBytes = await activeConfChar.read();
+    final activeIndex = activeBytes.length >= 2
+        ? (activeBytes[1] << 8) | (activeBytes[0] & 0xFF)
+        : (activeBytes.isNotEmpty ? activeBytes[0] : 0);
+    _logger.info('[CONFIG] Active config index: $activeIndex', tag: 'BLE');
+
+    final configData = await _fetchConfigData(activeIndex);
+    if (configData == null) {
+      throw NirScanException('Failed to fetch active config data');
+    }
+
+    return configData;
   }
 
   @override
   Future<void> setActiveScanConfiguration(int configIndex) async {
     _ensureConnected();
-    throw UnsupportedError('setActiveScanConfiguration not implemented yet');
+    _logger.info('[CONFIG] Setting active config to index: $configIndex',
+        tag: 'BLE');
+
+    final activeConfChar =
+        _findWriteCharacteristic(NanoGatt.gscisActiveScanConf) ??
+            _findCharacteristic(NanoGatt.gscisActiveScanConf);
+
+    if (activeConfChar == null) {
+      throw NirScanException('ACTIVE_SCAN_CONF characteristic not found');
+    }
+
+    // Write 2-byte little-endian index
+    final indexBytes = [configIndex & 0xFF, (configIndex >> 8) & 0xFF];
+    await activeConfChar.write(indexBytes, withoutResponse: false);
+    _logger.info('[CONFIG] Active config set to $configIndex', tag: 'BLE');
+
+    // Verify write
+    final verifyChar = _findCharacteristic(NanoGatt.gscisActiveScanConf);
+    if (verifyChar != null) {
+      final verifyBytes = await verifyChar.read();
+      final verifiedIndex = verifyBytes.length >= 2
+          ? (verifyBytes[1] << 8) | (verifyBytes[0] & 0xFF)
+          : -1;
+      if (verifiedIndex != configIndex) {
+        _logger.warning(
+            '[CONFIG] Config write verification failed (expected $configIndex, got $verifiedIndex)',
+            tag: 'BLE');
+      }
+    }
+  }
+
+  /// Fetches ALL configuration data with a single request.
+  /// TI firmware returns all configs in one response regardless of requested index.
+  Future<List<ScanConfiguration>> _fetchAllConfigsData(int anyConfigIndex) async {
+    final requestChar = _findCharacteristic(NanoGatt.gscisReqScanConfData);
+    final responseChar =
+        _findNotifyCharacteristic(NanoGatt.gscisRetScanConfData);
+
+    if (requestChar == null || responseChar == null) {
+      _logger.warning('[CONFIG] Config data characteristics not found',
+          tag: 'BLE');
+      return [];
+    }
+
+    final receiver = MultiPacketReceiver();
+    final completer = Completer<List<int>>();
+    late StreamSubscription<List<int>> subscription;
+
+    subscription = responseChar.onValueReceived.listen((data) {
+      if (data.isEmpty) return;
+
+      _logger.debug(
+          '[CONFIG] Config data packet: ${data.map((b) => '0x${b.toRadixString(16).padLeft(2, '0')}').join(' ')}',
+          tag: 'BLE');
+
+      receiver.onPacketReceived(data);
+      if (receiver.isComplete && !completer.isCompleted) {
+        completer.complete(receiver.data);
+      }
+    });
+
+    try {
+      await responseChar.setNotifyValue(true);
+      await Future.delayed(const Duration(milliseconds: 100));
+
+      // Request config data - TI returns ALL configs regardless of index
+      final indexBytes = [anyConfigIndex & 0xFF, (anyConfigIndex >> 8) & 0xFF];
+      await requestChar.write(indexBytes, withoutResponse: false);
+
+      final rawData = await completer.future.timeout(
+        const Duration(seconds: 10),
+        onTimeout: () => <int>[],
+      );
+
+      subscription.cancel();
+
+      if (rawData.isEmpty) {
+        _logger.warning('[CONFIG] Empty config data response', tag: 'BLE');
+        return [];
+      }
+
+      return _parseAllConfigsData(rawData);
+    } catch (e) {
+      _logger.error('[CONFIG] Failed to fetch config data: $e', tag: 'BLE');
+      subscription.cancel();
+      return [];
+    }
+  }
+
+  /// Fetches configuration data for a specific config index.
+  /// Used by getActiveScanConfiguration().
+  Future<ScanConfiguration?> _fetchConfigData(int configIndex) async {
+    final configs = await _fetchAllConfigsData(configIndex);
+    return configs.where((c) => c.index == configIndex).firstOrNull;
+  }
+
+  /// Parses raw config data bytes into List of ScanConfigurations.
+  ///
+  /// TI uses "tpl" (Troy's Packing Library) for serialization.
+  /// Response contains ALL configs concatenated, each with its own tpl header.
+  ///
+  /// TPL Header structure:
+  ///   Offset 0-3:   "tpl\0" magic
+  ///   Offset 4-7:   size (LE uint32)
+  ///   Offset 8+:    format string (null-terminated)
+  ///   After format: length values for c# arrays
+  ///   After lengths: actual struct data
+  List<ScanConfiguration> _parseAllConfigsData(List<int> data) {
+    // DEBUG: Dump first 100 bytes as hex for analysis
+    final hexDump = data
+        .take(100)
+        .map((b) => '0x${b.toRadixString(16).padLeft(2, '0')}')
+        .join(' ');
+    _logger.debug('[CONFIG] Raw data (${data.length}B): $hexDump', tag: 'BLE');
+
+    // Also dump as ASCII for name inspection
+    final asciiDump = data
+        .take(80)
+        .map((b) => (b >= 32 && b < 127) ? String.fromCharCode(b) : '.')
+        .join();
+    _logger.debug('[CONFIG] ASCII: $asciiDump', tag: 'BLE');
+
+    // Check for TI serialized format (starts with "tpl\0")
+    final isSerializedFormat = data.length >= 4 &&
+        data[0] == 0x74 && // 't'
+        data[1] == 0x70 && // 'p'
+        data[2] == 0x6c && // 'l'
+        data[3] == 0x00; // '\0'
+
+    final configs = <ScanConfiguration>[];
+
+    if (isSerializedFormat) {
+      _logger.debug('[CONFIG] Detected TI tpl serialized format', tag: 'BLE');
+
+      // Parse ALL tpl blocks in response
+      int offset = 0;
+      while (offset < data.length - 4) {
+        // Check for tpl magic at current offset
+        if (data[offset] == 0x74 &&
+            data[offset + 1] == 0x70 &&
+            data[offset + 2] == 0x6c &&
+            data[offset + 3] == 0x00) {
+          // Parse tpl header
+          final tplSize = _parseUint32LE(data, offset + 4);
+
+          // Find end of format string (null-terminated)
+          int formatEnd = offset + 8;
+          while (formatEnd < data.length && data[formatEnd] != 0x00) {
+            formatEnd++;
+          }
+
+          // Extract format string for validation
+          final formatString = String.fromCharCodes(
+              data.sublist(offset + 8, formatEnd));
+          formatEnd++; // Skip null terminator
+
+          // Only parse config metadata blocks with format S(cvc#c#vc)
+          // Skip scan sections blocks with format S(ccvvvv)# or similar
+          if (!formatString.startsWith('S(cvc#c#vc)')) {
+            _logger.debug(
+                '[CONFIG] Skipping non-config block at $offset (format: $formatString)',
+                tag: 'BLE');
+            offset += tplSize;
+            continue;
+          }
+
+          // After format string: length values for c# arrays
+          // Typically: 4 bytes for serial length (8), 4 bytes for name length (40)
+          final serialLen =
+              formatEnd + 4 <= data.length ? _parseUint32LE(data, formatEnd) : 8;
+          final nameLen = formatEnd + 8 <= data.length
+              ? _parseUint32LE(data, formatEnd + 4)
+              : 40;
+
+          // Data starts after header + format + lengths
+          final dataStart = formatEnd + 8;
+
+          // Parse scan type (first byte of data)
+          int scanType = 0;
+          if (dataStart < data.length) {
+            scanType = data[dataStart];
+          }
+
+          // Parse config index (bytes 1-2 of data, uint16 LE)
+          int configIdx = 0;
+          if (dataStart + 2 < data.length) {
+            configIdx = data[dataStart + 1] | (data[dataStart + 2] << 8);
+          }
+
+          // Parse serial number (starts at dataStart + 3)
+          final serialStart = dataStart + 3;
+
+          // Parse config name (starts after serial)
+          String name = 'Config $configIdx';
+          final nameStart = serialStart + serialLen;
+          if (nameStart + nameLen <= data.length) {
+            final nameBytes = data.sublist(nameStart, nameStart + nameLen);
+            final nullIndex = nameBytes.indexOf(0);
+            final effectiveLength = nullIndex == -1 ? nameLen : nullIndex;
+            final parsedName =
+                String.fromCharCodes(nameBytes.sublist(0, effectiveLength))
+                    .trim();
+            if (parsedName.isNotEmpty) {
+              name = parsedName;
+            }
+          }
+
+          // Default wavelength/pattern values (TODO: parse from tpl data)
+          const double startWavelength = 900.0;
+          const double endWavelength = 1700.0;
+          const int numPatterns = 228;
+          const int numRepeats = 6;
+          const double resolution = 10.0;
+
+          final scanTypeName = scanType == 0 ? 'Column' : (scanType == 1 ? 'Hadamard' : 'Unknown');
+          _logger.debug(
+              '[CONFIG] tpl block at $offset: size=$tplSize, configIdx=$configIdx, name="$name", type=$scanTypeName',
+              tag: 'BLE');
+
+          // Extract raw data for this config block
+          // tplSize includes the 4-byte magic, so total block = tplSize
+          final blockEnd = offset + tplSize;
+          final blockData = blockEnd <= data.length
+              ? data.sublist(offset, blockEnd)
+              : data.sublist(offset);
+
+          configs.add(ScanConfiguration(
+            index: configIdx,
+            name: name,
+            rawData: Uint8List.fromList(blockData),
+            numPatterns: numPatterns,
+            numRepeats: numRepeats,
+            startWavelength: startWavelength,
+            endWavelength: endWavelength,
+            resolution: resolution,
+          ));
+
+          _logger.info(
+              '[CONFIG] Parsed: "$name" ($scanTypeName) | ${startWavelength.toInt()}-${endWavelength.toInt()} nm | $numPatterns patterns',
+              tag: 'BLE');
+
+          // Move to next tpl block (tplSize includes magic bytes)
+          offset += tplSize;
+        } else {
+          offset++;
+        }
+      }
+    } else {
+      // Legacy raw struct format (mock data) - single config
+      _logger.debug('[CONFIG] Using legacy raw struct format', tag: 'BLE');
+
+      String name = 'Config 0';
+      int scanType = 0;
+      double startWavelength = 900.0;
+      double endWavelength = 1700.0;
+      int numPatterns = 228;
+      int numRepeats = 6;
+
+      if (data.length >= 40) {
+        final nameBytes = data.sublist(0, 40);
+        final nullIndex = nameBytes.indexOf(0);
+        final effectiveLength = nullIndex == -1 ? 40 : nullIndex;
+        name =
+            String.fromCharCodes(nameBytes.sublist(0, effectiveLength)).trim();
+        if (name.isEmpty) name = 'Config 0';
+      }
+
+      if (data.length > 40) {
+        scanType = data[40];
+      }
+
+      if (data.length >= 51) {
+        startWavelength = _parseFloatLE(data, 43);
+        endWavelength = _parseFloatLE(data, 47);
+      }
+
+      if (data.length >= 57) {
+        numPatterns = (data[52] << 8) | data[51];
+        numRepeats = (data[56] << 8) | data[55];
+      }
+
+      double resolution = 10.0;
+      if (numPatterns > 0 && endWavelength > startWavelength) {
+        resolution = (endWavelength - startWavelength) / numPatterns;
+      }
+
+      final scanTypeName = scanType == 0 ? 'Column' : (scanType == 1 ? 'Hadamard' : 'Unknown');
+      _logger.info(
+          '[CONFIG] Parsed: "$name" ($scanTypeName) | ${startWavelength.toInt()}-${endWavelength.toInt()} nm | $numPatterns patterns',
+          tag: 'BLE');
+
+      configs.add(ScanConfiguration(
+        index: 0,
+        name: name,
+        rawData: Uint8List.fromList(data),
+        numPatterns: numPatterns,
+        numRepeats: numRepeats,
+        startWavelength: startWavelength,
+        endWavelength: endWavelength,
+        resolution: resolution,
+      ));
+    }
+
+    return configs;
+  }
+
+  /// Parses a little-endian uint32 from bytes at the given offset.
+  int _parseUint32LE(List<int> data, int offset) {
+    if (data.length < offset + 4) return 0;
+    return data[offset] |
+        (data[offset + 1] << 8) |
+        (data[offset + 2] << 16) |
+        (data[offset + 3] << 24);
+  }
+
+  /// Parses a little-endian float from bytes at the given offset.
+  double _parseFloatLE(List<int> data, int offset) {
+    if (data.length < offset + 4) return 0.0;
+    final bytes = Uint8List.fromList(data.sublist(offset, offset + 4));
+    final byteData = ByteData.view(bytes.buffer);
+    return byteData.getFloat32(0, Endian.little);
   }
 
   @override
@@ -1100,7 +1531,8 @@ class BleNirScanService implements NirScanService {
     // TI SDK shows config index is at bytes [1] and [2] of each config list entry
     _logger.info('[SCAN] Fetching config list to get valid indices...',
         tag: 'BLE');
-    final validConfigIndices = await _fetchConfigIndices();
+    final validConfigIndices =
+        await _fetchConfigIndices(expectedCount: numConfigs);
 
     if (validConfigIndices.isEmpty) {
       _logger.warning('[SCAN] Could not fetch config indices, using fallback',
@@ -1186,18 +1618,25 @@ class BleNirScanService implements NirScanService {
   /// Fetches the list of valid scan configuration indices from the device.
   /// Uses GSCIS_REQ_STORED_CONF_LIST / GSCIS_RET_STORED_CONF_LIST protocol.
   /// Returns list of config indices (from bytes [1] and [2] of each entry).
-  Future<List<int>> _fetchConfigIndices() async {
+  ///
+  /// [expectedCount] - if provided, wait until this many indices are received.
+  /// [timeoutMs] - maximum time to wait for responses (default 3000ms).
+  Future<List<int>> _fetchConfigIndices({
+    int? expectedCount,
+    int timeoutMs = 3000,
+  }) async {
     final requestChar = _findCharacteristic(NanoGatt.gscisReqStoredConfList);
     final responseChar =
         _findNotifyCharacteristic(NanoGatt.gscisRetStoredConfList);
 
     if (requestChar == null || responseChar == null) {
-      _logger.warning('[SCAN] Config list characteristics not found',
+      _logger.warning('[CONFIG] Config list characteristics not found',
           tag: 'BLE');
       return [];
     }
 
     final configIndices = <int>[];
+    final completer = Completer<List<int>>();
     late StreamSubscription<List<int>> subscription;
 
     // Set up listener for config list responses
@@ -1205,14 +1644,21 @@ class BleNirScanService implements NirScanService {
       if (data.isEmpty) return;
 
       _logger.debug(
-          '[SCAN] Config list packet: ${data.map((b) => '0x${b.toRadixString(16).padLeft(2, '0')}').join(' ')}',
+          '[CONFIG] Config list packet: ${data.map((b) => '0x${b.toRadixString(16).padLeft(2, '0')}').join(' ')}',
           tag: 'BLE');
 
       // TI SDK format: byte[0] = packet index, byte[1-2] = config index (little-endian)
       if (data.length >= 3) {
         final configIndex = (data[2] << 8) | (data[1] & 0xFF);
         configIndices.add(configIndex);
-        _logger.info('[SCAN] Found config index: $configIndex', tag: 'BLE');
+        _logger.info('[CONFIG] Found config index: $configIndex', tag: 'BLE');
+
+        // Complete early if we've received expected number of configs
+        if (expectedCount != null &&
+            configIndices.length >= expectedCount &&
+            !completer.isCompleted) {
+          completer.complete(configIndices);
+        }
       }
     });
 
@@ -1221,16 +1667,26 @@ class BleNirScanService implements NirScanService {
       await responseChar.setNotifyValue(true);
       await Future.delayed(const Duration(milliseconds: 100));
 
+      _logger.debug('[CONFIG] Requesting config list...', tag: 'BLE');
+
       // Request config list
       await requestChar.write([0x00], withoutResponse: false);
 
-      // Wait for responses (multi-packet)
-      await Future.delayed(const Duration(milliseconds: 1000));
+      // Wait for responses with timeout
+      await completer.future.timeout(
+        Duration(milliseconds: timeoutMs),
+        onTimeout: () {
+          _logger.debug(
+              '[CONFIG] Config list timeout after ${timeoutMs}ms, got ${configIndices.length} indices',
+              tag: 'BLE');
+          return configIndices;
+        },
+      );
 
       subscription.cancel();
       return configIndices;
     } catch (e) {
-      _logger.error('[SCAN] Failed to fetch config indices: $e', tag: 'BLE');
+      _logger.error('[CONFIG] Failed to fetch config indices: $e', tag: 'BLE');
       subscription.cancel();
       return [];
     }
