@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:spectriem_app/services/ble/mock_nir_scan_service.dart';
 import 'package:spectriem_app/services/ble/nir_scan_service.dart';
@@ -113,6 +115,20 @@ void main() {
         final config = await service.getActiveScanConfiguration();
 
         expect(config.name, isNotEmpty);
+      });
+    });
+
+    group('calibration', () {
+      test('getCalibrationData returns data with spectrumCoefficients',
+          () async {
+        await service.connect('mock-device-1');
+
+        final result = await service.getCalibrationData();
+
+        expect(result.spectrumCoefficients, isA<Uint8List>());
+        expect(result.spectrumCoefficients.length, equals(48));
+        expect(result.coefficients, isA<Uint8List>());
+        expect(result.matrix, isA<Uint8List>());
       });
     });
 

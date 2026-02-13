@@ -65,6 +65,10 @@ class IntegrationLogger {
     log(LogCategory.ble, message);
   }
 
+  void cal(String message) {
+    log(LogCategory.cal, message);
+  }
+
   void state(String oldState, String newState) {
     log(LogCategory.state, '$oldState -> $newState');
   }

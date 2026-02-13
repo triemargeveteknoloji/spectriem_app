@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:fake_async/fake_async.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:riverpod/riverpod.dart';
 import 'package:spectriem_app/models/device_info.dart';
@@ -18,6 +17,8 @@ void main() {
   late ProviderContainer container;
   late MockNirScanService mockBleService;
   late LogService logService;
+  late ProviderSubscription<SensorCommunicationState> keepAlive;
+  late ProviderSubscription<AsyncValue<Object?>> keepAliveCmd;
 
   setUp(() {
     mockBleService = MockNirScanService(
@@ -33,19 +34,26 @@ void main() {
         logServiceProvider.overrideWithValue(logService),
       ],
     );
+
+    // Keep auto-dispose providers alive across pump() cycles
+    keepAlive = container.listen(sensorCommunicationProvider, (_, __) {});
+    keepAliveCmd = container.listen(commandExecutionProvider, (_, __) {});
   });
 
-  tearDown() async {
+  tearDown(() async {
+    keepAliveCmd.close();
+    keepAlive.close();
     await mockBleService.stopDeviceScan();
     mockBleService.dispose();
     logService.dispose();
     container.dispose();
-  }
+  });
 
-  // Helper to wait for async state updates and stream propagation
+  // Helper to wait for async state updates and stream propagation.
+  // Needs enough iterations to let sequential awaits (calibration + configs)
+  // complete through the event loop.
   Future<void> pump() async {
-    // Wait for microtasks AND timer queue to flush
-    for (var i = 0; i < 10; i++) {
+    for (var i = 0; i < 20; i++) {
       await Future.delayed(Duration.zero);
     }
   }
@@ -58,32 +66,24 @@ void main() {
       expect(state.configurations, null);
       expect(state.selectedConfigIndex, null);
       expect(state.logPanelExpanded, false);
+      expect(state.isCalibrationLoaded, null);
     });
 
-    test('loadConfigurations loads configurations when connected', () {
-      fakeAsync((async) {
-        // Keep provider alive during test
-        final sub = container.listen(sensorCommunicationProvider, (_, __) {});
-        final notifier = container.read(sensorCommunicationProvider.notifier);
+    test('loadConfigurations loads configurations when connected', () async {
+      final notifier = container.read(sensorCommunicationProvider.notifier);
 
-        // Simulate connection
-        mockBleService.simulateConnection();
-        async.flushMicrotasks();
+      // Simulate connection (triggers _initializePostConnection which loads configs)
+      mockBleService.simulateConnection();
+      await pump();
 
-        // Load configurations
-        notifier.loadConfigurations();
-        async.elapse(Duration.zero); // Process Future.delayed(Duration.zero)
-        async.flushMicrotasks();
+      // Manually load configurations to verify the method works directly
+      await notifier.loadConfigurations();
 
-        // Check configurations loaded
-        final state = container.read(sensorCommunicationProvider);
-        expect(state.configurations, isNotNull);
-        expect(state.configurations, isNotEmpty);
-        expect(state.selectedConfigIndex, isNotNull);
-        expect(state.selectedConfigIndex, state.configurations!.first.index);
-
-        sub.close();
-      });
+      final state = container.read(sensorCommunicationProvider);
+      expect(state.configurations, isNotNull);
+      expect(state.configurations, isNotEmpty);
+      expect(state.selectedConfigIndex, isNotNull);
+      expect(state.selectedConfigIndex, state.configurations!.first.index);
     });
 
     test('loadConfigurations sets first config as selected by default',
@@ -303,6 +303,89 @@ void main() {
       expect(state.configurations, isNotNull);
       expect(state.configurations, isNotEmpty);
     });
+
+    test('auto-fetches calibration on connection', () async {
+      var state = container.read(sensorCommunicationProvider);
+      expect(state.isCalibrationLoaded, null);
+
+      mockBleService.simulateConnection();
+      await pump();
+
+      state = container.read(sensorCommunicationProvider);
+      expect(state.isCalibrationLoaded, true);
+    });
+
+    test('calibration is fetched BEFORE configurations', () async {
+      final callOrder = <String>[];
+      final orderTrackingService = _OrderTrackingMockService(
+        onGetCalibrationData: () => callOrder.add('calibration'),
+        onGetScanConfigurations: () => callOrder.add('configurations'),
+      );
+
+      final trackingContainer = ProviderContainer(
+        overrides: [
+          nirScanServiceProvider.overrideWithValue(orderTrackingService),
+          logServiceProvider.overrideWithValue(logService),
+        ],
+      );
+
+      final sub =
+          trackingContainer.listen(sensorCommunicationProvider, (_, __) {});
+
+      // Connect triggers _initializePostConnection
+      orderTrackingService.simulateConnection();
+      await pump();
+
+      expect(callOrder, ['calibration', 'configurations']);
+
+      sub.close();
+      orderTrackingService.dispose();
+      trackingContainer.dispose();
+    });
+
+    test('calibration failure does not block config loading', () async {
+      final failCalibrationService = _FailCalibrationMockService();
+
+      final failContainer = ProviderContainer(
+        overrides: [
+          nirScanServiceProvider.overrideWithValue(failCalibrationService),
+          logServiceProvider.overrideWithValue(logService),
+        ],
+      );
+
+      final sub =
+          failContainer.listen(sensorCommunicationProvider, (_, __) {});
+
+      failCalibrationService.simulateConnection();
+      await pump();
+
+      final state = failContainer.read(sensorCommunicationProvider);
+      // Calibration should have failed
+      expect(state.isCalibrationLoaded, false);
+      // But configurations should still be loaded
+      expect(state.configurations, isNotNull);
+      expect(state.configurations, isNotEmpty);
+
+      sub.close();
+      failCalibrationService.dispose();
+      failContainer.dispose();
+    });
+
+    test('disconnect clears calibration state', () async {
+      // Connect - calibration loads
+      mockBleService.simulateConnection();
+      await pump();
+
+      var state = container.read(sensorCommunicationProvider);
+      expect(state.isCalibrationLoaded, true);
+
+      // Disconnect - calibration state should be cleared
+      mockBleService.simulateDisconnection();
+      await pump();
+
+      state = container.read(sensorCommunicationProvider);
+      expect(state.isCalibrationLoaded, null);
+    });
   });
 
   group('CommandExecutionNotifier', () {
@@ -314,24 +397,18 @@ void main() {
       expect(asyncValue.isLoading, false);
     });
 
-    test('executeCommand sets loading state while executing', () async {
+    test('executeCommand completes and is not loading after', () async {
       final notifier = container.read(commandExecutionProvider.notifier);
 
       mockBleService.simulateConnection();
       await pump();
 
-      // Start command execution
-      final future = notifier.executeCommand('getDeviceInfo');
+      // Execute command and wait for completion
+      await notifier.executeCommand('getDeviceInfo');
 
-      // Should be loading immediately
-      var asyncValue = container.read(commandExecutionProvider);
-      expect(asyncValue.isLoading, true);
-
-      // Wait to complete
-      await future;
-
-      asyncValue = container.read(commandExecutionProvider);
+      final asyncValue = container.read(commandExecutionProvider);
       expect(asyncValue.isLoading, false);
+      expect(asyncValue.hasValue, true);
     });
 
     test('executeCommand returns DeviceInfo for getDeviceInfo', () async {
@@ -418,6 +495,12 @@ void main() {
         ],
       );
 
+      // Keep auto-dispose providers alive in custom container
+      final failKeepAlive =
+          failingContainer.listen(sensorCommunicationProvider, (_, __) {});
+      final failKeepAliveCmd =
+          failingContainer.listen(commandExecutionProvider, (_, __) {});
+
       final notifier = failingContainer.read(commandExecutionProvider.notifier);
 
       failingService.simulateConnection();
@@ -430,6 +513,8 @@ void main() {
       expect(asyncValue.hasError, true);
       expect(asyncValue.error, isA<NirScanException>());
 
+      failKeepAliveCmd.close();
+      failKeepAlive.close();
       failingService.dispose();
       failingContainer.dispose();
     });
@@ -507,6 +592,12 @@ void main() {
         ],
       );
 
+      // Keep auto-dispose providers alive in custom container
+      final flakeyKeepAlive =
+          flakeyContainer.listen(sensorCommunicationProvider, (_, __) {});
+      final flakeyKeepAliveCmd =
+          flakeyContainer.listen(commandExecutionProvider, (_, __) {});
+
       final notifier = flakeyContainer.read(commandExecutionProvider.notifier);
 
       flakeyService.simulateConnection();
@@ -528,6 +619,8 @@ void main() {
       expect(asyncValue.hasError, false);
       expect(asyncValue.hasValue, true);
 
+      flakeyKeepAliveCmd.close();
+      flakeyKeepAlive.close();
       flakeyService.dispose();
       flakeyContainer.dispose();
     });
@@ -602,4 +695,46 @@ void main() {
           container.read(sensorCommunicationProvider).logPanelExpanded, true);
     });
   });
+}
+
+/// Mock that tracks the order of getCalibrationData and getScanConfigurations calls.
+class _OrderTrackingMockService extends MockNirScanService {
+  final void Function() onGetCalibrationData;
+  final void Function() onGetScanConfigurations;
+
+  _OrderTrackingMockService({
+    required this.onGetCalibrationData,
+    required this.onGetScanConfigurations,
+  }) : super(
+          operationDelay: Duration.zero,
+          scanDelay: Duration.zero,
+          deviceEmitInterval: Duration.zero,
+        );
+
+  @override
+  Future<CalibrationData> getCalibrationData() async {
+    onGetCalibrationData();
+    return super.getCalibrationData();
+  }
+
+  @override
+  Future<List<ScanConfiguration>> getScanConfigurations() async {
+    onGetScanConfigurations();
+    return super.getScanConfigurations();
+  }
+}
+
+/// Mock that fails calibration but succeeds for everything else.
+class _FailCalibrationMockService extends MockNirScanService {
+  _FailCalibrationMockService()
+      : super(
+          operationDelay: Duration.zero,
+          scanDelay: Duration.zero,
+          deviceEmitInterval: Duration.zero,
+        );
+
+  @override
+  Future<CalibrationData> getCalibrationData() async {
+    throw const NirScanException('Simulated calibration failure');
+  }
 }

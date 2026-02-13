@@ -97,16 +97,39 @@ if (data[0] == 0x00) {
 
 | Code | Meaning |
 |------|---------|
-| 0xFF | Success |
+| 0xFF | Success (scan index in data[1:5]) |
 | 0x00 | Scan in progress |
-| 0x01 | Lamp power failure |
-| 0x02 | Scan timeout |
-| 0x03 | Configuration error |
+| 0x01 | **Lamp power failure** |
+| 0x02 | ADC overflow/saturation |
+| 0x03 | Pattern stream error |
+| 0x04 | DLP subsystem failure |
 
 ## Error Status Flags (GGIS_ERROR_STATUS)
 
 | Bit | Flag | Meaning |
 |-----|------|---------|
-| 0x80 | TMP006_ERROR | Temperature sensor error |
-| 0x08 | EEPROM_ERROR | EEPROM communication error |
-| 0x04 | SPEC_LIB_ERROR | Spectrum library error |
+| 0x001 | SCAN_ERROR | Scan error (see scan result codes) |
+| 0x002 | ADC_ERROR | ADC communication error |
+| 0x004 | SD_CARD_ERROR | SD card read/write error |
+| 0x008 | EEPROM_ERROR | EEPROM communication error |
+| 0x010 | BT_ERROR | Bluetooth stack error |
+| 0x020 | SPEC_LIB_ERROR | Spectrum library error |
+| 0x040 | HW_ERROR | General hardware error |
+| 0x080 | TMP006_ERROR | Temperature sensor error |
+| 0x100 | HDC1000_ERROR | Humidity sensor error |
+| 0x200 | BATTERY_ERROR | Battery discharged |
+| 0x400 | MEMORY_ERROR | Memory allocation error |
+| 0x800 | UART_ERROR | UART communication error |
+
+## Calibration Timing
+
+> **ONEMLI (TI User's Guide s.53-57):** Kalibrasyon verileri **her cihaz
+> baglantiginda** VE **her yeni tarama oncesinde** cekilmelidir.
+> Ayni kural scan konfigurasyonlari icin de gecerlidir.
+>
+> Kalibrasyon UC adimdan olusur:
+> 1. Spectrum Calibration Coefficients (wavelength-to-pixel polynomial)
+> 2. Reference Calibration Coefficients
+> 3. Reference Calibration Matrix
+>
+> Detayli karsilastirma: `.claude/research/ble-workflow-comparison.md`

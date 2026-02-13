@@ -69,18 +69,19 @@ Bağlantı sonrası aşağıdaki karakteristiklere sırayla subscribe olunmalıd
 
 ```dart
 final subscriptionOrder = [
-  'GCIS_RET_REF_CAL_COEFF',      // 1
-  'GCIS_RET_REF_CAL_MATRIX',     // 2
-  'GSDIS_START_SCAN',            // 3
-  'GSDIS_RET_SCAN_NAME',         // 4
-  'GSDIS_RET_SCAN_TYPE',         // 5
-  'GSDIS_RET_SCAN_DATE',         // 6
-  'GSDIS_RET_PKT_FMT_VER',       // 7
-  'GSDIS_RET_SER_SCAN_DATA',     // 8
-  'GSCIS_RET_STORED_CONF_LIST',  // 9
-  'GSDIS_SD_STORED_SCAN_IND',    // 10
-  'GSDIS_CLEAR_SCAN',            // 11
-  'GSCIS_RET_SCAN_CONF_DATA',    // 12
+  'GCIS_RET_SPEC_CAL_COEFF',     // 1  ← Spectrum kalibrasyon
+  'GCIS_RET_REF_CAL_COEFF',      // 2
+  'GCIS_RET_REF_CAL_MATRIX',     // 3
+  'GSDIS_START_SCAN',            // 4
+  'GSDIS_RET_SCAN_NAME',         // 5
+  'GSDIS_RET_SCAN_TYPE',         // 6
+  'GSDIS_RET_SCAN_DATE',         // 7
+  'GSDIS_RET_PKT_FMT_VER',       // 8
+  'GSDIS_RET_SER_SCAN_DATA',     // 9
+  'GSCIS_RET_STORED_CONF_LIST',  // 10
+  'GSDIS_SD_STORED_SCAN_IND',    // 11
+  'GSDIS_CLEAR_SCAN',            // 12
+  'GSCIS_RET_SCAN_CONF_DATA',    // 13
 ];
 
 for (final charName in subscriptionOrder) {
@@ -91,9 +92,16 @@ for (final charName in subscriptionOrder) {
 
 ---
 
-## 2. Kalibrasyon Verisi Alma (İlk Bağlantı)
+## 2. Kalibrasyon Verisi Alma
 
-İlk bağlantıda kalibrasyon verileri alınmalıdır. Bu veriler cihaza özgüdür ve spektrum hesaplamaları için gereklidir.
+> **ONEMLI (TI User's Guide s.53-57):** Kalibrasyon verileri **her cihaz baglantiginda**
+> VE **her yeni tarama oncesinde** cekilmelidir. Sadece ilk baglantigta degil!
+> Bu, cevresel degisikliklere (sicaklik/nem) karsi guncel kalibrasyon saglar.
+
+Kalibrasyon **3 ayrı veri** icerir (UC ADIM - hicbiri atlanmamali):
+1. **Spectrum Calibration Coefficients** - Wavelength-to-pixel polynomial (6 x float64 = 48 byte)
+2. **Reference Calibration Coefficients** - Factory referans tarama verileri
+3. **Reference Calibration Matrix** - Kalibrasyon matrisi
 
 ```
 ┌──────────────────────────┐
@@ -167,6 +175,10 @@ Reference Calibration: Serialized struct
 ---
 
 ## 3. Tarama Konfigürasyonu
+
+> **ONEMLI (TI User's Guide s.53-57):** Tum scan konfigurasyonlari **her cihaz
+> baglantiginda** VE **her tarama oncesinde** yeniden cekilmelidir.
+> Konfigurasyonlar cihaz uzerinde degismis olabilir.
 
 ### Mevcut Konfigürasyonları Listele
 
@@ -522,12 +534,38 @@ Future<void> deleteScan(ScanIndex index) async {
 
 ## Hata Durumları
 
+### Scan Result Kodları (GSDIS_START_SCAN notification)
+| Kod | Açıklama | Çözüm |
+|-----|----------|-------|
+| 0xFF | Başarılı | Scan index data[1:5]'te |
+| 0x01 | **Lamp power failure** | Cihazı yeniden başlat, güç kaynağını kontrol et |
+| 0x02 | ADC overflow/saturation | Exposure time'ı azalt |
+| 0x03 | Pattern stream error | Cihazı yeniden başlat |
+| 0x04 | DLP subsystem failure | Cihazı yeniden başlat |
+
+### GGIS Error Status Flags (0x43484104)
+| Bit | Flag | Açıklama |
+|-----|------|----------|
+| 0x001 | Scan Error | Tarama hatası (detay: scan result kodu) |
+| 0x002 | ADC Error | ADC iletişim hatası |
+| 0x004 | SD Card Error | SD kart okuma/yazma hatası |
+| 0x008 | EEPROM Error | EEPROM iletişim hatası |
+| 0x010 | Bluetooth Error | BLE stack hatası |
+| 0x020 | Spectrum Library Error | dlpspec kütüphane hatası |
+| 0x040 | Hardware Error | Genel donanım hatası |
+| 0x080 | TMP006 Error | Sıcaklık sensörü hatası |
+| 0x100 | HDC1000 Error | Nem sensörü hatası |
+| 0x200 | Battery Discharged | Batarya düşük |
+| 0x400 | Memory Error | Bellek hatası |
+| 0x800 | UART Error | UART iletişim hatası |
+
+### Genel Hata Durumları
 | Durum | Açıklama | Çözüm |
 |-------|----------|-------|
 | Timeout | Tarama yanıtı gelmedi | Timeout süresini artır, cihazı kontrol et |
 | 0xFF dışı notify | Tarama başarısız | Hata kodunu kontrol et, yeniden dene |
 | Multi-packet eksik | Veri transfer hatası | Bağlantıyı kontrol et, yeniden iste |
-| Kalibrasyon yok | İlk bağlantı tamamlanmadı | Kalibrasyon akışını tekrarla |
+| Kalibrasyon yok | Kalibrasyon tamamlanmadı | Kalibrasyon akışını tekrarla |
 
 ### Tarama Timeout Değerleri
 

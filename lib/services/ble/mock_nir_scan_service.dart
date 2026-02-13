@@ -357,6 +357,7 @@ class MockNirScanService implements NirScanService {
     _checkError('getCalibrationData');
 
     return CalibrationData(
+      spectrumCoefficients: Uint8List(48),
       coefficients: Uint8List(1024),
       matrix: Uint8List(2048),
     );

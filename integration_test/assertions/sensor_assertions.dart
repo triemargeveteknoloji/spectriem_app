@@ -3,6 +3,9 @@ import 'dart:typed_data';
 import 'package:spectriem_app/models/device_info.dart';
 import 'package:spectriem_app/models/device_status.dart';
 import 'package:spectriem_app/models/scan_data.dart';
+import 'package:spectriem_app/services/ble/nir_scan_service.dart';
+
+import '../observability/integration_logger.dart';
 
 /// Asserts that [value] is within the range [min, max] inclusive.
 void assertInRange(num value, num min, num max, String fieldName) {
@@ -148,7 +151,61 @@ void assertValidScanData(ScanData data) {
 }
 
 /// Validates calibration data from a real NIRScan Nano sensor.
-void assertValidCalibrationData(Uint8List coefficients, Uint8List matrix) {
-  assertMinLength(coefficients, 100, 'calibration coefficients');
-  assertMinLength(matrix, 100, 'calibration matrix');
+///
+/// Validates all three calibration components:
+/// - Spectrum coefficients: polynomial for wavelength-to-pixel mapping (>= 48 bytes = 6 x float64)
+/// - Reference coefficients: calibration coefficients (>= 100 bytes)
+/// - Reference matrix: calibration matrix (>= 100 bytes)
+///
+/// [logger] is required for diagnostic output -- these logs are the primary
+/// remote debugging tool when running on a physical device.
+void assertValidCalibrationData(CalibrationData calData, IntegrationLogger logger) {
+  // Spectrum calibration coefficients: 6 x float64 = 48 bytes minimum
+  logger.cal(
+      '[ASSERT] Validating spectrum calibration coefficients: '
+      '${calData.spectrumCoefficients.length} bytes');
+
+  if (calData.spectrumCoefficients.length < 48) {
+    final hexDump = calData.spectrumCoefficients
+        .map((b) => b.toRadixString(16).padLeft(2, '0'))
+        .join(' ');
+    logger.cal(
+        '[ASSERT] FAIL: Spectrum cal coefficients too small: '
+        '${calData.spectrumCoefficients.length} bytes, expected >= 48 (6 x float64). '
+        'Raw hex: $hexDump');
+    throw AssertionError(
+      'Spectrum cal coefficients too small: '
+      '${calData.spectrumCoefficients.length} bytes, expected >= 48 (6 x float64)',
+    );
+  }
+  logger.cal(
+      '[ASSERT] Spectrum calibration coefficients VALID: '
+      '${calData.spectrumCoefficients.length} bytes >= 48');
+
+  // Reference calibration coefficients
+  logger.cal(
+      '[ASSERT] Validating reference coefficients: '
+      '${calData.coefficients.length} bytes');
+  assertMinLength(calData.coefficients, 100, 'calibration coefficients');
+  logger.cal(
+      '[ASSERT] Reference coefficients VALID: '
+      '${calData.coefficients.length} bytes >= 100');
+
+  // Reference calibration matrix
+  logger.cal(
+      '[ASSERT] Validating reference matrix: '
+      '${calData.matrix.length} bytes');
+  assertMinLength(calData.matrix, 100, 'calibration matrix');
+  logger.cal(
+      '[ASSERT] Reference matrix VALID: '
+      '${calData.matrix.length} bytes >= 100');
+
+  final totalBytes = calData.spectrumCoefficients.length +
+      calData.coefficients.length +
+      calData.matrix.length;
+  logger.cal(
+      '[ASSERT] All calibration data VALID: ${totalBytes}B total '
+      '(specCoeff=${calData.spectrumCoefficients.length}B, '
+      'refCoeff=${calData.coefficients.length}B, '
+      'refMatrix=${calData.matrix.length}B)');
 }

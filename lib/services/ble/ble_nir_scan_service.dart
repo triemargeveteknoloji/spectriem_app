@@ -176,6 +176,7 @@ class BleNirScanService implements NirScanService {
     _bleDevice = null;
     _services = null;
     _connectedDevice = null;
+    _invalidateCalibrationCache();
 
     _setConnectionState(NirConnectionState.disconnected);
   }
@@ -189,6 +190,7 @@ class BleNirScanService implements NirScanService {
     _connectedDevice = null;
     _bleDevice = null;
     _services = null;
+    _invalidateCalibrationCache();
     _setConnectionState(NirConnectionState.disconnected);
   }
 
@@ -459,21 +461,66 @@ class BleNirScanService implements NirScanService {
     await syncTime();
     _logger.info('[SCAN] Time synced successfully', tag: 'BLE');
 
-    // Check calibration data is available (required before scan)
-    final hasCalibration =
-        _cachedRefCalCoeff != null && _cachedRefCalMatrix != null;
-    if (!hasCalibration) {
-      _logger.warning(
-          '[SCAN] Calibration required! Call getCalibrationData() first.',
-          tag: 'BLE');
-      throw const CalibrationRequiredException();
+    // Re-fetch calibration data from device before every scan.
+    // Per TI User's Guide (DLPU030G), calibration must NOT be cached across scans
+    // because sensor conditions (temperature, etc.) change between scans.
+    if (!_skipCalibrationRefresh) {
+      _logger.info('[PRE-SCAN] Starting calibration refresh cycle', tag: 'CAL');
+      final calStopwatch = Stopwatch()..start();
+      _invalidateCalibrationCache();
+      _logger.info(
+          '[PRE-SCAN] Cache invalidated - will re-fetch all 3 calibration datasets',
+          tag: 'CAL');
+      try {
+        await _ensureCalibrationData();
+        calStopwatch.stop();
+        _logger.info(
+            '[PRE-SCAN] Calibration complete: specCoeff=${_cachedSpecCalCoeff?.length ?? 0}B, refCoeff=${_cachedRefCalCoeff?.length ?? 0}B, refMatrix=${_cachedRefCalMatrix?.length ?? 0}B (elapsed: ${calStopwatch.elapsedMilliseconds}ms)',
+            tag: 'CAL');
+      } catch (e) {
+        calStopwatch.stop();
+        _logger.error(
+            '[PRE-SCAN] Calibration refresh FAILED: $e - scan cannot proceed without fresh calibration data (elapsed: ${calStopwatch.elapsedMilliseconds}ms)',
+            tag: 'CAL');
+        rethrow;
+      }
+    } else {
+      // Test mode: verify cached calibration data is still available
+      final hasCalibration = _cachedSpecCalCoeff != null &&
+          _cachedRefCalCoeff != null &&
+          _cachedRefCalMatrix != null;
+      if (!hasCalibration) {
+        _logger.error(
+            '[PRE-SCAN] Calibration data missing (test mode, refresh skipped)',
+            tag: 'CAL');
+        throw const CalibrationRequiredException();
+      }
+      _logger.info(
+          '[PRE-SCAN] Using cached calibration (test mode) | SpecCoeff: ${_cachedSpecCalCoeff!.length}B | RefCoeff: ${_cachedRefCalCoeff!.length}B | Matrix: ${_cachedRefCalMatrix!.length}B',
+          tag: 'CAL');
     }
-    _logger.info(
-        '[SCAN] Calibration verified | Coeff: ${_cachedRefCalCoeff!.length}B | Matrix: ${_cachedRefCalMatrix!.length}B',
-        tag: 'BLE');
 
-    // Ensure active scan configuration is set (as per protocol Flow 8)
+    // Refresh scan configurations and ensure active config is set
     if (!_skipScanConfigCheck) {
+      // Refresh scan configurations from device before scanning
+      _logger.info(
+          '[PRE-SCAN] Refreshing scan configurations from device...',
+          tag: 'SCAN');
+      final configStopwatch = Stopwatch()..start();
+      try {
+        final configs = await getScanConfigurations();
+        configStopwatch.stop();
+        _logger.info(
+            '[PRE-SCAN] Config refresh complete: ${configs.length} configurations loaded (elapsed: ${configStopwatch.elapsedMilliseconds}ms)',
+            tag: 'SCAN');
+      } catch (e) {
+        configStopwatch.stop();
+        _logger.error(
+            '[PRE-SCAN] Config refresh FAILED: $e (elapsed: ${configStopwatch.elapsedMilliseconds}ms) - continuing with existing config',
+            tag: 'SCAN');
+      }
+
+      // Ensure active scan configuration is set (as per protocol Flow 8)
       _logger.info('[SCAN] Checking active scan configuration...', tag: 'BLE');
       await _ensureActiveScanConfig();
       _logger.info('[SCAN] Active scan configuration confirmed', tag: 'BLE');
@@ -791,11 +838,13 @@ class BleNirScanService implements NirScanService {
         tag: 'BLE');
     _logger.info('[SCAN] First 20 bytes: ${scanData.rawData.take(20).toList()}',
         tag: 'BLE');
+    if (scanData.rawData.length > 20) {
+      _logger.info(
+          '[SCAN] Last 20 bytes: ${scanData.rawData.skip(scanData.rawData.length - 20).take(20).toList()}',
+          tag: 'BLE');
+    }
     _logger.info(
-        '[SCAN] Last 20 bytes: ${scanData.rawData.skip(scanData.rawData.length - 20).take(20).toList()}',
-        tag: 'BLE');
-    _logger.info(
-        '[SCAN] Calibration available: coeff=${_cachedRefCalCoeff?.length ?? 0}B, matrix=${_cachedRefCalMatrix?.length ?? 0}B',
+        '[SCAN] Calibration available: specCoeff=${_cachedSpecCalCoeff?.length ?? 0}B, refCoeff=${_cachedRefCalCoeff?.length ?? 0}B, matrix=${_cachedRefCalMatrix?.length ?? 0}B',
         tag: 'BLE');
     _logger.info('[SCAN] =========================================',
         tag: 'BLE');
@@ -1322,11 +1371,28 @@ class BleNirScanService implements NirScanService {
   }
 
   // Calibration data cache
+  List<int>? _cachedSpecCalCoeff;
   List<int>? _cachedRefCalCoeff;
   List<int>? _cachedRefCalMatrix;
 
+  /// Invalidates all cached calibration data, forcing a re-fetch from device.
+  /// Per TI User's Guide, calibration must be re-fetched before every scan.
+  void _invalidateCalibrationCache() {
+    _logger.info(
+        '[PRE-SCAN] Invalidating calibration cache: specCoeff=${_cachedSpecCalCoeff != null}, refCoeff=${_cachedRefCalCoeff != null}, refMatrix=${_cachedRefCalMatrix != null}',
+        tag: 'CAL');
+    _cachedSpecCalCoeff = null;
+    _cachedRefCalCoeff = null;
+    _cachedRefCalMatrix = null;
+  }
+
   /// Sets calibration data directly (for testing only)
-  void setCalibrationDataForTesting(List<int> coefficients, List<int> matrix) {
+  void setCalibrationDataForTesting(
+    List<int> spectrumCoefficients,
+    List<int> coefficients,
+    List<int> matrix,
+  ) {
+    _cachedSpecCalCoeff = spectrumCoefficients;
     _cachedRefCalCoeff = coefficients;
     _cachedRefCalMatrix = matrix;
   }
@@ -1337,13 +1403,36 @@ class BleNirScanService implements NirScanService {
     _skipScanConfigCheck = true;
   }
 
+  /// Skip calibration refresh in performScan (for testing only).
+  /// When true, performScan uses cached calibration data instead of
+  /// re-fetching from BLE. Only use in tests that focus on non-calibration
+  /// aspects of performScan.
+  bool _skipCalibrationRefresh = false;
+  void skipCalibrationRefreshForTesting() {
+    _skipCalibrationRefresh = true;
+  }
+
   /// Ensures calibration data is available (fetches if not cached)
   Future<void> _ensureCalibrationData() async {
-    if (_cachedRefCalCoeff != null && _cachedRefCalMatrix != null) {
-      return; // Already cached
+    if (_cachedSpecCalCoeff != null &&
+        _cachedRefCalCoeff != null &&
+        _cachedRefCalMatrix != null) {
+      _logger.info(
+          '[CAL] All calibration data cached | SpecCoeff: ${_cachedSpecCalCoeff!.length}B | RefCoeff: ${_cachedRefCalCoeff!.length}B | Matrix: ${_cachedRefCalMatrix!.length}B',
+          tag: 'BLE');
+      return;
     }
 
-    // Fetch calibration coefficients
+    _logger.info(
+        '[CAL] Fetching calibration data (3-step) | Cached: spec=${_cachedSpecCalCoeff != null}, ref=${_cachedRefCalCoeff != null}, matrix=${_cachedRefCalMatrix != null}',
+        tag: 'BLE');
+
+    // Fetch spectrum calibration coefficients (per manual order: spectrum first)
+    if (_cachedSpecCalCoeff == null) {
+      _cachedSpecCalCoeff = await _fetchSpectrumCalibrationCoefficients();
+    }
+
+    // Fetch reference calibration coefficients
     if (_cachedRefCalCoeff == null) {
       _cachedRefCalCoeff = await _fetchCalibrationCoefficients();
     }
@@ -1351,6 +1440,78 @@ class BleNirScanService implements NirScanService {
     // Fetch calibration matrix
     if (_cachedRefCalMatrix == null) {
       _cachedRefCalMatrix = await _fetchCalibrationMatrix();
+    }
+
+    _logger.info(
+        '[CAL] All calibration data fetched | SpecCoeff: ${_cachedSpecCalCoeff!.length}B | RefCoeff: ${_cachedRefCalCoeff!.length}B | Matrix: ${_cachedRefCalMatrix!.length}B',
+        tag: 'BLE');
+  }
+
+  /// Fetches spectrum calibration coefficients (multi-packet)
+  /// Expected: 6 doubles (48 bytes) = p0-p4 polynomial + shift
+  Future<List<int>> _fetchSpectrumCalibrationCoefficients() async {
+    _logger.info('[CAL] Spectrum: Starting coefficient fetch (expected: 48B = 6 doubles)...',
+        tag: 'BLE');
+    final reqChar = _findCharacteristic(NanoGatt.gcisReqSpecCalCoeff);
+    final retChar = _findCharacteristic(NanoGatt.gcisRetSpecCalCoeff);
+
+    if (reqChar == null || retChar == null) {
+      _logger.error(
+          '[CAL] Spectrum: Characteristics not found! req=${reqChar != null}, ret=${retChar != null}',
+          tag: 'BLE');
+      throw NirScanException(
+          'Spectrum calibration coefficient characteristics not found');
+    }
+
+    _logger.info(
+        '[CAL] Spectrum: Characteristics found, setting up listener...',
+        tag: 'BLE');
+
+    final receiver = MultiPacketReceiver();
+    final completer = Completer<List<int>>();
+    int packetCount = 0;
+
+    final subscription = retChar.onValueReceived.listen((data) {
+      packetCount++;
+      final hex = data
+          .take(20)
+          .map((b) => '0x${b.toRadixString(16).padLeft(2, '0').toUpperCase()}')
+          .join(' ');
+      _logger.info(
+          '[CAL] Spectrum: Packet #$packetCount | ${data.length}B | $hex${data.length > 20 ? '...' : ''}',
+          tag: 'BLE');
+      receiver.onPacketReceived(data);
+      if (receiver.isComplete) {
+        _logger.info(
+            '[CAL] Spectrum: Data complete (${receiver.data.length} bytes, $packetCount packets)',
+            tag: 'BLE');
+        completer.complete(receiver.data);
+      }
+    });
+
+    _logger.info('[CAL] Spectrum: Requesting coefficients (write 0x00 to 410D)...',
+        tag: 'BLE');
+    await reqChar.write([0x00]);
+    _logger.info('[CAL] Spectrum: Request sent, waiting for response (timeout: 10s)...',
+        tag: 'BLE');
+
+    try {
+      final coeffData = await completer.future.timeout(
+        const Duration(seconds: 10),
+        onTimeout: () {
+          _logger.error(
+              '[CAL] Spectrum: TIMEOUT after 10s! Received $packetCount packets',
+              tag: 'BLE');
+          throw TimeoutException(
+              'Spectrum calibration coefficient fetch timeout');
+        },
+      );
+      _logger.info(
+          '[CAL] Spectrum: Fetch complete: ${coeffData.length} bytes ($packetCount packets)',
+          tag: 'BLE');
+      return coeffData;
+    } finally {
+      await subscription.cancel();
     }
   }
 
@@ -1494,8 +1655,16 @@ class BleNirScanService implements NirScanService {
   @override
   Future<CalibrationData> getCalibrationData() async {
     _ensureConnected();
+    _logger.info('[CAL] getCalibrationData() called', tag: 'BLE');
     await _ensureCalibrationData();
+    final totalBytes = _cachedSpecCalCoeff!.length +
+        _cachedRefCalCoeff!.length +
+        _cachedRefCalMatrix!.length;
+    _logger.info(
+        '[CAL] Returning calibration data | Total: ${totalBytes}B | SpecCoeff: ${_cachedSpecCalCoeff!.length}B | RefCoeff: ${_cachedRefCalCoeff!.length}B | Matrix: ${_cachedRefCalMatrix!.length}B',
+        tag: 'BLE');
     return CalibrationData(
+      spectrumCoefficients: Uint8List.fromList(_cachedSpecCalCoeff!),
       coefficients: Uint8List.fromList(_cachedRefCalCoeff!),
       matrix: Uint8List.fromList(_cachedRefCalMatrix!),
     );

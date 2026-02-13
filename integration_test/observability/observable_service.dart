@@ -195,11 +195,19 @@ class ObservableNirScanService implements NirScanService {
 
   @override
   Future<CalibrationData> getCalibrationData() async {
-    _logger.log(LogCategory.cal, 'Fetching calibration data...');
+    _logger.log(LogCategory.cal, 'Fetching calibration data (spectrum coeff + ref coeff + matrix)...');
     final data = await _delegate.getCalibrationData();
     _logger.log(LogCategory.cal, 'Calibration data received');
-    _logger.data('Coefficients size', '${data.coefficients.length} bytes');
-    _logger.data('Matrix size', '${data.matrix.length} bytes');
+    _logger.data('Spectrum coeff size', '${data.spectrumCoefficients.length} bytes');
+    _logger.data('Ref coefficients size', '${data.coefficients.length} bytes');
+    _logger.data('Ref matrix size', '${data.matrix.length} bytes');
+    if (data.spectrumCoefficients.isNotEmpty) {
+      final hexPreview = data.spectrumCoefficients
+          .take(16)
+          .map((b) => b.toRadixString(16).padLeft(2, '0'))
+          .join(' ');
+      _logger.data('Spectrum coeff hex preview', '$hexPreview...');
+    }
     return data;
   }
 

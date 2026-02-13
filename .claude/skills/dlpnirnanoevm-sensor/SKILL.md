@@ -151,18 +151,19 @@ Standard Bluetooth SIG servisi.
 ### Notification Subscription Sırası
 Bağlantı sonrası descriptor'lar bu sırayla yazılmalı:
 ```
-1. GCIS_RET_REF_CAL_COEFF
-2. GCIS_RET_REF_CAL_MATRIX
-3. GSDIS_START_SCAN
-4. GSDIS_RET_SCAN_NAME
-5. GSDIS_RET_SCAN_TYPE
-6. GSDIS_RET_SCAN_DATE
-7. GSDIS_RET_PKT_FMT_VER
-8. GSDIS_RET_SER_SCAN_DATA_STRUCT
-9. GSCIS_RET_STORED_CONF_LIST
-10. GSDIS_SD_STORED_SCAN_IND_LIST_DATA
-11. GSDIS_CLEAR_SCAN
-12. GSCIS_RET_SCAN_CONF_DATA
+1. GCIS_RET_SPEC_CAL_COEFF   ← Spectrum kalibrasyon (eksik olmamalı!)
+2. GCIS_RET_REF_CAL_COEFF
+3. GCIS_RET_REF_CAL_MATRIX
+4. GSDIS_START_SCAN
+5. GSDIS_RET_SCAN_NAME
+6. GSDIS_RET_SCAN_TYPE
+7. GSDIS_RET_SCAN_DATE
+8. GSDIS_RET_PKT_FMT_VER
+9. GSDIS_RET_SER_SCAN_DATA_STRUCT
+10. GSCIS_RET_STORED_CONF_LIST
+11. GSDIS_SD_STORED_SCAN_IND_LIST_DATA
+12. GSDIS_CLEAR_SCAN
+13. GSCIS_RET_SCAN_CONF_DATA
 → ACTION_NOTIFY_DONE broadcast
 ```
 
@@ -194,17 +195,27 @@ const String CCCD_UUID = "00002902-0000-1000-8000-00805f9b34fb";
 
 ### Tarama Başlatma
 ```
-1. setTime() → GDTS_TIME write
-2. (callback) → setStub(prefix) → GSDIS_SET_SCAN_NAME_STUB
-3. (callback) → requestRefCalCoefficients() (ilk bağlantıda)
-   VEYA startScan(saveToSD) → GSDIS_START_SCAN write
-4. Tarama tamamlandığında → GSDIS_START_SCAN notify (data[0] == 0xFF)
-5. Scan index alınır → requestScanName(index)
-6. → requestScanType(index)
-7. → requestScanDate(index)
-8. → requestPacketFormatVersion(index)
-9. → requestSerializedScanDataStruct(index)
-10. Multi-packet veri alımı → SCAN_DATA broadcast
+1. Kalibrasyon verileri al (her scan öncesi - manual s.53-57)
+2. Scan konfigürasyonları al (her scan öncesi - manual s.53-57)
+3. setTime() → GDTS_TIME write
+4. (callback) → setStub(prefix) → GSDIS_SET_SCAN_NAME_STUB
+5. startScan(saveToSD) → GSDIS_START_SCAN write
+6. Tarama tamamlandığında → GSDIS_START_SCAN notify (data[0] == 0xFF)
+7. Scan index alınır → requestScanName(index)
+8. → requestScanType(index)
+9. → requestScanDate(index)
+10. → requestPacketFormatVersion(index)
+11. → requestSerializedScanDataStruct(index)
+12. Multi-packet veri alımı → SCAN_DATA broadcast
+```
+
+### Scan Result Kodları
+```
+0xFF = Başarılı (scan index data[1:5]'te)
+0x01 = Lamp power failure (lamba gücü hatası)
+0x02 = ADC overflow/saturation
+0x03 = Pattern stream error
+0x04 = DLP subsystem failure
 ```
 
 ### Multi-Packet Veri Alımı

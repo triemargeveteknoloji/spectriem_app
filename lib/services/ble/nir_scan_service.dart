@@ -110,10 +110,12 @@ abstract class NirScanService {
 
 /// Calibration data from the device
 class CalibrationData {
+  final Uint8List spectrumCoefficients;
   final Uint8List coefficients;
   final Uint8List matrix;
 
   const CalibrationData({
+    required this.spectrumCoefficients,
     required this.coefficients,
     required this.matrix,
   });

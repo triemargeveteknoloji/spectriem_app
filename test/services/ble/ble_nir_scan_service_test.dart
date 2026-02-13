@@ -1025,8 +1025,12 @@ void main() {
         );
       });
 
-      test('throws CalibrationRequiredException when calibration not cached',
+      test(
+          'throws NirScanException when calibration characteristics not found',
           () async {
+        // performScan now always re-fetches calibration from BLE.
+        // If calibration characteristics are missing, _ensureCalibrationData
+        // throws NirScanException (not CalibrationRequiredException).
         final mockDevice = MockBluetoothDevice();
         final mockService = MockBluetoothService();
 
@@ -1047,7 +1051,7 @@ void main() {
                 predelay: anyNamed('predelay'), timeout: anyNamed('timeout')))
             .thenAnswer((_) async => 512);
 
-        // Minimal service setup - GDTS for time sync only
+        // Minimal service setup - GDTS for time sync only (no GCIS)
         when(mockService.uuid)
             .thenReturn(Guid('53455203-444c-5020-4e49-52204e616e6f'));
         final mockTimeChar = MockBluetoothCharacteristic();
@@ -1063,10 +1067,10 @@ void main() {
         await service.connect('AA:BB:CC:DD:EE:FF');
         await Future.delayed(const Duration(milliseconds: 50));
 
-        // Attempt scan without calibration
+        // Attempt scan - calibration re-fetch will fail (no GCIS characteristics)
         expect(
           () => service.performScan(),
-          throwsA(isA<CalibrationRequiredException>()),
+          throwsA(isA<NirScanException>()),
         );
       });
 
@@ -1134,18 +1138,28 @@ void main() {
         await service.connect('AA:BB:CC:DD:EE:FF');
 
         // Set calibration data for testing (required before scan)
-        service.setCalibrationDataForTesting([0x01], [0x02]);
+        service.setCalibrationDataForTesting([0x01], [0x01], [0x02]);
+        service.skipCalibrationRefreshForTesting();
         service.skipScanConfigCheckForTesting();
 
-        // Start scan - will timeout waiting for notification, but we only care about time sync
+        // Start scan - will eventually fail, but we only care about time sync
         final scanFuture = service.performScan();
         await Future.delayed(const Duration(milliseconds: 100));
 
         // Assert: time sync should have been called BEFORE scan started
         expect(timeSyncCalled, isTrue);
 
+        // Send error notification to stop scan cleanly (avoids "test failed after completed")
+        await Future.delayed(const Duration(milliseconds: 300));
+        startScanNotifyController.add([0x02, 0x00, 0x00, 0x00, 0x00]);
+        try {
+          await scanFuture;
+        } catch (_) {
+          // Expected - scan fails with ScanFailedException
+        }
+
         // Cleanup
-        startScanNotifyController.close();
+        await startScanNotifyController.close();
       });
 
       // TODO: Fix timing issues with mock notification streams
@@ -1212,13 +1226,15 @@ void main() {
         await Future.delayed(const Duration(milliseconds: 50));
 
         // Set calibration data for testing (required before scan)
-        service.setCalibrationDataForTesting([0x01], [0x02]);
+        service.setCalibrationDataForTesting([0x01], [0x01], [0x02]);
+        service.skipCalibrationRefreshForTesting();
         service.skipScanConfigCheckForTesting();
 
         // Start scan in background, will wait for notification
         final scanFuture = service.performScan(saveToSd: false);
 
-        await Future.delayed(const Duration(milliseconds: 50));
+        // Wait for scan to progress past the 200ms internal delay and write
+        await Future.delayed(const Duration(milliseconds: 400));
 
         // Verify write was called with [0x00] (save=false)
         verify(mockStartScanChar
@@ -1295,12 +1311,14 @@ void main() {
         await Future.delayed(const Duration(milliseconds: 50));
 
         // Set calibration data for testing (required before scan)
-        service.setCalibrationDataForTesting([0x01], [0x02]);
+        service.setCalibrationDataForTesting([0x01], [0x01], [0x02]);
+        service.skipCalibrationRefreshForTesting();
         service.skipScanConfigCheckForTesting();
 
         final scanFuture = service.performScan(saveToSd: true);
 
-        await Future.delayed(const Duration(milliseconds: 50));
+        // Wait for scan to progress past the 200ms internal delay and write
+        await Future.delayed(const Duration(milliseconds: 400));
 
         // Verify write was called with [0x01] (save=true)
         verify(mockStartScanChar
@@ -1377,12 +1395,14 @@ void main() {
         await Future.delayed(const Duration(milliseconds: 50));
 
         // Set calibration data for testing (required before scan)
-        service.setCalibrationDataForTesting([0x01], [0x02]);
+        service.setCalibrationDataForTesting([0x01], [0x01], [0x02]);
+        service.skipCalibrationRefreshForTesting();
         service.skipScanConfigCheckForTesting();
 
         final scanFuture = service.performScan();
 
-        await Future.delayed(const Duration(milliseconds: 50));
+        // Wait for scan to progress past the 200ms internal delay and write
+        await Future.delayed(const Duration(milliseconds: 400));
 
         // Emit error response (not 0xFF)
         startScanNotifyController.add([0x02, 0x00, 0x00, 0x00, 0x00]);
@@ -1590,13 +1610,14 @@ void main() {
         await Future.delayed(const Duration(milliseconds: 50));
 
         // Set calibration data for testing (required before scan)
-        service.setCalibrationDataForTesting([0x01], [0x02]);
+        service.setCalibrationDataForTesting([0x01], [0x01], [0x02]);
+        service.skipCalibrationRefreshForTesting();
         service.skipScanConfigCheckForTesting();
 
         final scanFuture = service.performScan();
 
-        // Wait for performScan to finish its 200ms delay and start listening
-        await Future.delayed(const Duration(milliseconds: 300));
+        // Wait for performScan to finish its 200ms delay, write scan cmd, and start listening
+        await Future.delayed(const Duration(milliseconds: 400));
 
         // Simulate scan complete notification: 0xFF + 4-byte scan index
         // Scan index = 0x00000001 (little-endian)
@@ -1651,6 +1672,508 @@ void main() {
         await retScanDateNotifyController.close();
         await retPktFmtVerNotifyController.close();
         await retSerScanDataNotifyController.close();
+      });
+
+      test(
+          'performScan invalidates calibration cache and re-fetches from BLE each call',
+          () async {
+        // This test verifies that performScan does NOT use cached calibration
+        // data. Per TI User's Guide, calibration must be re-fetched before
+        // every scan. We verify by checking that calibration BLE request
+        // characteristics are written to on each performScan call.
+        final mockDevice = MockBluetoothDevice();
+        final mockGdtsService = MockBluetoothService();
+        final mockGsdisService = MockBluetoothService();
+        final mockGcisService = MockBluetoothService();
+        final mockTimeChar = MockBluetoothCharacteristic();
+        final mockStartScanChar = MockBluetoothCharacteristic();
+
+        // Calibration characteristics
+        final mockReqSpecCoeffChar = MockBluetoothCharacteristic();
+        final mockRetSpecCoeffChar = MockBluetoothCharacteristic();
+        final mockReqCoeffChar = MockBluetoothCharacteristic();
+        final mockRetCoeffChar = MockBluetoothCharacteristic();
+        final mockReqMatrixChar = MockBluetoothCharacteristic();
+        final mockRetMatrixChar = MockBluetoothCharacteristic();
+
+        // Error/status characteristics for diagnostic reads
+        final mockErrStatusChar = createMockCharacteristic(
+          uuid: Guid('4348410a-444c-5020-4e49-52204e616e6f'),
+          read: true,
+          notify: false,
+          write: false,
+        );
+        final mockDevStatusChar = createMockCharacteristic(
+          uuid: Guid('43484109-444c-5020-4e49-52204e616e6f'),
+          read: true,
+          notify: false,
+          write: false,
+        );
+
+        // Stream controllers
+        final startScanNotifyController =
+            StreamController<List<int>>.broadcast();
+        final specCoeffNotifyController =
+            StreamController<List<int>>.broadcast();
+        final coeffNotifyController = StreamController<List<int>>.broadcast();
+        final matrixNotifyController = StreamController<List<int>>.broadcast();
+
+        var specCoeffWriteCount = 0;
+        var coeffWriteCount = 0;
+        var matrixWriteCount = 0;
+
+        // Device setup
+        when(mockDevice.remoteId)
+            .thenReturn(const DeviceIdentifier('AA:BB:CC:DD:EE:FF'));
+        when(mockDevice.platformName).thenReturn('NIRScan Nano');
+        when(mockDevice.connect(
+          timeout: anyNamed('timeout'),
+          autoConnect: anyNamed('autoConnect'),
+        )).thenAnswer((_) async {});
+        when(mockDevice.discoverServices()).thenAnswer(
+            (_) async => [mockGdtsService, mockGsdisService, mockGcisService]);
+        when(mockDevice.connectionState).thenAnswer(
+          (_) => Stream.value(BluetoothConnectionState.connected),
+        );
+        when(mockDevice.disconnect()).thenAnswer((_) async {});
+        when(mockDevice.requestMtu(any,
+                predelay: anyNamed('predelay'), timeout: anyNamed('timeout')))
+            .thenAnswer((_) async => 512);
+
+        // GDTS service for time sync
+        when(mockGdtsService.uuid)
+            .thenReturn(Guid('53455203-444c-5020-4e49-52204e616e6f'));
+        when(mockGdtsService.characteristics).thenReturn([mockTimeChar]);
+        when(mockTimeChar.uuid)
+            .thenReturn(Guid('4348410c-444c-5020-4e49-52204e616e6f'));
+        stubCharacteristicProperties(mockTimeChar, write: true, notify: false);
+        when(mockTimeChar.write(any,
+                withoutResponse: anyNamed('withoutResponse')))
+            .thenAnswer((_) async {});
+
+        // GSDIS service for scan
+        when(mockGsdisService.uuid)
+            .thenReturn(Guid('53455206-444c-5020-4e49-52204e616e6f'));
+        when(mockGsdisService.characteristics)
+            .thenReturn([mockStartScanChar, mockErrStatusChar, mockDevStatusChar]);
+        when(mockStartScanChar.uuid)
+            .thenReturn(Guid('4348411d-444c-5020-4e49-52204e616e6f'));
+        stubCharacteristicProperties(mockStartScanChar,
+            notify: true, write: true);
+        when(mockStartScanChar.write(any,
+                withoutResponse: anyNamed('withoutResponse')))
+            .thenAnswer((_) async {
+          // Send scan error notification shortly after write completes.
+          // This ensures writeComplete=true is set before the notification
+          // arrives in performScan's listener.
+          Future.delayed(const Duration(milliseconds: 50), () {
+            startScanNotifyController
+                .add([0x02, 0x00, 0x00, 0x00, 0x00]);
+          });
+        });
+        when(mockStartScanChar.setNotifyValue(true))
+            .thenAnswer((_) async => true);
+        when(mockStartScanChar.setNotifyValue(false))
+            .thenAnswer((_) async => true);
+        when(mockStartScanChar.onValueReceived)
+            .thenAnswer((_) => startScanNotifyController.stream);
+        when(mockStartScanChar.lastValueStream)
+            .thenAnswer((_) => startScanNotifyController.stream);
+        when(mockStartScanChar.isNotifying).thenReturn(true);
+
+        // Error/device status reads
+        when(mockErrStatusChar.read()).thenAnswer((_) async => [0x00, 0x00]);
+        when(mockDevStatusChar.read()).thenAnswer((_) async => [0x00, 0x00]);
+
+        // GCIS service for calibration
+        when(mockGcisService.uuid)
+            .thenReturn(Guid('53455204-444c-5020-4e49-52204e616e6f'));
+        when(mockGcisService.characteristics).thenReturn([
+          mockReqSpecCoeffChar,
+          mockRetSpecCoeffChar,
+          mockReqCoeffChar,
+          mockRetCoeffChar,
+          mockReqMatrixChar,
+          mockRetMatrixChar,
+        ]);
+
+        // Spectrum coeff request (write only)
+        when(mockReqSpecCoeffChar.uuid)
+            .thenReturn(Guid('4348410d-444c-5020-4e49-52204e616e6f'));
+        stubCharacteristicProperties(mockReqSpecCoeffChar,
+            write: true, notify: false);
+        when(mockReqSpecCoeffChar.write(any,
+                withoutResponse: anyNamed('withoutResponse')))
+            .thenAnswer((_) async {
+          specCoeffWriteCount++;
+        });
+
+        // Spectrum coeff return (notify only)
+        when(mockRetSpecCoeffChar.uuid)
+            .thenReturn(Guid('4348410e-444c-5020-4e49-52204e616e6f'));
+        stubCharacteristicProperties(mockRetSpecCoeffChar,
+            notify: true, write: false);
+        when(mockRetSpecCoeffChar.setNotifyValue(any))
+            .thenAnswer((_) async => true);
+        when(mockRetSpecCoeffChar.onValueReceived)
+            .thenAnswer((_) => specCoeffNotifyController.stream);
+        when(mockRetSpecCoeffChar.isNotifying).thenReturn(true);
+
+        // Ref coeff request (write only)
+        when(mockReqCoeffChar.uuid)
+            .thenReturn(Guid('4348410f-444c-5020-4e49-52204e616e6f'));
+        stubCharacteristicProperties(mockReqCoeffChar,
+            write: true, notify: false);
+        when(mockReqCoeffChar.write(any,
+                withoutResponse: anyNamed('withoutResponse')))
+            .thenAnswer((_) async {
+          coeffWriteCount++;
+        });
+
+        // Ref coeff return (notify only)
+        when(mockRetCoeffChar.uuid)
+            .thenReturn(Guid('43484110-444c-5020-4e49-52204e616e6f'));
+        stubCharacteristicProperties(mockRetCoeffChar,
+            notify: true, write: false);
+        when(mockRetCoeffChar.setNotifyValue(any))
+            .thenAnswer((_) async => true);
+        when(mockRetCoeffChar.onValueReceived)
+            .thenAnswer((_) => coeffNotifyController.stream);
+        when(mockRetCoeffChar.isNotifying).thenReturn(true);
+
+        // Matrix request (write only)
+        when(mockReqMatrixChar.uuid)
+            .thenReturn(Guid('43484111-444c-5020-4e49-52204e616e6f'));
+        stubCharacteristicProperties(mockReqMatrixChar,
+            write: true, notify: false);
+        when(mockReqMatrixChar.write(any,
+                withoutResponse: anyNamed('withoutResponse')))
+            .thenAnswer((_) async {
+          matrixWriteCount++;
+        });
+
+        // Matrix return (notify only)
+        when(mockRetMatrixChar.uuid)
+            .thenReturn(Guid('43484112-444c-5020-4e49-52204e616e6f'));
+        stubCharacteristicProperties(mockRetMatrixChar,
+            notify: true, write: false);
+        when(mockRetMatrixChar.setNotifyValue(any))
+            .thenAnswer((_) async => true);
+        when(mockRetMatrixChar.onValueReceived)
+            .thenAnswer((_) => matrixNotifyController.stream);
+        when(mockRetMatrixChar.isNotifying).thenReturn(true);
+
+        when(mockAdapter.getDevice('AA:BB:CC:DD:EE:FF')).thenReturn(mockDevice);
+
+        await service.connect('AA:BB:CC:DD:EE:FF');
+        await Future.delayed(const Duration(milliseconds: 50));
+
+        // Pre-populate calibration cache (simulating a previous fetch)
+        service.setCalibrationDataForTesting([0x01], [0x02], [0x03]);
+        service.skipScanConfigCheckForTesting();
+
+        // === First performScan call ===
+        // performScan should invalidate cache and re-fetch from BLE
+        final scanFuture1 = service.performScan();
+        await Future.delayed(const Duration(milliseconds: 50));
+
+        // Feed calibration data via BLE notifications
+        // Spectrum coeff: 2 bytes
+        specCoeffNotifyController.add([0x00, 0x02, 0x00]); // header
+        await Future.delayed(const Duration(milliseconds: 20));
+        specCoeffNotifyController.add([0x01, 0xAA, 0xBB]); // data
+        await Future.delayed(const Duration(milliseconds: 50));
+
+        // Ref coeff: 2 bytes
+        coeffNotifyController.add([0x00, 0x02, 0x00]); // header
+        await Future.delayed(const Duration(milliseconds: 20));
+        coeffNotifyController.add([0x01, 0xCC, 0xDD]); // data
+        await Future.delayed(const Duration(milliseconds: 50));
+
+        // Matrix: 2 bytes
+        matrixNotifyController.add([0x00, 0x02, 0x00]); // header
+        await Future.delayed(const Duration(milliseconds: 20));
+        matrixNotifyController.add([0x01, 0xEE, 0xFF]); // data
+
+        // Scan error notification is sent automatically by the mockStartScanChar
+        // write handler (after writeComplete=true), so just await the result.
+        await expectLater(scanFuture1, throwsA(isA<ScanFailedException>()));
+
+        // Verify: calibration BLE fetches happened on first call
+        // even though cache was pre-populated
+        expect(specCoeffWriteCount, equals(1),
+            reason:
+                'Spectrum coeff should be re-fetched (cache was invalidated)');
+        expect(coeffWriteCount, equals(1),
+            reason: 'Ref coeff should be re-fetched (cache was invalidated)');
+        expect(matrixWriteCount, equals(1),
+            reason: 'Matrix should be re-fetched (cache was invalidated)');
+
+        // === Second performScan call ===
+        // Should invalidate and re-fetch again
+        final scanFuture2 = service.performScan();
+        await Future.delayed(const Duration(milliseconds: 50));
+
+        // Feed calibration data again
+        specCoeffNotifyController.add([0x00, 0x02, 0x00]);
+        await Future.delayed(const Duration(milliseconds: 20));
+        specCoeffNotifyController.add([0x01, 0x11, 0x22]);
+        await Future.delayed(const Duration(milliseconds: 50));
+
+        coeffNotifyController.add([0x00, 0x02, 0x00]);
+        await Future.delayed(const Duration(milliseconds: 20));
+        coeffNotifyController.add([0x01, 0x33, 0x44]);
+        await Future.delayed(const Duration(milliseconds: 50));
+
+        matrixNotifyController.add([0x00, 0x02, 0x00]);
+        await Future.delayed(const Duration(milliseconds: 20));
+        matrixNotifyController.add([0x01, 0x55, 0x66]);
+
+        // Scan error notification is sent automatically by the mockStartScanChar
+        // write handler (after writeComplete=true), so just await the result.
+        await expectLater(scanFuture2, throwsA(isA<ScanFailedException>()));
+
+        // Verify: calibration BLE fetches happened AGAIN on second call
+        expect(specCoeffWriteCount, equals(2),
+            reason:
+                'Spectrum coeff should be fetched twice (once per performScan)');
+        expect(coeffWriteCount, equals(2),
+            reason:
+                'Ref coeff should be fetched twice (once per performScan)');
+        expect(matrixWriteCount, equals(2),
+            reason: 'Matrix should be fetched twice (once per performScan)');
+
+        // Cleanup
+        await startScanNotifyController.close();
+        await specCoeffNotifyController.close();
+        await coeffNotifyController.close();
+        await matrixNotifyController.close();
+      });
+
+      test('performScan refreshes scan configurations before scanning',
+          () async {
+        // This test verifies that performScan calls getScanConfigurations()
+        // before starting the scan, ensuring fresh config data from device.
+        // We use skipScanConfigCheckForTesting() to isolate the new
+        // getScanConfigurations() call from the existing _ensureActiveScanConfig().
+        // We track writes to GSCIS_REQ_SCAN_CONF_DATA which only
+        // getScanConfigurations() -> _fetchAllConfigsData() triggers.
+        final mockDevice = MockBluetoothDevice();
+        final mockGdtsService = MockBluetoothService();
+        final mockGsdisService = MockBluetoothService();
+        final mockGscisService = MockBluetoothService();
+        final mockTimeChar = MockBluetoothCharacteristic();
+        final mockStartScanChar = MockBluetoothCharacteristic();
+
+        // GSCIS characteristics for config refresh (UUIDs from NanoGatt)
+        final mockNumStoredConfChar = createMockCharacteristic(
+          uuid: Guid('43484113-444c-5020-4e49-52204e616e6f'), // gscisNumStoredConf
+          read: true,
+          write: false,
+          notify: false,
+        );
+        final mockActiveConfChar = createMockCharacteristic(
+          uuid: Guid('43484118-444c-5020-4e49-52204e616e6f'), // gscisActiveScanConf
+          read: true,
+          write: true,
+          notify: false,
+        );
+        final mockReqConfListChar = createMockCharacteristic(
+          uuid: Guid('43484114-444c-5020-4e49-52204e616e6f'), // gscisReqStoredConfList
+          write: true,
+          notify: false,
+          read: false,
+        );
+        final mockRetConfListChar = createMockCharacteristic(
+          uuid: Guid('43484115-444c-5020-4e49-52204e616e6f'), // gscisRetStoredConfList
+          notify: true,
+          write: false,
+          read: false,
+        );
+        final mockReqConfDataChar = createMockCharacteristic(
+          uuid: Guid('43484116-444c-5020-4e49-52204e616e6f'), // gscisReqScanConfData
+          write: true,
+          notify: false,
+          read: false,
+        );
+        final mockRetConfDataChar = createMockCharacteristic(
+          uuid: Guid('43484117-444c-5020-4e49-52204e616e6f'), // gscisRetScanConfData
+          notify: true,
+          write: false,
+          read: false,
+        );
+
+        // Error/status characteristics for diagnostic reads
+        final mockErrStatusChar = createMockCharacteristic(
+          uuid: Guid('4348410a-444c-5020-4e49-52204e616e6f'),
+          read: true,
+          notify: false,
+          write: false,
+        );
+        final mockDevStatusChar = createMockCharacteristic(
+          uuid: Guid('43484109-444c-5020-4e49-52204e616e6f'),
+          read: true,
+          notify: false,
+          write: false,
+        );
+
+        final startScanNotifyController =
+            StreamController<List<int>>.broadcast();
+        final retConfListController = StreamController<List<int>>.broadcast();
+        final retConfDataController = StreamController<List<int>>.broadcast();
+
+        var confDataRequestCount = 0;
+
+        // Device setup
+        when(mockDevice.remoteId)
+            .thenReturn(const DeviceIdentifier('AA:BB:CC:DD:EE:FF'));
+        when(mockDevice.platformName).thenReturn('NIRScan Nano');
+        when(mockDevice.connect(
+          timeout: anyNamed('timeout'),
+          autoConnect: anyNamed('autoConnect'),
+        )).thenAnswer((_) async {});
+        when(mockDevice.discoverServices()).thenAnswer(
+            (_) async => [mockGdtsService, mockGsdisService, mockGscisService]);
+        when(mockDevice.connectionState).thenAnswer(
+          (_) => Stream.value(BluetoothConnectionState.connected),
+        );
+        when(mockDevice.disconnect()).thenAnswer((_) async {});
+        when(mockDevice.requestMtu(any,
+                predelay: anyNamed('predelay'), timeout: anyNamed('timeout')))
+            .thenAnswer((_) async => 512);
+
+        // GDTS service for time sync
+        when(mockGdtsService.uuid)
+            .thenReturn(Guid('53455203-444c-5020-4e49-52204e616e6f'));
+        when(mockGdtsService.characteristics).thenReturn([mockTimeChar]);
+        when(mockTimeChar.uuid)
+            .thenReturn(Guid('4348410c-444c-5020-4e49-52204e616e6f'));
+        stubCharacteristicProperties(mockTimeChar, write: true, notify: false);
+        when(mockTimeChar.write(any,
+                withoutResponse: anyNamed('withoutResponse')))
+            .thenAnswer((_) async {});
+
+        // GSDIS service for scan
+        when(mockGsdisService.uuid)
+            .thenReturn(Guid('53455206-444c-5020-4e49-52204e616e6f'));
+        when(mockGsdisService.characteristics)
+            .thenReturn([mockStartScanChar, mockErrStatusChar, mockDevStatusChar]);
+        when(mockStartScanChar.uuid)
+            .thenReturn(Guid('4348411d-444c-5020-4e49-52204e616e6f'));
+        stubCharacteristicProperties(mockStartScanChar,
+            notify: true, write: true);
+        when(mockStartScanChar.write(any,
+                withoutResponse: anyNamed('withoutResponse')))
+            .thenAnswer((_) async {
+          // Send scan error notification shortly after write completes.
+          // This ensures writeComplete=true is set before the notification
+          // arrives in performScan's listener.
+          Future.delayed(const Duration(milliseconds: 50), () {
+            startScanNotifyController
+                .add([0x02, 0x00, 0x00, 0x00, 0x00]);
+          });
+        });
+        when(mockStartScanChar.setNotifyValue(true))
+            .thenAnswer((_) async => true);
+        when(mockStartScanChar.setNotifyValue(false))
+            .thenAnswer((_) async => true);
+        when(mockStartScanChar.onValueReceived)
+            .thenAnswer((_) => startScanNotifyController.stream);
+        when(mockStartScanChar.lastValueStream)
+            .thenAnswer((_) => startScanNotifyController.stream);
+        when(mockStartScanChar.isNotifying).thenReturn(true);
+
+        // Error/device status reads
+        when(mockErrStatusChar.read()).thenAnswer((_) async => [0x00, 0x00]);
+        when(mockDevStatusChar.read()).thenAnswer((_) async => [0x00, 0x00]);
+
+        // GSCIS service for scan configurations
+        when(mockGscisService.uuid)
+            .thenReturn(Guid('53455205-444c-5020-4e49-52204e616e6f'));
+        when(mockGscisService.characteristics).thenReturn([
+          mockNumStoredConfChar,
+          mockActiveConfChar,
+          mockReqConfListChar,
+          mockRetConfListChar,
+          mockReqConfDataChar,
+          mockRetConfDataChar,
+        ]);
+
+        // NUM_STORED_CONF: returns 1 config
+        when(mockNumStoredConfChar.read())
+            .thenAnswer((_) async => [0x01, 0x00]);
+
+        // ACTIVE_SCAN_CONF: returns config index 0
+        when(mockActiveConfChar.read())
+            .thenAnswer((_) async => [0x00, 0x00]);
+        when(mockActiveConfChar.write(any,
+                withoutResponse: anyNamed('withoutResponse')))
+            .thenAnswer((_) async {});
+
+        // Config list notifications
+        when(mockRetConfListChar.setNotifyValue(any))
+            .thenAnswer((_) async => true);
+        when(mockRetConfListChar.onValueReceived)
+            .thenAnswer((_) => retConfListController.stream);
+        when(mockRetConfListChar.isNotifying).thenReturn(true);
+        when(mockReqConfListChar.write(any,
+                withoutResponse: anyNamed('withoutResponse')))
+            .thenAnswer((_) async {
+          // Emit config list entry when requested
+          retConfListController.add([0x00, 0x00, 0x00]); // index 0
+        });
+
+        // Config data notifications - track request count
+        when(mockRetConfDataChar.setNotifyValue(any))
+            .thenAnswer((_) async => true);
+        when(mockRetConfDataChar.onValueReceived)
+            .thenAnswer((_) => retConfDataController.stream);
+        when(mockRetConfDataChar.isNotifying).thenReturn(true);
+        when(mockReqConfDataChar.write(any,
+                withoutResponse: anyNamed('withoutResponse')))
+            .thenAnswer((_) async {
+          confDataRequestCount++;
+          // Emit legacy format config data
+          final configData = List<int>.filled(60, 0);
+          final nameBytes = 'Default'.codeUnits;
+          for (int i = 0; i < nameBytes.length; i++) {
+            configData[i] = nameBytes[i];
+          }
+          retConfDataController.add([0x00, configData.length & 0xFF, 0x00]);
+          Future.delayed(const Duration(milliseconds: 10), () {
+            retConfDataController.add([0x01, ...configData]);
+          });
+        });
+
+        when(mockAdapter.getDevice('AA:BB:CC:DD:EE:FF')).thenReturn(mockDevice);
+
+        await service.connect('AA:BB:CC:DD:EE:FF');
+        await Future.delayed(const Duration(milliseconds: 50));
+
+        // Set calibration data (required before scan)
+        service.setCalibrationDataForTesting([0x01], [0x02], [0x03]);
+        service.skipCalibrationRefreshForTesting();
+        // DO NOT skip scan config check - we want to verify
+        // getScanConfigurations() is called within performScan
+
+        // Start scan - scan error notification is sent automatically by the
+        // mockStartScanChar write handler (after writeComplete=true)
+        final scanFuture = service.performScan();
+        await expectLater(scanFuture, throwsA(isA<ScanFailedException>()));
+
+        // Verify: GSCIS_REQ_SCAN_CONF_DATA was written to, proving
+        // getScanConfigurations() was called during performScan.
+        // This characteristic is ONLY accessed by getScanConfigurations()
+        // (via _fetchAllConfigsData), NOT by _ensureActiveScanConfig.
+        expect(confDataRequestCount, greaterThanOrEqualTo(1),
+            reason:
+                'getScanConfigurations should be called during performScan, '
+                'which writes to GSCIS_REQ_SCAN_CONF_DATA');
+
+        // Cleanup
+        await startScanNotifyController.close();
+        await retConfListController.close();
+        await retConfDataController.close();
       });
     });
 
@@ -1746,6 +2269,12 @@ void main() {
         final mockDevice = MockBluetoothDevice();
         final mockGcisService = MockBluetoothService();
 
+        // Spectrum coefficient characteristics
+        final mockReqSpecCoeffChar = MockBluetoothCharacteristic();
+        final mockRetSpecCoeffChar = MockBluetoothCharacteristic();
+        final specCoeffNotifyController =
+            StreamController<List<int>>.broadcast();
+
         // Coefficient characteristics
         final mockReqCoeffChar = MockBluetoothCharacteristic();
         final mockRetCoeffChar = MockBluetoothCharacteristic();
@@ -1777,11 +2306,35 @@ void main() {
         when(mockGcisService.uuid)
             .thenReturn(Guid('53455204-444c-5020-4e49-52204e616e6f'));
         when(mockGcisService.characteristics).thenReturn([
+          mockReqSpecCoeffChar,
+          mockRetSpecCoeffChar,
           mockReqCoeffChar,
           mockRetCoeffChar,
           mockReqMatrixChar,
           mockRetMatrixChar,
         ]);
+
+        // Request spectrum coeff characteristic (write only)
+        when(mockReqSpecCoeffChar.uuid)
+            .thenReturn(Guid('4348410d-444c-5020-4e49-52204e616e6f'));
+        stubCharacteristicProperties(mockReqSpecCoeffChar,
+            write: true, notify: false);
+        when(mockReqSpecCoeffChar.write(any,
+                withoutResponse: anyNamed('withoutResponse')))
+            .thenAnswer((_) async {});
+
+        // Return spectrum coeff characteristic (notification only)
+        when(mockRetSpecCoeffChar.uuid)
+            .thenReturn(Guid('4348410e-444c-5020-4e49-52204e616e6f'));
+        stubCharacteristicProperties(mockRetSpecCoeffChar,
+            notify: true, write: false);
+        when(mockRetSpecCoeffChar.setNotifyValue(true))
+            .thenAnswer((_) async => true);
+        when(mockRetSpecCoeffChar.setNotifyValue(false))
+            .thenAnswer((_) async => true);
+        when(mockRetSpecCoeffChar.onValueReceived)
+            .thenAnswer((_) => specCoeffNotifyController.stream);
+        when(mockRetSpecCoeffChar.isNotifying).thenReturn(true);
 
         // Request coeff characteristic (write only)
         when(mockReqCoeffChar.uuid)
@@ -1837,6 +2390,13 @@ void main() {
 
         await Future.delayed(const Duration(milliseconds: 50));
 
+        // Spectrum coeff response (fetched first per manual order):
+        specCoeffNotifyController.add([0x00, 0x02, 0x00]);
+        await Future.delayed(const Duration(milliseconds: 20));
+        specCoeffNotifyController.add([0x01, 0x55, 0x66]);
+
+        await Future.delayed(const Duration(milliseconds: 50));
+
         // Multi-packet coeff response:
         // Header: [0x00, 0x04, 0x00] = size 4 bytes
         coeffNotifyController.add([0x00, 0x04, 0x00]);
@@ -1855,12 +2415,15 @@ void main() {
 
         final calData = await calibrationFuture;
 
+        expect(calData.spectrumCoefficients.length, equals(2));
+        expect(calData.spectrumCoefficients, equals([0x55, 0x66]));
         expect(calData.coefficients.length, equals(4));
         expect(calData.coefficients, equals([0xAA, 0xBB, 0xCC, 0xDD]));
         expect(calData.matrix.length, equals(3));
         expect(calData.matrix, equals([0x11, 0x22, 0x33]));
 
         // Cleanup
+        await specCoeffNotifyController.close();
         await coeffNotifyController.close();
         await matrixNotifyController.close();
       });
@@ -1868,6 +2431,12 @@ void main() {
       test('getCalibrationData uses cached data on second call', () async {
         final mockDevice = MockBluetoothDevice();
         final mockGcisService = MockBluetoothService();
+
+        // Spectrum coefficient characteristics
+        final mockReqSpecCoeffChar = MockBluetoothCharacteristic();
+        final mockRetSpecCoeffChar = MockBluetoothCharacteristic();
+        final specCoeffNotifyController =
+            StreamController<List<int>>.broadcast();
 
         // Coefficient characteristics
         final mockReqCoeffChar = MockBluetoothCharacteristic();
@@ -1879,6 +2448,7 @@ void main() {
         final mockRetMatrixChar = MockBluetoothCharacteristic();
         final matrixNotifyController = StreamController<List<int>>.broadcast();
 
+        var specCoeffWriteCount = 0;
         var coeffWriteCount = 0;
         var matrixWriteCount = 0;
 
@@ -1903,11 +2473,35 @@ void main() {
         when(mockGcisService.uuid)
             .thenReturn(Guid('53455204-444c-5020-4e49-52204e616e6f'));
         when(mockGcisService.characteristics).thenReturn([
+          mockReqSpecCoeffChar,
+          mockRetSpecCoeffChar,
           mockReqCoeffChar,
           mockRetCoeffChar,
           mockReqMatrixChar,
           mockRetMatrixChar,
         ]);
+
+        // Request spectrum coeff characteristic
+        when(mockReqSpecCoeffChar.uuid)
+            .thenReturn(Guid('4348410d-444c-5020-4e49-52204e616e6f'));
+        stubCharacteristicProperties(mockReqSpecCoeffChar,
+            write: true, notify: false);
+        when(mockReqSpecCoeffChar.write(any,
+                withoutResponse: anyNamed('withoutResponse')))
+            .thenAnswer((_) async {
+          specCoeffWriteCount++;
+        });
+
+        // Return spectrum coeff characteristic
+        when(mockRetSpecCoeffChar.uuid)
+            .thenReturn(Guid('4348410e-444c-5020-4e49-52204e616e6f'));
+        stubCharacteristicProperties(mockRetSpecCoeffChar,
+            notify: true, write: false);
+        when(mockRetSpecCoeffChar.setNotifyValue(any))
+            .thenAnswer((_) async => true);
+        when(mockRetSpecCoeffChar.onValueReceived)
+            .thenAnswer((_) => specCoeffNotifyController.stream);
+        when(mockRetSpecCoeffChar.isNotifying).thenReturn(true);
 
         // Request coeff characteristic
         when(mockReqCoeffChar.uuid)
@@ -1962,6 +2556,13 @@ void main() {
         final calibrationFuture1 = service.getCalibrationData();
         await Future.delayed(const Duration(milliseconds: 50));
 
+        // Emit spectrum coefficient data
+        specCoeffNotifyController.add([0x00, 0x02, 0x00]);
+        await Future.delayed(const Duration(milliseconds: 20));
+        specCoeffNotifyController.add([0x01, 0x55, 0x66]);
+
+        await Future.delayed(const Duration(milliseconds: 50));
+
         // Emit coefficient data
         coeffNotifyController.add([0x00, 0x02, 0x00]); // Header: 2 bytes
         await Future.delayed(const Duration(milliseconds: 20));
@@ -1976,6 +2577,7 @@ void main() {
 
         await calibrationFuture1;
 
+        expect(specCoeffWriteCount, equals(1));
         expect(coeffWriteCount, equals(1));
         expect(matrixWriteCount, equals(1));
 
@@ -1983,13 +2585,185 @@ void main() {
         final calData2 = await service.getCalibrationData();
 
         // Verify no additional writes were made
+        expect(specCoeffWriteCount, equals(1));
         expect(coeffWriteCount, equals(1));
         expect(matrixWriteCount, equals(1));
 
+        expect(calData2.spectrumCoefficients, equals([0x55, 0x66]));
         expect(calData2.coefficients, equals([0xAA, 0xBB]));
         expect(calData2.matrix, equals([0x11, 0x22]));
 
         // Cleanup
+        await specCoeffNotifyController.close();
+        await coeffNotifyController.close();
+        await matrixNotifyController.close();
+      });
+
+      test(
+          'getCalibrationData returns spectrum coefficients, ref coefficients, and matrix',
+          () async {
+        final mockDevice = MockBluetoothDevice();
+        final mockGcisService = MockBluetoothService();
+
+        // Spectrum coefficient characteristics
+        final mockReqSpecCoeffChar = MockBluetoothCharacteristic();
+        final mockRetSpecCoeffChar = MockBluetoothCharacteristic();
+        final specCoeffNotifyController =
+            StreamController<List<int>>.broadcast();
+
+        // Ref coefficient characteristics
+        final mockReqCoeffChar = MockBluetoothCharacteristic();
+        final mockRetCoeffChar = MockBluetoothCharacteristic();
+        final coeffNotifyController = StreamController<List<int>>.broadcast();
+
+        // Matrix characteristics
+        final mockReqMatrixChar = MockBluetoothCharacteristic();
+        final mockRetMatrixChar = MockBluetoothCharacteristic();
+        final matrixNotifyController = StreamController<List<int>>.broadcast();
+
+        when(mockDevice.remoteId)
+            .thenReturn(const DeviceIdentifier('AA:BB:CC:DD:EE:FF'));
+        when(mockDevice.platformName).thenReturn('NIRScan Nano');
+        when(mockDevice.connect(
+          timeout: anyNamed('timeout'),
+          autoConnect: anyNamed('autoConnect'),
+        )).thenAnswer((_) async {});
+        when(mockDevice.discoverServices())
+            .thenAnswer((_) async => [mockGcisService]);
+        when(mockDevice.connectionState).thenAnswer(
+          (_) => Stream.value(BluetoothConnectionState.connected),
+        );
+        when(mockDevice.disconnect()).thenAnswer((_) async {});
+        when(mockDevice.requestMtu(any,
+                predelay: anyNamed('predelay'), timeout: anyNamed('timeout')))
+            .thenAnswer((_) async => 512);
+
+        // GCIS Service
+        when(mockGcisService.uuid)
+            .thenReturn(Guid('53455204-444c-5020-4e49-52204e616e6f'));
+        when(mockGcisService.characteristics).thenReturn([
+          mockReqSpecCoeffChar,
+          mockRetSpecCoeffChar,
+          mockReqCoeffChar,
+          mockRetCoeffChar,
+          mockReqMatrixChar,
+          mockRetMatrixChar,
+        ]);
+
+        // Request spectrum coeff characteristic (write only)
+        when(mockReqSpecCoeffChar.uuid)
+            .thenReturn(Guid('4348410d-444c-5020-4e49-52204e616e6f'));
+        stubCharacteristicProperties(mockReqSpecCoeffChar,
+            write: true, notify: false);
+        when(mockReqSpecCoeffChar.write(any,
+                withoutResponse: anyNamed('withoutResponse')))
+            .thenAnswer((_) async {});
+
+        // Return spectrum coeff characteristic (notification only)
+        when(mockRetSpecCoeffChar.uuid)
+            .thenReturn(Guid('4348410e-444c-5020-4e49-52204e616e6f'));
+        stubCharacteristicProperties(mockRetSpecCoeffChar,
+            notify: true, write: false);
+        when(mockRetSpecCoeffChar.setNotifyValue(true))
+            .thenAnswer((_) async => true);
+        when(mockRetSpecCoeffChar.setNotifyValue(false))
+            .thenAnswer((_) async => true);
+        when(mockRetSpecCoeffChar.onValueReceived)
+            .thenAnswer((_) => specCoeffNotifyController.stream);
+        when(mockRetSpecCoeffChar.isNotifying).thenReturn(true);
+
+        // Request ref coeff characteristic (write only)
+        when(mockReqCoeffChar.uuid)
+            .thenReturn(Guid('4348410f-444c-5020-4e49-52204e616e6f'));
+        stubCharacteristicProperties(mockReqCoeffChar,
+            write: true, notify: false);
+        when(mockReqCoeffChar.write(any,
+                withoutResponse: anyNamed('withoutResponse')))
+            .thenAnswer((_) async {});
+
+        // Return ref coeff characteristic (notification only)
+        when(mockRetCoeffChar.uuid)
+            .thenReturn(Guid('43484110-444c-5020-4e49-52204e616e6f'));
+        stubCharacteristicProperties(mockRetCoeffChar,
+            notify: true, write: false);
+        when(mockRetCoeffChar.setNotifyValue(true))
+            .thenAnswer((_) async => true);
+        when(mockRetCoeffChar.setNotifyValue(false))
+            .thenAnswer((_) async => true);
+        when(mockRetCoeffChar.onValueReceived)
+            .thenAnswer((_) => coeffNotifyController.stream);
+        when(mockRetCoeffChar.isNotifying).thenReturn(true);
+
+        // Request matrix characteristic (write only)
+        when(mockReqMatrixChar.uuid)
+            .thenReturn(Guid('43484111-444c-5020-4e49-52204e616e6f'));
+        stubCharacteristicProperties(mockReqMatrixChar,
+            write: true, notify: false);
+        when(mockReqMatrixChar.write(any,
+                withoutResponse: anyNamed('withoutResponse')))
+            .thenAnswer((_) async {});
+
+        // Return matrix characteristic (notification only)
+        when(mockRetMatrixChar.uuid)
+            .thenReturn(Guid('43484112-444c-5020-4e49-52204e616e6f'));
+        stubCharacteristicProperties(mockRetMatrixChar,
+            notify: true, write: false);
+        when(mockRetMatrixChar.setNotifyValue(true))
+            .thenAnswer((_) async => true);
+        when(mockRetMatrixChar.setNotifyValue(false))
+            .thenAnswer((_) async => true);
+        when(mockRetMatrixChar.onValueReceived)
+            .thenAnswer((_) => matrixNotifyController.stream);
+        when(mockRetMatrixChar.isNotifying).thenReturn(true);
+
+        when(mockAdapter.getDevice('AA:BB:CC:DD:EE:FF'))
+            .thenReturn(mockDevice);
+
+        await service.connect('AA:BB:CC:DD:EE:FF');
+        await Future.delayed(const Duration(milliseconds: 50));
+
+        // Start getCalibrationData
+        final calibrationFuture = service.getCalibrationData();
+
+        await Future.delayed(const Duration(milliseconds: 50));
+
+        // Spectrum coeff response (fetched FIRST per manual order):
+        // Header: [0x00, 0x06, 0x00] = size 6 bytes
+        specCoeffNotifyController.add([0x00, 0x06, 0x00]);
+        await Future.delayed(const Duration(milliseconds: 20));
+        // Data packet: [0x01, 0xEE, 0xFF, 0xDD, 0xCC, 0xBB, 0xAA]
+        specCoeffNotifyController.add([0x01, 0xEE, 0xFF, 0xDD, 0xCC, 0xBB, 0xAA]);
+
+        await Future.delayed(const Duration(milliseconds: 50));
+
+        // Ref coeff response:
+        // Header: [0x00, 0x04, 0x00] = size 4 bytes
+        coeffNotifyController.add([0x00, 0x04, 0x00]);
+        await Future.delayed(const Duration(milliseconds: 20));
+        // Data packet: [0x01, 0xAA, 0xBB, 0xCC, 0xDD]
+        coeffNotifyController.add([0x01, 0xAA, 0xBB, 0xCC, 0xDD]);
+
+        await Future.delayed(const Duration(milliseconds: 50));
+
+        // Matrix response:
+        // Header: [0x00, 0x03, 0x00] = size 3 bytes
+        matrixNotifyController.add([0x00, 0x03, 0x00]);
+        await Future.delayed(const Duration(milliseconds: 20));
+        // Data packet: [0x01, 0x11, 0x22, 0x33]
+        matrixNotifyController.add([0x01, 0x11, 0x22, 0x33]);
+
+        final calData = await calibrationFuture;
+
+        expect(calData.spectrumCoefficients.length, equals(6));
+        expect(calData.spectrumCoefficients,
+            equals([0xEE, 0xFF, 0xDD, 0xCC, 0xBB, 0xAA]));
+        expect(calData.coefficients.length, equals(4));
+        expect(calData.coefficients, equals([0xAA, 0xBB, 0xCC, 0xDD]));
+        expect(calData.matrix.length, equals(3));
+        expect(calData.matrix, equals([0x11, 0x22, 0x33]));
+
+        // Cleanup
+        await specCoeffNotifyController.close();
         await coeffNotifyController.close();
         await matrixNotifyController.close();
       });

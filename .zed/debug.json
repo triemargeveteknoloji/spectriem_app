@@ -1,0 +1,20 @@
+[
+  {
+    "adapter": "flutter",
+    "label": "Debug on Connected Device",
+    "request": "launch",
+    "program": "lib/main.dart",
+  },
+  {
+    "adapter": "flutter",
+    "label": "Debug with DevTools",
+    "request": "launch",
+    "program": "lib/main.dart",
+    "autoLaunchDevTools": true,
+  },
+  {
+    "adapter": "flutter",
+    "label": "Attach to Running App",
+    "request": "attach",
+  },
+]

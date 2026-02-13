@@ -17,6 +17,8 @@ class SensorCommunicationState with _$SensorCommunicationState {
     required bool logPanelExpanded,
     List<ScanConfiguration>? configurations,
     int? selectedConfigIndex,
+    // null = not attempted, true = loaded, false = failed
+    bool? isCalibrationLoaded,
   }) = _SensorCommunicationState;
 }
 
@@ -47,13 +49,65 @@ class SensorCommunication extends _$SensorCommunication {
     state = state.copyWith(isConnected: isNowConnected);
 
     if (isNowConnected && !wasConnected) {
-      loadConfigurations();
+      _initializePostConnection();
     } else if (!isNowConnected) {
       state = state.copyWith(
         configurations: null,
         selectedConfigIndex: null,
+        isCalibrationLoaded: null,
       );
     }
+  }
+
+  Future<void> _initializePostConnection() async {
+    final logService = ref.read(logServiceProvider);
+
+    logService.info(
+      '[POST-CONNECT] Starting post-connection initialization sequence',
+      tag: 'BLE',
+    );
+
+    // Step 1: Calibration (mandatory per TI manual, but non-blocking for configs)
+    logService.info(
+      '[POST-CONNECT] Step 1/2: Fetching calibration data from device...',
+      tag: 'CAL',
+    );
+    try {
+      final nirScanService = ref.read(nirScanServiceProvider);
+      final calData = await nirScanService.getCalibrationData();
+      state = state.copyWith(isCalibrationLoaded: true);
+      logService.info(
+        '[POST-CONNECT] Calibration loaded successfully: '
+        'specCoeff=${calData.spectrumCoefficients.length}B, '
+        'refCoeff=${calData.coefficients.length}B, '
+        'refMatrix=${calData.matrix.length}B',
+        tag: 'CAL',
+      );
+    } catch (e, st) {
+      state = state.copyWith(isCalibrationLoaded: false);
+      logService.error(
+        '[POST-CONNECT] Calibration FAILED: $e - will retry before scan. '
+        'Device may need re-connection if this persists.',
+        tag: 'CAL',
+      );
+      logService.debug(
+        '[POST-CONNECT] Calibration failure stack trace: $st',
+        tag: 'CAL',
+      );
+    }
+
+    // Step 2: Load configurations (always attempt, even if calibration failed)
+    logService.info(
+      '[POST-CONNECT] Step 2/2: Loading scan configurations...',
+      tag: 'BLE',
+    );
+    await loadConfigurations();
+    logService.info(
+      '[POST-CONNECT] Post-connection initialization complete. '
+      'calLoaded=${state.isCalibrationLoaded}, '
+      'configCount=${state.configurations?.length ?? 0}',
+      tag: 'BLE',
+    );
   }
 
   Future<void> loadConfigurations() async {
@@ -143,7 +197,7 @@ class CommandExecution extends _$CommandExecution {
         case 'getCalibrationData':
           final result = await bleService.getCalibrationData();
           logService.info(
-              '↓ RSP: Coeff ${result.coefficients.length}B, Matrix ${result.matrix.length}B',
+              '↓ RSP: SpecCoeff ${result.spectrumCoefficients.length}B, RefCoeff ${result.coefficients.length}B, Matrix ${result.matrix.length}B',
               tag: 'UI');
           return result;
 

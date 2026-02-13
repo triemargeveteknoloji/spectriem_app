@@ -29,7 +29,10 @@ class TestContext {
   /// Scan data from spectral scan
   ScanData? scanData;
 
-  /// Calibration coefficients (raw bytes)
+  /// Spectrum calibration coefficients (raw bytes, polynomial for wavelength-to-pixel)
+  Uint8List? spectrumCoefficients;
+
+  /// Reference calibration coefficients (raw bytes)
   Uint8List? calibrationCoefficients;
 
   /// Calibration matrix (raw bytes)
@@ -43,6 +46,7 @@ class TestContext {
 
   /// Sets calibration data from CalibrationData object
   set calibrationData(CalibrationData data) {
+    spectrumCoefficients = data.spectrumCoefficients;
     calibrationCoefficients = data.coefficients;
     calibrationMatrix = data.matrix;
   }
@@ -65,6 +69,7 @@ class TestContext {
     deviceInfo = null;
     deviceStatus = null;
     scanData = null;
+    spectrumCoefficients = null;
     calibrationCoefficients = null;
     calibrationMatrix = null;
     scanConfigurations = null;
@@ -90,6 +95,9 @@ class TestContext {
     buffer.writeln('Status: ${deviceStatus != null ? "OK" : "MISSING"}');
     buffer.writeln(
       'Scan data: ${scanData != null ? "${scanData!.rawData.length} bytes" : "MISSING"}',
+    );
+    buffer.writeln(
+      'Spectrum coeff: ${spectrumCoefficients != null ? "${spectrumCoefficients!.length} bytes" : "MISSING"}',
     );
     buffer.writeln(
       'Calibration: ${calibrationCoefficients != null ? "OK" : "MISSING"}',
