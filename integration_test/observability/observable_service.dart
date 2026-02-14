@@ -194,6 +194,13 @@ class ObservableNirScanService implements NirScanService {
   }
 
   @override
+  Future<void> resetErrorStatus() async {
+    _logger.ble('Resetting error status via GCS command...');
+    await _delegate.resetErrorStatus();
+    _logger.ble('Error status reset complete');
+  }
+
+  @override
   Future<CalibrationData> getCalibrationData() async {
     _logger.log(LogCategory.cal, 'Fetching calibration data (spectrum coeff + ref coeff + matrix)...');
     final data = await _delegate.getCalibrationData();

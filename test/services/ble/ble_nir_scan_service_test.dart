@@ -1140,7 +1140,7 @@ void main() {
         // Set calibration data for testing (required before scan)
         service.setCalibrationDataForTesting([0x01], [0x01], [0x02]);
         service.skipCalibrationRefreshForTesting();
-        service.skipScanConfigCheckForTesting();
+
 
         // Start scan - will eventually fail, but we only care about time sync
         final scanFuture = service.performScan();
@@ -1228,7 +1228,7 @@ void main() {
         // Set calibration data for testing (required before scan)
         service.setCalibrationDataForTesting([0x01], [0x01], [0x02]);
         service.skipCalibrationRefreshForTesting();
-        service.skipScanConfigCheckForTesting();
+
 
         // Start scan in background, will wait for notification
         final scanFuture = service.performScan(saveToSd: false);
@@ -1313,7 +1313,7 @@ void main() {
         // Set calibration data for testing (required before scan)
         service.setCalibrationDataForTesting([0x01], [0x01], [0x02]);
         service.skipCalibrationRefreshForTesting();
-        service.skipScanConfigCheckForTesting();
+
 
         final scanFuture = service.performScan(saveToSd: true);
 
@@ -1397,7 +1397,7 @@ void main() {
         // Set calibration data for testing (required before scan)
         service.setCalibrationDataForTesting([0x01], [0x01], [0x02]);
         service.skipCalibrationRefreshForTesting();
-        service.skipScanConfigCheckForTesting();
+
 
         final scanFuture = service.performScan();
 
@@ -1612,7 +1612,7 @@ void main() {
         // Set calibration data for testing (required before scan)
         service.setCalibrationDataForTesting([0x01], [0x01], [0x02]);
         service.skipCalibrationRefreshForTesting();
-        service.skipScanConfigCheckForTesting();
+
 
         final scanFuture = service.performScan();
 
@@ -1870,7 +1870,7 @@ void main() {
 
         // Pre-populate calibration cache (simulating a previous fetch)
         service.setCalibrationDataForTesting([0x01], [0x02], [0x03]);
-        service.skipScanConfigCheckForTesting();
+
 
         // === First performScan call ===
         // performScan should invalidate cache and re-fetch from BLE
@@ -1950,231 +1950,8 @@ void main() {
         await matrixNotifyController.close();
       });
 
-      test('performScan refreshes scan configurations before scanning',
-          () async {
-        // This test verifies that performScan calls getScanConfigurations()
-        // before starting the scan, ensuring fresh config data from device.
-        // We use skipScanConfigCheckForTesting() to isolate the new
-        // getScanConfigurations() call from the existing _ensureActiveScanConfig().
-        // We track writes to GSCIS_REQ_SCAN_CONF_DATA which only
-        // getScanConfigurations() -> _fetchAllConfigsData() triggers.
-        final mockDevice = MockBluetoothDevice();
-        final mockGdtsService = MockBluetoothService();
-        final mockGsdisService = MockBluetoothService();
-        final mockGscisService = MockBluetoothService();
-        final mockTimeChar = MockBluetoothCharacteristic();
-        final mockStartScanChar = MockBluetoothCharacteristic();
-
-        // GSCIS characteristics for config refresh (UUIDs from NanoGatt)
-        final mockNumStoredConfChar = createMockCharacteristic(
-          uuid: Guid('43484113-444c-5020-4e49-52204e616e6f'), // gscisNumStoredConf
-          read: true,
-          write: false,
-          notify: false,
-        );
-        final mockActiveConfChar = createMockCharacteristic(
-          uuid: Guid('43484118-444c-5020-4e49-52204e616e6f'), // gscisActiveScanConf
-          read: true,
-          write: true,
-          notify: false,
-        );
-        final mockReqConfListChar = createMockCharacteristic(
-          uuid: Guid('43484114-444c-5020-4e49-52204e616e6f'), // gscisReqStoredConfList
-          write: true,
-          notify: false,
-          read: false,
-        );
-        final mockRetConfListChar = createMockCharacteristic(
-          uuid: Guid('43484115-444c-5020-4e49-52204e616e6f'), // gscisRetStoredConfList
-          notify: true,
-          write: false,
-          read: false,
-        );
-        final mockReqConfDataChar = createMockCharacteristic(
-          uuid: Guid('43484116-444c-5020-4e49-52204e616e6f'), // gscisReqScanConfData
-          write: true,
-          notify: false,
-          read: false,
-        );
-        final mockRetConfDataChar = createMockCharacteristic(
-          uuid: Guid('43484117-444c-5020-4e49-52204e616e6f'), // gscisRetScanConfData
-          notify: true,
-          write: false,
-          read: false,
-        );
-
-        // Error/status characteristics for diagnostic reads
-        final mockErrStatusChar = createMockCharacteristic(
-          uuid: Guid('4348410a-444c-5020-4e49-52204e616e6f'),
-          read: true,
-          notify: false,
-          write: false,
-        );
-        final mockDevStatusChar = createMockCharacteristic(
-          uuid: Guid('43484109-444c-5020-4e49-52204e616e6f'),
-          read: true,
-          notify: false,
-          write: false,
-        );
-
-        final startScanNotifyController =
-            StreamController<List<int>>.broadcast();
-        final retConfListController = StreamController<List<int>>.broadcast();
-        final retConfDataController = StreamController<List<int>>.broadcast();
-
-        var confDataRequestCount = 0;
-
-        // Device setup
-        when(mockDevice.remoteId)
-            .thenReturn(const DeviceIdentifier('AA:BB:CC:DD:EE:FF'));
-        when(mockDevice.platformName).thenReturn('NIRScan Nano');
-        when(mockDevice.connect(
-          timeout: anyNamed('timeout'),
-          autoConnect: anyNamed('autoConnect'),
-        )).thenAnswer((_) async {});
-        when(mockDevice.discoverServices()).thenAnswer(
-            (_) async => [mockGdtsService, mockGsdisService, mockGscisService]);
-        when(mockDevice.connectionState).thenAnswer(
-          (_) => Stream.value(BluetoothConnectionState.connected),
-        );
-        when(mockDevice.disconnect()).thenAnswer((_) async {});
-        when(mockDevice.requestMtu(any,
-                predelay: anyNamed('predelay'), timeout: anyNamed('timeout')))
-            .thenAnswer((_) async => 512);
-
-        // GDTS service for time sync
-        when(mockGdtsService.uuid)
-            .thenReturn(Guid('53455203-444c-5020-4e49-52204e616e6f'));
-        when(mockGdtsService.characteristics).thenReturn([mockTimeChar]);
-        when(mockTimeChar.uuid)
-            .thenReturn(Guid('4348410c-444c-5020-4e49-52204e616e6f'));
-        stubCharacteristicProperties(mockTimeChar, write: true, notify: false);
-        when(mockTimeChar.write(any,
-                withoutResponse: anyNamed('withoutResponse')))
-            .thenAnswer((_) async {});
-
-        // GSDIS service for scan
-        when(mockGsdisService.uuid)
-            .thenReturn(Guid('53455206-444c-5020-4e49-52204e616e6f'));
-        when(mockGsdisService.characteristics)
-            .thenReturn([mockStartScanChar, mockErrStatusChar, mockDevStatusChar]);
-        when(mockStartScanChar.uuid)
-            .thenReturn(Guid('4348411d-444c-5020-4e49-52204e616e6f'));
-        stubCharacteristicProperties(mockStartScanChar,
-            notify: true, write: true);
-        when(mockStartScanChar.write(any,
-                withoutResponse: anyNamed('withoutResponse')))
-            .thenAnswer((_) async {
-          // Send scan error notification shortly after write completes.
-          // This ensures writeComplete=true is set before the notification
-          // arrives in performScan's listener.
-          Future.delayed(const Duration(milliseconds: 50), () {
-            startScanNotifyController
-                .add([0x02, 0x00, 0x00, 0x00, 0x00]);
-          });
-        });
-        when(mockStartScanChar.setNotifyValue(true))
-            .thenAnswer((_) async => true);
-        when(mockStartScanChar.setNotifyValue(false))
-            .thenAnswer((_) async => true);
-        when(mockStartScanChar.onValueReceived)
-            .thenAnswer((_) => startScanNotifyController.stream);
-        when(mockStartScanChar.lastValueStream)
-            .thenAnswer((_) => startScanNotifyController.stream);
-        when(mockStartScanChar.isNotifying).thenReturn(true);
-
-        // Error/device status reads
-        when(mockErrStatusChar.read()).thenAnswer((_) async => [0x00, 0x00]);
-        when(mockDevStatusChar.read()).thenAnswer((_) async => [0x00, 0x00]);
-
-        // GSCIS service for scan configurations
-        when(mockGscisService.uuid)
-            .thenReturn(Guid('53455205-444c-5020-4e49-52204e616e6f'));
-        when(mockGscisService.characteristics).thenReturn([
-          mockNumStoredConfChar,
-          mockActiveConfChar,
-          mockReqConfListChar,
-          mockRetConfListChar,
-          mockReqConfDataChar,
-          mockRetConfDataChar,
-        ]);
-
-        // NUM_STORED_CONF: returns 1 config
-        when(mockNumStoredConfChar.read())
-            .thenAnswer((_) async => [0x01, 0x00]);
-
-        // ACTIVE_SCAN_CONF: returns config index 0
-        when(mockActiveConfChar.read())
-            .thenAnswer((_) async => [0x00, 0x00]);
-        when(mockActiveConfChar.write(any,
-                withoutResponse: anyNamed('withoutResponse')))
-            .thenAnswer((_) async {});
-
-        // Config list notifications
-        when(mockRetConfListChar.setNotifyValue(any))
-            .thenAnswer((_) async => true);
-        when(mockRetConfListChar.onValueReceived)
-            .thenAnswer((_) => retConfListController.stream);
-        when(mockRetConfListChar.isNotifying).thenReturn(true);
-        when(mockReqConfListChar.write(any,
-                withoutResponse: anyNamed('withoutResponse')))
-            .thenAnswer((_) async {
-          // Emit config list entry when requested
-          retConfListController.add([0x00, 0x00, 0x00]); // index 0
-        });
-
-        // Config data notifications - track request count
-        when(mockRetConfDataChar.setNotifyValue(any))
-            .thenAnswer((_) async => true);
-        when(mockRetConfDataChar.onValueReceived)
-            .thenAnswer((_) => retConfDataController.stream);
-        when(mockRetConfDataChar.isNotifying).thenReturn(true);
-        when(mockReqConfDataChar.write(any,
-                withoutResponse: anyNamed('withoutResponse')))
-            .thenAnswer((_) async {
-          confDataRequestCount++;
-          // Emit legacy format config data
-          final configData = List<int>.filled(60, 0);
-          final nameBytes = 'Default'.codeUnits;
-          for (int i = 0; i < nameBytes.length; i++) {
-            configData[i] = nameBytes[i];
-          }
-          retConfDataController.add([0x00, configData.length & 0xFF, 0x00]);
-          Future.delayed(const Duration(milliseconds: 10), () {
-            retConfDataController.add([0x01, ...configData]);
-          });
-        });
-
-        when(mockAdapter.getDevice('AA:BB:CC:DD:EE:FF')).thenReturn(mockDevice);
-
-        await service.connect('AA:BB:CC:DD:EE:FF');
-        await Future.delayed(const Duration(milliseconds: 50));
-
-        // Set calibration data (required before scan)
-        service.setCalibrationDataForTesting([0x01], [0x02], [0x03]);
-        service.skipCalibrationRefreshForTesting();
-        // DO NOT skip scan config check - we want to verify
-        // getScanConfigurations() is called within performScan
-
-        // Start scan - scan error notification is sent automatically by the
-        // mockStartScanChar write handler (after writeComplete=true)
-        final scanFuture = service.performScan();
-        await expectLater(scanFuture, throwsA(isA<ScanFailedException>()));
-
-        // Verify: GSCIS_REQ_SCAN_CONF_DATA was written to, proving
-        // getScanConfigurations() was called during performScan.
-        // This characteristic is ONLY accessed by getScanConfigurations()
-        // (via _fetchAllConfigsData), NOT by _ensureActiveScanConfig.
-        expect(confDataRequestCount, greaterThanOrEqualTo(1),
-            reason:
-                'getScanConfigurations should be called during performScan, '
-                'which writes to GSCIS_REQ_SCAN_CONF_DATA');
-
-        // Cleanup
-        await startScanNotifyController.close();
-        await retConfListController.close();
-        await retConfDataController.close();
-      });
+      // Config refresh test removed: performScan no longer calls
+      // getScanConfigurations() - configs are loaded at connection time only.
     });
 
     group('syncTime', () {

@@ -6,26 +6,21 @@ import '../assertions/sensor_assertions.dart';
 import 'package:spectriem_app/services/ble/nir_scan_service.dart';
 import 'package:spectriem_app/models/scan_data.dart';
 
-/// Executes spectral scans and validates the returned data.
+/// Executes spectral scans with retry logic for lamp failures.
 ///
-/// This step performs TWO scans to verify:
-/// 1. Scan functionality works correctly
-/// 2. Stale notification data doesn't affect subsequent scans
-/// 3. Each scan gets its own fresh notification response
+/// On lamp failure (0x01):
+/// 1. Calls resetErrorStatus() to clear error flags
+/// 2. Waits 5s for sensor recovery
+/// 3. Retries the scan
 ///
-/// The step:
-/// 1. Initiates first spectral scan (may fail with lamp error)
-/// 2. Waits briefly for sensor recovery
-/// 3. Initiates second spectral scan
-/// 4. Compares results to verify independence
-/// 5. Stores final scan data in [TestContext.scanData]
+/// The step performs TWO scans to verify stale notification handling.
 Future<void> executePerformScanStep(
   TestContext context,
   StepExecutor executor,
   IntegrationLogger logger,
 ) async {
   await executor.execute(
-    'PERFORM_SCAN: Executing spectral scans (2x)',
+    'PERFORM_SCAN: Executing spectral scans (2x with retry)',
     () async {
       // ===== SCAN 1 =====
       logger.ble('=== SCAN 1 ===');
@@ -48,22 +43,56 @@ Future<void> executePerformScanStep(
         logger.pass('[SCAN1] First scan successful');
 
         context.scanData = scanData1;
+      } on ScanFailedException catch (e) {
+        scan1Stopwatch.stop();
+        scan1Error = e.message;
+        logger.data('[SCAN1] Duration', '${scan1Stopwatch.elapsedMilliseconds}ms');
+        logger.data('[SCAN1] Error', e.message);
+
+        // Lamp failure or other scan error - try error reset + retry
+        final isLampFailure = e.message.contains('Lamp power failure');
+        if (isLampFailure) {
+          logger.ble('[SCAN1] Lamp failure detected - resetting error status and retrying...');
+        } else {
+          logger.ble('[SCAN1] Scan failed - resetting error status and retrying...');
+        }
+
+        // Read battery level for diagnostics
+        try {
+          final status = await context.service.getDeviceStatus();
+          logger.data('[DIAG] Battery', '${status.batteryLevel}%');
+          logger.data('[DIAG] Error status', status.errorStatus);
+          logger.data('[DIAG] Device status', status.deviceStatus);
+        } catch (diagErr) {
+          logger.ble('[DIAG] Could not read status: $diagErr');
+        }
+
+        // Reset error flags
+        try {
+          await context.service.resetErrorStatus();
+          logger.ble('[SCAN1] Error status reset complete');
+        } catch (resetErr) {
+          logger.ble('[SCAN1] Error reset failed: $resetErr');
+        }
+
+        // Wait for sensor recovery
+        logger.ble('Waiting 5s for sensor recovery after error reset...');
+        await Future.delayed(const Duration(seconds: 5));
       } on NirScanException catch (e) {
         scan1Stopwatch.stop();
         scan1Error = e.message;
         logger.data('[SCAN1] Duration', '${scan1Stopwatch.elapsedMilliseconds}ms');
         logger.data('[SCAN1] Error', e.message);
-        logger.ble('[SCAN1] First scan failed (expected for lamp warmup)');
-      }
+        logger.ble('[SCAN1] First scan failed with BLE error');
 
-      // ===== WAIT BETWEEN SCANS =====
-      logger.ble('Waiting 3s for sensor recovery...');
-      await Future.delayed(const Duration(seconds: 3));
+        // Wait for recovery
+        logger.ble('Waiting 3s for sensor recovery...');
+        await Future.delayed(const Duration(seconds: 3));
+      }
 
       // ===== SCAN 2 =====
       logger.ble('=== SCAN 2 ===');
       logger.ble('Starting second spectral scan...');
-      logger.ble('This scan tests stale notification handling');
 
       final scan2Stopwatch = Stopwatch()..start();
       String? scan2Error;
@@ -97,6 +126,16 @@ Future<void> executePerformScanStep(
         logger.data('[SCAN2] Duration', '${scan2Stopwatch.elapsedMilliseconds}ms');
         logger.data('[SCAN2] Error', e.message);
         logger.ble('[SCAN2] Second scan also failed');
+
+        // Post-failure diagnostics
+        try {
+          final status = await context.service.getDeviceStatus();
+          logger.data('[DIAG] Battery', '${status.batteryLevel}%');
+          logger.data('[DIAG] Error status', status.errorStatus);
+          logger.data('[DIAG] Device status', status.deviceStatus);
+        } catch (diagErr) {
+          logger.ble('[DIAG] Could not read status: $diagErr');
+        }
       }
 
       // ===== COMPARISON =====
@@ -104,12 +143,9 @@ Future<void> executePerformScanStep(
       logger.data('Scan 1 result', scan1Error ?? 'Success: $scan1Index');
       logger.data('Scan 2 result', scan2Error ?? 'Success: $scan2Index');
 
-      // Critical check: If scan 1 failed but returned 0xFF later,
-      // scan 2 should NOT use that stale 0xFF
       if (scan1Error != null && scan1Index == null) {
         logger.data('Stale data check', 'Scan 1 failed, checking Scan 2 behavior...');
 
-        // If scan 2 completed too fast (< 1s), it might have used stale data
         if (scan2Error == null && scan2Stopwatch.elapsedMilliseconds < 1000) {
           logger.data(
             'WARNING',
@@ -122,7 +158,6 @@ Future<void> executePerformScanStep(
         }
       }
 
-      // If both succeeded, verify they have different indices
       if (scan1Index != null && scan2Index != null) {
         if (scan1Index == scan2Index) {
           logger.data('WARNING', 'Both scans returned same name - might be stale data');
@@ -131,20 +166,17 @@ Future<void> executePerformScanStep(
         }
       }
 
-      // Final validation - at least one scan should succeed for test to pass
+      // Final validation
       final finalScanData = scanData2 ?? scanData1;
       if (finalScanData != null) {
         assertValidScanData(finalScanData);
         context.scanData = finalScanData;
         logger.pass('Spectral scan step complete (at least one scan succeeded)');
       } else {
-        // Both scans failed - this is a hardware issue
         logger.ble('Both scans failed - likely hardware issue (lamp, config, etc.)');
         logger.data('Scan 1 error', scan1Error ?? 'unknown');
         logger.data('Scan 2 error', scan2Error ?? 'unknown');
 
-        // Don't fail the test if both scans return the same error (consistent behavior)
-        // This indicates the stale data fix is working but sensor has actual issues
         if (scan1Error == scan2Error) {
           logger.pass('Both scans failed with SAME error - consistent behavior (no stale data issue)');
           logger.ble('STALE DATA FIX VERIFIED: Each scan gets its own fresh error response');
@@ -153,6 +185,6 @@ Future<void> executePerformScanStep(
         }
       }
     },
-    timeout: TestConfig.performScanTimeout * 2, // Double timeout for 2 scans
+    timeout: TestConfig.performScanTimeout * 2,
   );
 }

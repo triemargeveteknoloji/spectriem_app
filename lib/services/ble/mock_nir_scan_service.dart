@@ -351,6 +351,15 @@ class MockNirScanService implements NirScanService {
   }
 
   @override
+  Future<void> resetErrorStatus() async {
+    _ensureConnected();
+    if (operationDelay > Duration.zero) {
+      await Future.delayed(operationDelay);
+    }
+    _checkError('resetErrorStatus');
+  }
+
+  @override
   Future<CalibrationData> getCalibrationData() async {
     _ensureConnected();
     await Future.delayed(operationDelay * 5);

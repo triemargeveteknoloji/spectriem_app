@@ -67,6 +67,25 @@ class SensorCommunication extends _$SensorCommunication {
       tag: 'BLE',
     );
 
+    // Step 0: Reset error status flags (clears stale TMP006/EEPROM errors)
+    logService.info(
+      '[POST-CONNECT] Step 0: Resetting error status...',
+      tag: 'BLE',
+    );
+    try {
+      final nirScanService = ref.read(nirScanServiceProvider);
+      await nirScanService.resetErrorStatus();
+      logService.info(
+        '[POST-CONNECT] Error status reset complete',
+        tag: 'BLE',
+      );
+    } catch (e) {
+      logService.warning(
+        '[POST-CONNECT] Error status reset failed: $e (non-critical)',
+        tag: 'BLE',
+      );
+    }
+
     // Step 1: Calibration (mandatory per TI manual, but non-blocking for configs)
     logService.info(
       '[POST-CONNECT] Step 1/2: Fetching calibration data from device...',

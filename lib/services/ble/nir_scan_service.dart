@@ -104,6 +104,9 @@ abstract class NirScanService {
   /// Get calibration data (coefficients and matrix)
   Future<CalibrationData> getCalibrationData();
 
+  /// Reset error status flags on the device via GCS command.
+  Future<void> resetErrorStatus();
+
   /// Dispose resources
   void dispose();
 }
