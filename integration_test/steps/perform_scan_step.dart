@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import '../config/test_config.dart';
 import '../core/step_executor.dart';
 import '../core/test_context.dart';
@@ -77,6 +79,34 @@ Future<void> executePerformScanStep(
 
         // Wait for sensor recovery
         logger.ble('Waiting 5s for sensor recovery after error reset...');
+        await Future.delayed(const Duration(seconds: 5));
+      } on TimeoutException catch (e) {
+        scan1Stopwatch.stop();
+        scan1Error = e.message ?? 'Timeout';
+        logger.data('[SCAN1] Duration', '${scan1Stopwatch.elapsedMilliseconds}ms');
+        logger.data('[SCAN1] Error', 'TimeoutException: ${e.message}');
+        logger.ble('[SCAN1] Scan timed out - likely stale error flag or disconnect');
+
+        // Read diagnostics if still connected
+        try {
+          final status = await context.service.getDeviceStatus();
+          logger.data('[DIAG] Battery', '${status.batteryLevel}%');
+          logger.data('[DIAG] Error status', status.errorStatus);
+          logger.data('[DIAG] Device status', status.deviceStatus);
+        } catch (diagErr) {
+          logger.ble('[DIAG] Could not read status: $diagErr');
+        }
+
+        // Reset error flags
+        try {
+          await context.service.resetErrorStatus();
+          logger.ble('[SCAN1] Error status reset complete');
+        } catch (resetErr) {
+          logger.ble('[SCAN1] Error reset failed: $resetErr');
+        }
+
+        // Wait for sensor recovery
+        logger.ble('Waiting 5s for sensor recovery after timeout...');
         await Future.delayed(const Duration(seconds: 5));
       } on NirScanException catch (e) {
         scan1Stopwatch.stop();

@@ -74,6 +74,14 @@ Future<void> executeFullSensorFlow(
   context.recordStepDuration('connect', stopwatch.elapsed);
   stopwatch.reset();
 
+  // Step 2.5: Reset error status (matches notifier's post-connection behavior)
+  try {
+    await context.service.resetErrorStatus();
+    logger.ble('[POST-CONNECT] Error status reset');
+  } catch (e) {
+    logger.ble('[POST-CONNECT] Error status reset failed: $e');
+  }
+
   // Step 3: Read device info
   stopwatch.start();
   await executeDeviceInfoStep(context, executor, logger);

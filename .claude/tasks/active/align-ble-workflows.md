@@ -137,6 +137,11 @@ Bu sira `ble_nir_scan_service.dart` degisikliklerini gruplayip context switch'i 
 - [x] Update `test_context.dart` - spectrumCoefficients field
 - [x] Add `cal()` convenience method to integration_logger
 
+### Phase 6: Integration Test Resilience (Timeout + Error Reset) ✅
+- [x] Add `resetErrorStatus()` post-connect step in `full_sensor_flow.dart`
+- [x] Add `TimeoutException` catch in `perform_scan_step.dart` with retry logic
+- [ ] Commit + push changes
+
 ### Verification
 - [x] `flutter test` - 237 pass, 1 skip, 2 pre-existing fail (bluetooth_connection_screen timing)
 - [x] `flutter analyze` - no new warnings in modified files
@@ -148,3 +153,4 @@ Bu sira `ble_nir_scan_service.dart` degisikliklerini gruplayip context switch'i 
 **S1** (2026-02-13): Initialized. Codebase exploration completed - all 4 issues analyzed with exact line numbers. Plan designed with TDD approach and 5-phase implementation order. ⚡ Key: spectrum cal coeff failure = hard error.
 **S2** (2026-02-13): Phase 1 complete (TDD). `spectrumCoefficients` field + `_fetchSpectrumCalibrationCoefficients()` + all existing tests fixed. 5/5 calibration tests pass. Logging enhanced: hex dump per packet, 3-step summary, error-level for timeouts. 5 pre-existing performScan failures unrelated.
 **S3** (2026-02-13): ⚡ Phase 2-5 complete (parallel agents). 3 agents dispatched: (1) performScan cal+config refresh, (2) notifier auto-cal, (3) test+integration fixes. Post-merge fixes: tearDown syntax bug, fakeAsync→async conversion, unused import/var cleanup, spectrumCoefficients log in CommandExecution. 237/237 pass (2 pre-existing bluetooth_connection_screen fails, 0 new). Agresif loglama: `[PRE-SCAN]`, `[POST-CONNECT]`, `[CAL-STEP]`, `[ASSERT]` prefix'leri, hex preview, byte sizes, timing.
+**S4** (2026-02-15): Phase 6 - Integration test resilience. Test log analizi: scan trigger'dan 5.6s sonra disconnect + 30s timeout. Root cause: `resetErrorStatus()` integration test path'inde hiç çağrılmıyor + `TimeoutException` catch edilmiyor. Fix: post-connect `resetErrorStatus()` eklendi, `TimeoutException` handler ile retry logic eklendi. Production koda dokunulmadı.
