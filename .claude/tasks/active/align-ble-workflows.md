@@ -142,11 +142,19 @@ Bu sira `ble_nir_scan_service.dart` degisikliklerini gruplayip context switch'i 
 - [x] Add `TimeoutException` catch in `perform_scan_step.dart` with retry logic
 - [ ] Commit + push changes
 
+### Phase 7: Disconnect Investigation (Scan-Time Disconnect)
+- [x] Test: performScan completes with error immediately on disconnect (not 30s timeout)
+- [x] Log `disconnectReason` (platform, code, description) in disconnect handler
+- [x] Detect disconnect during scan wait - complete scanCompleter with error
+- [x] Integration test: disconnect-aware scan retry (skip scan 2 on disconnect)
+- [ ] Physical device test: capture disconnect reason from log
+- [ ] Analyze disconnect reason and determine next action (cooldown / reconnect / etc.)
+
 ### Verification
 - [x] `flutter test` - 237 pass, 1 skip, 2 pre-existing fail (bluetooth_connection_screen timing)
 - [x] `flutter analyze` - no new warnings in modified files
 - [x] `dart run build_runner build` - code gen succeeds
-- [ ] Integration test on physical device (sonraki session)
+- [ ] Integration test on physical device
 
 ## Sessions
 
@@ -154,3 +162,4 @@ Bu sira `ble_nir_scan_service.dart` degisikliklerini gruplayip context switch'i 
 **S2** (2026-02-13): Phase 1 complete (TDD). `spectrumCoefficients` field + `_fetchSpectrumCalibrationCoefficients()` + all existing tests fixed. 5/5 calibration tests pass. Logging enhanced: hex dump per packet, 3-step summary, error-level for timeouts. 5 pre-existing performScan failures unrelated.
 **S3** (2026-02-13): ⚡ Phase 2-5 complete (parallel agents). 3 agents dispatched: (1) performScan cal+config refresh, (2) notifier auto-cal, (3) test+integration fixes. Post-merge fixes: tearDown syntax bug, fakeAsync→async conversion, unused import/var cleanup, spectrumCoefficients log in CommandExecution. 237/237 pass (2 pre-existing bluetooth_connection_screen fails, 0 new). Agresif loglama: `[PRE-SCAN]`, `[POST-CONNECT]`, `[CAL-STEP]`, `[ASSERT]` prefix'leri, hex preview, byte sizes, timing.
 **S4** (2026-02-15): Phase 6 - Integration test resilience. Test log analizi: scan trigger'dan 5.6s sonra disconnect + 30s timeout. Root cause: `resetErrorStatus()` integration test path'inde hiç çağrılmıyor + `TimeoutException` catch edilmiyor. Fix: post-connect `resetErrorStatus()` eklendi, `TimeoutException` handler ile retry logic eklendi. Production koda dokunulmadı.
+**S5** (2026-02-16): ⚡ Phase 7 - Disconnect investigation. test_log(3) analizi: lamp failure gitti (guc kaynagi fix), yeni sorun = scan trigger'dan 5.5s sonra BLE disconnect. 3 kritik fix: (1) `disconnectReason` (platform/code/description) disconnect handler'da loglanıyor, (2) `_onDisconnectCallbacks` ile performScan disconnect'te hemen fail ediyor (30s timeout yerine), (3) Integration test disconnect-aware (scan 2 atlanır). 237 pass, 0 regression. Sonraki adım: fiziksel cihazda test → disconnect reason kodunu oku → root cause'a göre aksiyon.

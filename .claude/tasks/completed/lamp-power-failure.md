@@ -1,7 +1,7 @@
 # lamp-power-failure
 
 **Created:** 2026-02-04
-**Status:** 🚧 In Progress
+**Status:** ✅ Completed
 
 ---
 
@@ -113,3 +113,4 @@ Sensör scan trigger'ı kabul ediyor ve notification gönderiyor, ancak 0xFF (su
 ## Sessions
 
 **S1** (2026-02-14): ⚡ Implemented 7-phase fix for lamp power failure. Removed pre-scan config refresh + diagnostic reads, added 1s cooldown, GCS resetErrorStatus, failed config index tracking. All unit tests pass. Needs physical device verification.
+**S2** (2026-02-16): ⚡ Root cause confirmed: **hardware power issue**. Guc kaynagi degistirilince lamp power failure tamamen cozuldu. Yeni test logunda (test_log 3) 0x01 hatasi yok. Yazilim tarafindaki overhead azaltma ve resetErrorStatus eklemeleri yine de faydali - cihaz daha kararlı calisiyor. Task tamamlandi, kalan sorun (scan sirasinda disconnect) farkli bir root cause ve `align-ble-workflows` task'inda takip ediliyor.
