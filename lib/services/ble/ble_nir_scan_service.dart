@@ -39,6 +39,9 @@ class BleNirScanService implements NirScanService {
   /// NIRScan Nano doesn't handle concurrent BLE operations well.
   Completer<void>? _bleOperationLock;
 
+  /// Callbacks invoked on unexpected disconnect (e.g. during scan wait).
+  final List<void Function()> _onDisconnectCallbacks = [];
+
   BleNirScanService({
     BleAdapter? adapter,
     required LogService logger,
@@ -132,9 +135,20 @@ class BleNirScanService implements NirScanService {
 
       _connectionSubscription = _bleDevice!.connectionState.listen((state) {
         if (state == BluetoothConnectionState.disconnected) {
+          // Capture disconnect reason BEFORE _handleDisconnection nulls _bleDevice
+          final reason = _bleDevice?.disconnectReason;
           _logger.warning(
               '[BLE] Device disconnected | ID: $deviceId | State: ${_currentState.toString().split('.').last}',
               tag: 'BLE');
+          if (reason != null) {
+            _logger.warning(
+                '[BLE] Disconnect reason: platform=${reason.platform}, code=${reason.code}, description=${reason.description}',
+                tag: 'BLE');
+          } else {
+            _logger.warning(
+                '[BLE] Disconnect reason: unavailable',
+                tag: 'BLE');
+          }
           _handleDisconnection();
         }
       });
@@ -191,6 +205,11 @@ class BleNirScanService implements NirScanService {
   }
 
   void _handleDisconnection() {
+    // Notify pending operations (e.g. performScan) before clearing state
+    for (final callback in _onDisconnectCallbacks) {
+      callback();
+    }
+    _onDisconnectCallbacks.clear();
     _connectedDevice = null;
     _bleDevice = null;
     _services = null;
@@ -558,6 +577,19 @@ class BleNirScanService implements NirScanService {
     final scanCompleter = Completer<List<int>>();
     late StreamSubscription<List<int>> startScanSubscription;
 
+    // Register disconnect callback to fail fast instead of waiting 30s timeout
+    void onDisconnect() {
+      if (!scanCompleter.isCompleted) {
+        _logger.error(
+            '[SCAN] Device disconnected during scan wait - failing immediately',
+            tag: 'BLE');
+        scanCompleter.completeError(
+            const NirScanException('Device disconnected during scan'));
+      }
+    }
+
+    _onDisconnectCallbacks.add(onDisconnect);
+
     // DIAGNOSTIC: Timing tracker for scan flow
     final stopwatch = Stopwatch()..start();
 
@@ -676,9 +708,16 @@ class BleNirScanService implements NirScanService {
             tag: 'BLE');
       }
       await startScanSubscription.cancel();
+      _onDisconnectCallbacks.remove(onDisconnect);
+      rethrow;
+    } on NirScanException {
+      // Device disconnected during scan wait - fail fast
+      await startScanSubscription.cancel();
+      _onDisconnectCallbacks.remove(onDisconnect);
       rethrow;
     }
     await startScanSubscription.cancel();
+    _onDisconnectCallbacks.remove(onDisconnect);
     _logger.info('[SCAN] Hardware complete | Result: ${scanResult.length}B',
         tag: 'BLE');
 

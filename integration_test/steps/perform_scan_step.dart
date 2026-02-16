@@ -113,21 +113,34 @@ Future<void> executePerformScanStep(
         scan1Error = e.message;
         logger.data('[SCAN1] Duration', '${scan1Stopwatch.elapsedMilliseconds}ms');
         logger.data('[SCAN1] Error', e.message);
-        logger.ble('[SCAN1] First scan failed with BLE error');
 
-        // Wait for recovery
-        logger.ble('Waiting 3s for sensor recovery...');
-        await Future.delayed(const Duration(seconds: 3));
+        final isDisconnect = e.message.contains('disconnected');
+        if (isDisconnect) {
+          logger.ble('[SCAN1] Device disconnected during scan - connection lost');
+          logger.ble('[SCAN1] Skipping retry (no connection)');
+        } else {
+          logger.ble('[SCAN1] First scan failed with BLE error');
+          logger.ble('Waiting 3s for sensor recovery...');
+          await Future.delayed(const Duration(seconds: 3));
+        }
       }
 
       // ===== SCAN 2 =====
-      logger.ble('=== SCAN 2 ===');
-      logger.ble('Starting second spectral scan...');
+      final bool scan1Disconnected =
+          scan1Error != null && scan1Error.contains('disconnected');
 
+      logger.ble('=== SCAN 2 ===');
       final scan2Stopwatch = Stopwatch()..start();
       String? scan2Error;
       String? scan2Index;
       ScanData? scanData2;
+
+      if (scan1Disconnected) {
+        scan2Stopwatch.stop();
+        scan2Error = 'Skipped (device disconnected in scan 1)';
+        logger.ble('[SCAN2] Skipped - device disconnected during scan 1');
+      } else {
+      logger.ble('Starting second spectral scan...');
 
       try {
         scanData2 = await context.service.performScan(saveToSd: false);
@@ -167,6 +180,7 @@ Future<void> executePerformScanStep(
           logger.ble('[DIAG] Could not read status: $diagErr');
         }
       }
+      } // end if (!scan1Disconnected)
 
       // ===== COMPARISON =====
       logger.ble('=== COMPARISON ===');
@@ -202,6 +216,12 @@ Future<void> executePerformScanStep(
         assertValidScanData(finalScanData);
         context.scanData = finalScanData;
         logger.pass('Spectral scan step complete (at least one scan succeeded)');
+      } else if (scan1Disconnected) {
+        logger.ble('Scan failed: device disconnected during scan operation');
+        logger.data('Scan 1 error', scan1Error ?? 'unknown');
+        logger.ble('CHECK LOG: Look for "[BLE] Disconnect reason:" to identify root cause');
+        throw AssertionError(
+            'Device disconnected during scan: $scan1Error');
       } else {
         logger.ble('Both scans failed - likely hardware issue (lamp, config, etc.)');
         logger.data('Scan 1 error', scan1Error ?? 'unknown');

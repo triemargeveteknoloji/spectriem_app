@@ -1952,6 +1952,105 @@ void main() {
 
       // Config refresh test removed: performScan no longer calls
       // getScanConfigurations() - configs are loaded at connection time only.
+
+      test('fails immediately on device disconnect during scan wait', () async {
+        final mockDevice = MockBluetoothDevice();
+        final mockGdtsService = MockBluetoothService();
+        final mockGsdisService = MockBluetoothService();
+        final mockTimeChar = MockBluetoothCharacteristic();
+        final mockStartScanChar = MockBluetoothCharacteristic();
+        final startScanNotifyController =
+            StreamController<List<int>>.broadcast();
+        final connectionStateController =
+            StreamController<BluetoothConnectionState>.broadcast();
+
+        when(mockDevice.remoteId)
+            .thenReturn(const DeviceIdentifier('AA:BB:CC:DD:EE:FF'));
+        when(mockDevice.platformName).thenReturn('NIRScan Nano');
+        when(mockDevice.connect(
+          timeout: anyNamed('timeout'),
+          autoConnect: anyNamed('autoConnect'),
+        )).thenAnswer((_) async {});
+        when(mockDevice.discoverServices())
+            .thenAnswer((_) async => [mockGdtsService, mockGsdisService]);
+        when(mockDevice.connectionState)
+            .thenAnswer((_) => connectionStateController.stream);
+        when(mockDevice.disconnect()).thenAnswer((_) async {});
+        when(mockDevice.requestMtu(any,
+                predelay: anyNamed('predelay'),
+                timeout: anyNamed('timeout')))
+            .thenAnswer((_) async => 512);
+
+        // GDTS service for time sync
+        when(mockGdtsService.uuid)
+            .thenReturn(Guid('53455203-444c-5020-4e49-52204e616e6f'));
+        when(mockGdtsService.characteristics).thenReturn([mockTimeChar]);
+        when(mockTimeChar.uuid)
+            .thenReturn(Guid('4348410c-444c-5020-4e49-52204e616e6f'));
+        stubCharacteristicProperties(mockTimeChar, write: true, notify: false);
+        when(mockTimeChar.write(any,
+                withoutResponse: anyNamed('withoutResponse')))
+            .thenAnswer((_) async {});
+
+        // GSDIS service for scan
+        when(mockGsdisService.uuid)
+            .thenReturn(Guid('53455206-444c-5020-4e49-52204e616e6f'));
+        when(mockGsdisService.characteristics)
+            .thenReturn([mockStartScanChar]);
+        when(mockStartScanChar.uuid)
+            .thenReturn(Guid('4348411d-444c-5020-4e49-52204e616e6f'));
+        stubCharacteristicProperties(mockStartScanChar,
+            notify: true, write: true);
+        when(mockStartScanChar.write(any,
+                withoutResponse: anyNamed('withoutResponse')))
+            .thenAnswer((_) async {});
+        when(mockStartScanChar.setNotifyValue(true))
+            .thenAnswer((_) async => true);
+        when(mockStartScanChar.setNotifyValue(false))
+            .thenAnswer((_) async => true);
+        when(mockStartScanChar.isNotifying).thenReturn(true);
+        when(mockStartScanChar.onValueReceived)
+            .thenAnswer((_) => startScanNotifyController.stream);
+        when(mockStartScanChar.lastValueStream)
+            .thenAnswer((_) => startScanNotifyController.stream);
+
+        when(mockAdapter.getDevice('AA:BB:CC:DD:EE:FF'))
+            .thenReturn(mockDevice);
+
+        await service.connect('AA:BB:CC:DD:EE:FF');
+        await Future.delayed(const Duration(milliseconds: 50));
+
+        // Set calibration data for testing (required before scan)
+        service.setCalibrationDataForTesting([0x01], [0x01], [0x02]);
+        service.skipCalibrationRefreshForTesting();
+
+        // Start scan - will wait for notification
+        final stopwatch = Stopwatch()..start();
+        final scanFuture = service.performScan();
+
+        // Wait for scan to reach the notification wait phase
+        await Future.delayed(const Duration(milliseconds: 500));
+
+        // Set up expectation BEFORE emitting disconnect to avoid unhandled error
+        final expectation =
+            expectLater(scanFuture, throwsA(isA<NirScanException>()));
+
+        // Simulate device disconnect
+        connectionStateController.add(BluetoothConnectionState.disconnected);
+
+        // performScan should fail fast with NirScanException, not wait 30s
+        await expectation;
+        stopwatch.stop();
+
+        // Should complete in well under 30s (the timeout duration)
+        expect(stopwatch.elapsedMilliseconds, lessThan(5000),
+            reason:
+                'performScan should fail immediately on disconnect, not wait for 30s timeout');
+
+        // Cleanup
+        await startScanNotifyController.close();
+        await connectionStateController.close();
+      });
     });
 
     group('syncTime', () {
