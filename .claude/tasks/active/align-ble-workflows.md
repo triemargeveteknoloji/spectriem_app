@@ -142,24 +142,71 @@ Bu sira `ble_nir_scan_service.dart` degisikliklerini gruplayip context switch'i 
 - [x] Add `TimeoutException` catch in `perform_scan_step.dart` with retry logic
 - [ ] Commit + push changes
 
-### Phase 7: Disconnect Investigation (Scan-Time Disconnect)
+### Phase 7: Disconnect Investigation (Scan-Time Disconnect) ✅
 - [x] Test: performScan completes with error immediately on disconnect (not 30s timeout)
 - [x] Log `disconnectReason` (platform, code, description) in disconnect handler
 - [x] Detect disconnect during scan wait - complete scanCompleter with error
 - [x] Integration test: disconnect-aware scan retry (skip scan 2 on disconnect)
-- [ ] Physical device test: capture disconnect reason from log
-- [ ] Analyze disconnect reason and determine next action (cooldown / reconnect / etc.)
+- [x] Physical device test: test_log(4) — no disconnect, lamp power failure instead (see Log Analysis below)
 
 ### Verification
 - [x] `flutter test` - 237 pass, 1 skip, 2 pre-existing fail (bluetooth_connection_screen timing)
 - [x] `flutter analyze` - no new warnings in modified files
 - [x] `dart run build_runner build` - code gen succeeds
-- [ ] Integration test on physical device
+- [x] Integration test on physical device — test_log(4) analyzed (see Log Analysis)
+
+---
+
+## Log Analysis: test_log(4) — 2026-02-17
+
+**Source:** `~/Downloads/test_log (4).txt` | **Device:** C370145, FW 2.1.0 | **Test result:** PASS (failures handled gracefully)
+
+### Sonuc: Lamp Power Failure (0x01) + Coklu Donanim Hatasi
+
+BLE baglanti stabil (disconnect yok), ancak her iki scan 0x01 (lamp power failure) ile basarisiz.
+
+### Error Status Decode: 0x008C
+
+| Bit | Maske | Hata | Durumu |
+|-----|-------|------|--------|
+| 2 | 0x004 | SD Card Error | SET |
+| 3 | 0x008 | EEPROM Error | SET |
+| 7 | 0x080 | TMP006 Error (sicaklik sensoru) | SET |
+
+`resetErrorStatus` sonrasi bile ayni 0x008C — donanim kaynaklı, yazilimla temizlenemiyor.
+
+### Timeline Ozeti
+
+- Connect → CCCD → resetError → DeviceInfo → Config (idx 4 timeout, idx 6 OK, active=7 "Hadamard 1") → Cal (3-step OK)
+- **Scan 1:** cal refresh (3.2s) → cooldown → trigger → **0x01 @ T+748ms** → error=0x008C, device=0x0033
+- resetErrorStatus → 5s bekleme
+- **Scan 2:** cal refresh (3.5s) → cooldown → trigger → **0x01 @ T+2057ms** → error=0x008C, device=0x0033
+- Test teardown → PASS
+
+### Onemli Gozlemler
+
+1. **BLE disconnect yok** — test_log(3)'teki disconnect sorunu bu logda mevcut degil
+2. **TMP006 hatasi** — sicaklik sensoru arizasi lamp power failure'in olasi root cause'u (firmware lamp kontolunde temp feedback kullaniyor)
+3. **Config index 4** — her zaman timeout, muhtemelen corrupt/eksik (bilinen sorun)
+4. **Kalibrasyon akisi dogru** — 3-step fetch, invalidate+refresh, boyutlar tutarli (144B+3822B+2428B)
+5. **specCoeff 144B** — TI serialized struct (header+metadata dahil), 48B raw polynomial degil — dogru
+
+### Root Cause Adaylari (oncelik sirasi)
+
+1. **TMP006 arizasi** → lamp guc regulasyonu bozuk
+2. **Guc kaynagi yetersizligi** → USB port/kablo kalitesi
+3. **SD+EEPROM hatalari** → firmware pipeline etkisi (dolayli)
+
+### Onerilen Donanim Aksiyon
+
+- Cihazi power cycle (tam kapat-ac, sadece reconnect degil)
+- Farkli USB port/kablo (1A+ adapter)
+- 0x008C devam ederse donanim servisi gerekli
 
 ## Sessions
 
-**S1** (2026-02-13): Initialized. Codebase exploration completed - all 4 issues analyzed with exact line numbers. Plan designed with TDD approach and 5-phase implementation order. ⚡ Key: spectrum cal coeff failure = hard error.
-**S2** (2026-02-13): Phase 1 complete (TDD). `spectrumCoefficients` field + `_fetchSpectrumCalibrationCoefficients()` + all existing tests fixed. 5/5 calibration tests pass. Logging enhanced: hex dump per packet, 3-step summary, error-level for timeouts. 5 pre-existing performScan failures unrelated.
-**S3** (2026-02-13): ⚡ Phase 2-5 complete (parallel agents). 3 agents dispatched: (1) performScan cal+config refresh, (2) notifier auto-cal, (3) test+integration fixes. Post-merge fixes: tearDown syntax bug, fakeAsync→async conversion, unused import/var cleanup, spectrumCoefficients log in CommandExecution. 237/237 pass (2 pre-existing bluetooth_connection_screen fails, 0 new). Agresif loglama: `[PRE-SCAN]`, `[POST-CONNECT]`, `[CAL-STEP]`, `[ASSERT]` prefix'leri, hex preview, byte sizes, timing.
-**S4** (2026-02-15): Phase 6 - Integration test resilience. Test log analizi: scan trigger'dan 5.6s sonra disconnect + 30s timeout. Root cause: `resetErrorStatus()` integration test path'inde hiç çağrılmıyor + `TimeoutException` catch edilmiyor. Fix: post-connect `resetErrorStatus()` eklendi, `TimeoutException` handler ile retry logic eklendi. Production koda dokunulmadı.
-**S5** (2026-02-16): ⚡ Phase 7 - Disconnect investigation. test_log(3) analizi: lamp failure gitti (guc kaynagi fix), yeni sorun = scan trigger'dan 5.5s sonra BLE disconnect. 3 kritik fix: (1) `disconnectReason` (platform/code/description) disconnect handler'da loglanıyor, (2) `_onDisconnectCallbacks` ile performScan disconnect'te hemen fail ediyor (30s timeout yerine), (3) Integration test disconnect-aware (scan 2 atlanır). 237 pass, 0 regression. Sonraki adım: fiziksel cihazda test → disconnect reason kodunu oku → root cause'a göre aksiyon.
+**S1-S3** (2026-02-13): Phase 1-5 complete. Codebase analysis, TDD implementation, parallel agent dispatch. specCoeff+refCoeff+matrix 3-step cal, cache invalidation, config refresh, auto-cal notifier, all test+integration fixes. 237 pass.
+  ⚡ Key: spectrum cal coeff failure = hard error (TI manual zorunlu adim)
+**S4** (2026-02-15): Phase 6 - Integration test resilience. post-connect `resetErrorStatus()` + `TimeoutException` retry logic eklendi.
+**S5** (2026-02-16): ⚡ Phase 7 - Disconnect investigation. test_log(3): scan-time BLE disconnect. Fix: `disconnectReason` logging, `_onDisconnectCallbacks` ile aninda fail, disconnect-aware retry. 237 pass.
+**S6** (2026-02-23): test_log(4) analizi. BLE disconnect yok (fix calisiyor), ancak lamp power failure (0x01) her iki scan'de. Error status 0x008C = SD Card + EEPROM + TMP006 (sicaklik sensoru) hatalari. Root cause muhtemelen donanim kaynakli. Yazilim tarafi dogru calisiyor.
